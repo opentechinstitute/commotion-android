@@ -29,13 +29,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.View.OnClickListener;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import android.widget.Button;
-import android.widget.TabHost.OnTabChangeListener;
 
 public class StatusActivity extends android.app.TabActivity {
     private BarnacleApp app;

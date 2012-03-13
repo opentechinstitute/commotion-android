@@ -35,7 +35,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -331,9 +330,6 @@ public class BarnacleApp extends android.app.Application {
         if (!installIfNeeded(newVersion, R.raw.setup, FILE_SCRIPT)) return false;
         if (!installIfNeeded(newVersion, R.raw.run,   "run")) 	  return false;
         if (!installIfNeeded(newVersion, R.raw.wifi,  "wifi"))    return false;
-
-//        if (!installIfNeeded(newVersion, R.raw.dhcp_dnsmasq, "dhcp_dnsmasq")) return false;
-//        if (!installIfNeeded(newVersion, R.raw.dnsmasq, "dnsmasq")) return false;
 
         // unpack all scripts
         String [] scripts = getResources().getStringArray(R.array.script_values);

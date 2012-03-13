@@ -396,7 +396,6 @@ public class BarnacleService extends android.app.Service {
     }
 
     private void clientAdded(ClientData cd) {
-        boolean firstConnect = true;
 
         for (int i = 0; i < clients.size(); ++i) {
             ClientData c = clients.get(i);
@@ -407,7 +406,6 @@ public class BarnacleService extends android.app.Service {
                 }
                 cd.allowed = c.allowed;
                 clients.remove(i); // we'll add it at the end
-                firstConnect = false;
                 break;
             }
         }

@@ -26,13 +26,13 @@
     <string name="announce">Associate</string>
     <string name="noprefs">Please, set your preferences</string>
     <string name="noclients">No clients connected</string>
-    <string name="starting">Starting...</string>
+    <string name="starting">Starting…</string>
     <string name="dataready">Data network is ready</string>
-    <string name="disablewifi">Disabling Wifi Manager...</string>
+    <string name="disablewifi">Disabling Wifi Manager…</string>
     <string name="conflictwifi">Wifi Manager is interfering with Barnacle!</string>
     <string name="waitwifi">Waiting until Wifi is disabled</string>
-    <string name="running">Running...</string>
-    <string name="restarting">Restarting...</string>
+    <string name="running">Running…</string>
+    <string name="restarting">Restarting…</string>
     <string name="beaconing">beaconing ad-hoc network</string>
     <string name="filterok">Connected to NAT</string>
     <string name="filtererr">Could not connect to NAT, will retry later</string>
@@ -105,19 +105,19 @@
         <!-- <item>14</item> -->
     </string-array>
     <string-array name="channel_names">
-        <item>1 - 2412 MHz</item>
-        <item>2 - 2417 MHz</item>
-        <item>3 - 2422 MHz</item>
-        <item>4 - 2427 MHz</item>
-        <item>5 - 2432 MHz</item>
-        <item>6 - 2437 MHz</item>
-        <item>7 - 2442 MHz</item>
-        <item>8 - 2447 MHz</item>
-        <item>9 - 2452 MHz</item>
-        <item>10 - 2457 MHz</item>
-        <item>11 - 2462 MHz</item>
-        <item>12 - 2467 MHz</item>
-        <item>13 - 2472 MHz</item>
+        <item>1 – 2412 MHz</item>
+        <item>2 – 2417 MHz</item>
+        <item>3 – 2422 MHz</item>
+        <item>4 – 2427 MHz</item>
+        <item>5 – 2432 MHz</item>
+        <item>6 – 2437 MHz</item>
+        <item>7 – 2442 MHz</item>
+        <item>8 – 2447 MHz</item>
+        <item>9 – 2452 MHz</item>
+        <item>10 – 2457 MHz</item>
+        <item>11 – 2462 MHz</item>
+        <item>12 – 2467 MHz</item>
+        <item>13 – 2472 MHz</item>
         <!-- <item>14 - 2484 MHz</item> -->
     </string-array>
 
