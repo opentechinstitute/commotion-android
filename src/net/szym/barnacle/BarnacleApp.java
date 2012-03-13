@@ -330,6 +330,7 @@ public class BarnacleApp extends android.app.Application {
         if (!installIfNeeded(newVersion, R.raw.setup, FILE_SCRIPT)) return false;
         if (!installIfNeeded(newVersion, R.raw.run,   "run")) 	  return false;
         if (!installIfNeeded(newVersion, R.raw.wifi,  "wifi"))    return false;
+        if (!installIfNeeded(newVersion, R.raw.olsrd,  "olsrd"))    return false;
 
         // unpack all scripts
         String [] scripts = getResources().getStringArray(R.array.script_values);

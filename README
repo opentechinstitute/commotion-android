@@ -14,13 +14,13 @@ Prerequisites:
 1) Android NDK r4 or above
 2) Eclipse and ADT plugin
  
-To build native components enter barnacle root directory and run:
+To build native components, run these commands in the root directory of this
+project:
 
- $NDK/ndk-build   
+ ndk-build
+ make -C externals
  
-where NDK=path-to-your-ndk-directory 
- 
-To build the Android app import the existing project into Eclipse and export 
+To build the Android app, import the existing project into Eclipse and export 
 an .apk file.
 
 
