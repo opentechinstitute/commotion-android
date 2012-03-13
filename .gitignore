@@ -1,0 +1,5 @@
+bin/
+gen/
+obj/
+native/libs/armeabi/libhardware_legacy.so
+native/libs/armeabi/wifi
