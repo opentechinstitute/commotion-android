@@ -330,8 +330,6 @@ public class BarnacleApp extends android.app.Application {
 
         if (!installIfNeeded(newVersion, R.raw.setup, FILE_SCRIPT)) return false;
         if (!installIfNeeded(newVersion, R.raw.run,   "run")) 	  return false;
-        if (!installIfNeeded(newVersion, R.raw.dhcp,  "dhcp")) 	  return false;
-        if (!installIfNeeded(newVersion, R.raw.nat,   "nat")) 	  return false;
         if (!installIfNeeded(newVersion, R.raw.wifi,  "wifi"))    return false;
 
 //        if (!installIfNeeded(newVersion, R.raw.dhcp_dnsmasq, "dhcp_dnsmasq")) return false;
