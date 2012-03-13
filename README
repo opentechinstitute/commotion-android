@@ -1,31 +1,26 @@
-Barnacle Wifi Tether
+OLSR Mesh Tether
 ====================
 
-Barnacle is a combination of tools to provide wifi tethering 
-on an Android phone:
- * NAT
- * DHCP server
- * WLAN ad-hoc setup
+OLSR Mesh Tether is a combination of tools to provide OLSR mesh networking
+over wifi on an Android phone.  It handles setting up the wifi into ad-hoc
+mode, setting up the IP address, and running the olsrd program.
 
-How to build Barnacle
----------------------
+It is based on the Barnacle Wifi Tether app.
 
-Prerequisites:                                                                                                                                                                                                       
-1) Android NDK r4 or above                                                                                                                                                                                           
-2) Eclipse and ADT plugin                                                                                                                                                                                            
-                                                                                                                                                                                                                     
-To build native components enter barnacle root directory and run                                                                                                                                                     
-$NDK/ndk-build                                                                                                                                                                                                       
-                                                                                                                                                                                                                     
-where NDK=path-to-your-ndk-directory                                                                                                                                                                                 
-                                                                                                                                                                                                                     
-To build the Android app import the existing project into Eclipse and export                                                                                                                                         
+How to build
+------------
+
+Prerequisites:
+1) Android NDK r4 or above
+2) Eclipse and ADT plugin
+ 
+To build native components enter barnacle root directory and run:
+
+ $NDK/ndk-build   
+ 
+where NDK=path-to-your-ndk-directory 
+ 
+To build the Android app import the existing project into Eclipse and export 
 an .apk file.
-
-Questions?
-----------
-
-For more information see: http://szym.net/barnacle/ 
-or e-mail: barnacle@szym.net
 
 

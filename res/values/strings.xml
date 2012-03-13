@@ -18,23 +18,19 @@
 -->
 <resources>
 
-    <string name="app_name">Barnacle Wifi Tether</string>
+    <string name="app_name">OLSR Mesh Tether</string>
     <string name="clientview">Barnacle Clients</string>
     <string name="notify_running">Sharing your connection</string>
     <string name="notify_client">Client connected</string>
     <string name="notify_error">Error occured</string>
-
     <string name="announce">Associate</string>
-
     <string name="noprefs">Please, set your preferences</string>
     <string name="noclients">No clients connected</string>
-
     <string name="starting">Starting...</string>
     <string name="dataready">Data network is ready</string>
     <string name="disablewifi">Disabling Wifi Manager...</string>
     <string name="conflictwifi">Wifi Manager is interfering with Barnacle!</string>
     <string name="waitwifi">Waiting until Wifi is disabled</string>
-
     <string name="running">Running...</string>
     <string name="restarting">Restarting...</string>
     <string name="beaconing">beaconing ad-hoc network</string>
@@ -44,8 +40,6 @@
     <string name="connected">Connected %s</string>
     <string name="renewed">Renewed %s</string>
     <string name="stopped">Stopped</string>
-
-
     <string name="wanerr">Could not find WAN interface</string>
     <string name="wanok">Mobile data interface found: </string>
     <string name="lanok">Wireless interface found: </string>
@@ -59,20 +53,16 @@
     <string name="dirtystop">Warning: did not finish cleanly</string>
     <string name="unexpected">Stopped unexpectedly!</string>
     <string name="exception">Exception occured!</string>
-
     <string name="invalidip">Invalid IP address</string>
     <string name="invalidmac">Invalid MAC address</string>
-
     <string name="wepASC">WEP key must have 5 or 13 characters</string>
     <string name="wepHEX">WEP key must have 10 or 26 hex digit</string>
     <string name="wepHEXhint">10 or 26 hex digits</string>
     <string name="wepASChint">5 or 13 characters</string>
-
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
 
-
-    <!--  DO NOT TRANSLATE -->
+    <!-- DO NOT TRANSLATE -->
     <string name="if_wan">if_wan</string>
     <string name="if_lan">if_lan</string>
     <string name="nat_queue">nat_queue</string>
@@ -92,7 +82,6 @@
     <string name="lan_channel">lan_channel</string>
     <string name="lan_wep">lan_wep</string>
     <string name="lan_wext">lan_wext</string>
-
     <string name="nat_filter">nat_filter</string>
     <string name="nat_ctrl">nat_ctrl</string>
     <string name="nat_preserve">nat_preserve</string>
@@ -113,7 +102,7 @@
         <item>11</item>
         <item>12</item>
         <item>13</item>
-<!--    <item>14</item> -->
+        <!-- <item>14</item> -->
     </string-array>
     <string-array name="channel_names">
         <item>1 - 2412 MHz</item>
@@ -129,15 +118,16 @@
         <item>11 - 2462 MHz</item>
         <item>12 - 2467 MHz</item>
         <item>13 - 2472 MHz</item>
-<!--    <item>14 - 2484 MHz</item> -->
+        <!-- <item>14 - 2484 MHz</item> -->
     </string-array>
 
     <integer-array name="script_ids">
-      <item>-1</item>
-      <item>@raw/script_hero</item> <!-- THIS WORKS! YAY! -->
-      <item>@raw/script_samsung</item>
-      <item>@raw/script_aria</item>
+        <item>-1</item>
+        <item>@raw/script_hero</item> <!-- THIS WORKS! YAY! -->
+        <item>@raw/script_samsung</item>
+        <item>@raw/script_aria</item>
     </integer-array>
+
     <string-array name="script_values">
         <item></item>
         <item>hero</item>
@@ -150,16 +140,15 @@
         <item>Samsung</item>
         <item>Aria/Liberty (see blog)</item>
     </string-array>
-
     <string-array name="wep_type">
-      <item>ASCII</item>
-      <item>Hex</item>
+        <item>ASCII</item>
+        <item>Hex</item>
     </string-array>
 
     <string name="websiteUrl">http://szym.net/barnacle/</string>
     <string name="fixUrl">http://szym.net/barnacle/fix/</string>
     <string name="rootUrl">http://szym.net/barnacle/faq/#root</string>
     <string name="wikiUrl">http://github.com/szym/barnacle/wiki</string>
-    <string name="paypalUrl">https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=U3GSAVQDS3UK6&amp;lc=US&amp;item_name=szym%2enet&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted</string>
+    <string name="paypalUrl">https://www.paypal.com/</string>
 
 </resources>
