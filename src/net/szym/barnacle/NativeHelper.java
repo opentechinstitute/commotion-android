@@ -76,6 +76,9 @@ public class NativeHelper {
 		chmod("0750", new File(RUN));
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(WIFI));
+		chmod("0750", new File(app_bin, "script_aria"));
+		chmod("0750", new File(app_bin, "script_hero"));
+		chmod("0750", new File(app_bin, "script_samsung"));
 		return result;
 	}
 

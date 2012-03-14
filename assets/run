@@ -6,7 +6,6 @@ cd ${brncl_path:-.}
 # load the driver
 # NOTE: Android's shell is ash and there is no "test" or "["
 : ${brncl_lan_script:=wifi}
-chmod 750 ./$brncl_lan_script
 ./$brncl_lan_script load
 
 # necessary hack for HTC phones

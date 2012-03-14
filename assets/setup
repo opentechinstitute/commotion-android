@@ -38,7 +38,5 @@ export brncl_path
 # for init.rc parsing
 export brncl_hardware="`getprop ro.hardware`"
 
-
-chmod 750 wifi run
 exec su -c ${1:-${brncl_path}/run}
 
