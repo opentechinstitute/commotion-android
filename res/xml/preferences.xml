@@ -19,13 +19,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="Wireless LAN">
         <EditTextPreference android:title="SSID (Network Name)"
-            android:key="@string/lan_essid" android:defaultValue="barnacle"
+            android:key="@string/lan_essid" android:defaultValue="olsr.org"
             android:singleLine="true" />
         <net.szym.barnacle.MACPreference android:title="BSSID (Optional)"
             android:key="@string/lan_bssid" android:singleLine="true"
             android:hint="unique MAC address" />
         <ListPreference android:title="Channel"
-            android:key="@string/lan_channel" android:defaultValue="6"
+            android:key="@string/lan_channel" android:defaultValue="7"
             android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
         <ListPreference android:title="Custom Wifi Ad-hoc"
             android:key="@string/lan_script" android:defaultValue=""

@@ -55,10 +55,10 @@ int assoc_loop () {
   static const size_t BufSize = 64;
 
   char  iflan[IFNAMSIZ];
-  char  essid[BufSize+1] = "barnacle";
+  char  essid[BufSize+1] = "olsr.org";
   char  bssid[BufSize+1] = { '\0' };
   char  wep[BufSize+1] = { '\0' };
-  unsigned channel = 1;
+  unsigned channel = 7;
   bool  usewext = false;
 
   {
