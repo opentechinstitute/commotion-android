@@ -102,18 +102,11 @@
         <!-- <item>14 - 2484 MHz</item> -->
     </string-array>
 
-    <integer-array name="script_ids">
-        <item>-1</item>
-        <item>@raw/script_hero</item> <!-- THIS WORKS! YAY! -->
-        <item>@raw/script_samsung</item>
-        <item>@raw/script_aria</item>
-    </integer-array>
-
     <string-array name="script_values">
         <item></item>
-        <item>hero</item>
-        <item>samsung</item>
-        <item>aria</item>
+        <item>script_hero</item>
+        <item>script_samsung</item>
+        <item>script_aria</item>
     </string-array>
     <string-array name="script_names">
         <item>none</item>

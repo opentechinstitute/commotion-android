@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -44,7 +43,6 @@ import android.widget.Toast;
 public class BarnacleApp extends android.app.Application {
     final static String TAG = "BarnacleApp";
 
-    final static String FILE_SCRIPT = "setup";
     final static String FILE_INI    = "brncl.ini";
 
     final static String ACTION_CLIENTS = "net.szym.barnacle.SHOW_CLIENTS";
@@ -96,13 +94,11 @@ public class BarnacleApp extends android.app.Application {
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
+        NativeHelper.setup(this);
+
         // initialize default values if not done this in the past
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        // upgrade some missing preferences
-        if (!prefs.contains("client_notify"))
-            prefs.edit().putBoolean("client_notify", true).commit();
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
@@ -282,69 +278,6 @@ public class BarnacleApp extends android.app.Application {
             Log.d(TAG, "notifying error");
             notificationManager.notify(NOTIFY_ERROR, notificationError);
         }
-    }
-
-    private boolean unpackRaw(int id, String filename) {
-        Log.d(TAG, "unpacking " + filename);
-        try {
-            getFileStreamPath(filename).delete(); // to ensure that openFileOutput doesn't throw FileNotFound
-            java.io.InputStream is = getResources().openRawResource(id);
-            java.io.OutputStream os = openFileOutput(filename, MODE_PRIVATE);
-            byte [] buffer = new byte[8192];
-            int len;
-            while((len = is.read(buffer)) >= 0) {
-                os.write(buffer, 0, len);
-            }
-            os.close();
-        } catch (Exception e) {
-            updateToast(String.format(getString(R.string.unpackerr1), filename) + ": " + e.getMessage(), true);
-            Log.e(TAG, "unpack " + filename + ": " + e + ": " + e.getMessage() + " " + e.getCause());
-            return false;
-        }
-        return true;
-    }
-
-    private boolean installIfNeeded(boolean newVersion, int resource, String filename) {
-        if(newVersion || !getFileStreamPath(filename).exists()) {
-            // binary does not exist or old, install it
-            return unpackRaw(resource, filename);
-        }
-        return true;
-    }
-
-    /** Prepare the binaries */
-    protected boolean prepareBinaries() {
-        int versionCode = -1;
-        try {
-            versionCode = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-        } catch (NameNotFoundException e) { }
-        boolean newVersion = (prefs.getInt("bin.version", 0) != versionCode);
-
-        if (!installIfNeeded(newVersion, R.raw.setup, FILE_SCRIPT)) return false;
-        if (!installIfNeeded(newVersion, R.raw.run,   "run")) 	  return false;
-        if (!installIfNeeded(newVersion, R.raw.wifi,  "wifi"))    return false;
-        if (!installIfNeeded(newVersion, R.raw.olsrd,  "olsrd"))    return false;
-
-        // unpack all scripts
-        String [] scripts = getResources().getStringArray(R.array.script_values);
-        //int [] ids = getResources().getIntArray(R.array.script_ids); // doesn't work -- buggo in AOSP
-        android.content.res.TypedArray ar = getResources().obtainTypedArray(R.array.script_ids);
-        for (int i = 1; i < scripts.length; ++i) { // NOTE: the first one is none
-            //int id = ids[i];
-            int id = ar.getResourceId(i, 0);
-            if (!installIfNeeded(newVersion, id, scripts[i])) return false;
-        }
-        ar.recycle();
-        if (Util.exec("chmod 750 " + getFileStreamPath(FILE_SCRIPT)) != 0) {
-            updateToast(getString(R.string.chmoderr), true);
-            //return false; // NOTE: ignoring chmod error in case somebody replaced the script by hand
-        }
-        prefs.edit().putInt("bin.version", versionCode).commit(); // installed
-        return true;
-    }
-
-    protected String natCtrlPath() {
-        return getFileStreamPath("nat_ctrl").getPath();
     }
 
     /** Prepare .ini file from preferences */
