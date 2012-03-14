@@ -23,14 +23,11 @@ import java.util.ArrayList;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.AdapterView;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.TextView;
-import android.widget.BaseAdapter;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
 public class ClientsActivity extends android.app.ListActivity {
     private BarnacleApp app;
@@ -79,36 +76,11 @@ public class ClientsActivity extends android.app.ListActivity {
                 holder.ipaddress.setText(client.ip);
                 holder.hostname.setText(client.hostname != null ? client.hostname : "[ none ]");
                 holder.allowed.setChecked(client.allowed);
-                if (app.service != null && app.service.hasFiltering()) {
-                    holder.allowed.setVisibility(CheckBox.VISIBLE);
-                    holder.allowed.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            client.allowed = isChecked;
-                            if (app.service != null) {
-                                app.service.filterRequest(client.mac, client.allowed);
-                            } else {
-                                buttonView.setVisibility(View.INVISIBLE); // is it not confusing?
-                            }
-                        }
-                    });
-                } else {
-                    holder.allowed.setVisibility(View.INVISIBLE);
-                }
                 return convertView;
             }
         };
         setListAdapter(adapter);
         setTitle(getString(R.string.clientview));
-        getListView().setLongClickable(true);
-        getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View v,
-                    int position, long id) {
-                app.dmzRequest(clients.get(position).ip);
-                return true;
-            }
-        });
         getListView().setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View v, int arg2,

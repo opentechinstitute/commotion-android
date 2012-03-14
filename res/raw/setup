@@ -12,22 +12,8 @@ set -e
 # lan_netmask
 # lan_essid
 # lan_bssid
-# lan_wep
 # lan_channel
 # lan_script
-# dhcp_dns1
-# dhcp_dns2
-# dhcp_leasetime
-# dhcp_firstname
-# dhcp_numhosts
-# nat_queue
-# nat_timeout
-# nat_timeout_tcp
-# nat_firstport
-# nat_numports
-# nat_log
-# nat_ctrl
-# nat_preserve
 
 . ./brncl.ini
 
@@ -52,9 +38,7 @@ export brncl_path
 # for init.rc parsing
 export brncl_hardware="`getprop ro.hardware`"
 
-# NOTE: it would be very unsafe to have this in ./run
-rm $brncl_nat_ctrl 2>/dev/null || true
 
-chmod 750 wifi dhcp nat run
+chmod 750 wifi run
 exec su -c ${1:-${brncl_path}/run}
 

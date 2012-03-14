@@ -21,13 +21,11 @@ package net.szym.barnacle;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -242,11 +240,6 @@ public class BarnacleApp extends android.app.Application {
             notificationManager.notify(NOTIFY_CLIENT, notificationClientAdded);
         }
 
-        if (prefs.getBoolean("client_allow", false)) {
-            cd.allowed = true;
-            service.filterRequest(cd.mac, true);
-        }
-
         if (clientsActivity != null)
             clientsActivity.update();
     }
@@ -365,12 +358,6 @@ public class BarnacleApp extends android.app.Application {
                 if (ids[i] == R.string.lan_essid) {
                     v = '"'+v+'"';
                 }
-                if (ids[i] == R.string.lan_wep) {
-                    String pass = WEPPreference.getAsciiContent(v);
-                    if (pass != null) {
-                        v = Util.asc2hex(pass);
-                    }
-                }
                 sb.append("brncl_").append(k).append('=').append(v).append('\n');
             }
         }
@@ -382,9 +369,6 @@ public class BarnacleApp extends android.app.Application {
                 sb.append("brncl_").append(k).append("=1\n");
         }
 
-        sb.append("brncl_nat_ctrl=").append(natCtrlPath()).append('\n');
-        String preservedPorts = prefs.getString(getString(R.string.nat_preserve), "");
-        sb.append("brncl_nat_preserve=").append(Util.toCommaList(preservedPorts)).append('\n');
         sb.append("brncl_path=").append(getFilesDir()).append('\n');
 
         /*
@@ -439,36 +423,6 @@ public class BarnacleApp extends android.app.Application {
         // NOTE: always use the name found by the process
         if_lan = found_if_lan;
         prefs.edit().putString(getString(R.string.if_lan), if_lan).commit();
-    }
-
-    public void dmzRequest(final String ip) {
-        if (service != null) {
-            String preservedPorts = prefs.getString(getString(R.string.nat_preserve), "");
-            if (preservedPorts.length() > 0) {
-                (new AlertDialog.Builder(clientsActivity))
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Port Forwarding")
-                .setMessage(String.format("Would you like to forward ports %s to %s?", preservedPorts, ip))
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        service.dmzRequest(ip);
-                    }})
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }})
-                .create().show();
-            } else {
-                (new AlertDialog.Builder(clientsActivity))
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle("Port Forwarding")
-                .setMessage("Define some preserved ports in NAT settings first.")
-                .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) { dialog.dismiss(); }})
-                .create().show();
-            }
-        }
     }
 
     void cleanUpNotifications() {

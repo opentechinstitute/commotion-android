@@ -55,37 +55,18 @@
     <string name="exception">Exception occured!</string>
     <string name="invalidip">Invalid IP address</string>
     <string name="invalidmac">Invalid MAC address</string>
-    <string name="wepASC">WEP key must have 5 or 13 characters</string>
-    <string name="wepHEX">WEP key must have 10 or 26 hex digit</string>
-    <string name="wepHEXhint">10 or 26 hex digits</string>
-    <string name="wepASChint">5 or 13 characters</string>
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
 
     <!-- DO NOT TRANSLATE -->
     <string name="if_wan">if_wan</string>
     <string name="if_lan">if_lan</string>
-    <string name="nat_queue">nat_queue</string>
-    <string name="nat_timeout">nat_timeout</string>
-    <string name="nat_timeout_tcp">nat_timeout_tcp</string>
-    <string name="nat_numports">nat_numports</string>
-    <string name="nat_firstport">nat_firstport</string>
-    <string name="dhcp_numhosts">dhcp_numhosts</string>
-    <string name="dhcp_firsthost">dhcp_firsthost</string>
-    <string name="dhcp_leasetime">dhcp_leasetime</string>
-    <string name="dhcp_dns1">dhcp_dns1</string>
-    <string name="dhcp_dns2">dhcp_dns2</string>
     <string name="lan_netmask">lan_netmask</string>
     <string name="lan_gw">lan_gw</string>
     <string name="lan_essid">lan_essid</string>
     <string name="lan_bssid">lan_bssid</string>
     <string name="lan_channel">lan_channel</string>
-    <string name="lan_wep">lan_wep</string>
     <string name="lan_wext">lan_wext</string>
-    <string name="nat_filter">nat_filter</string>
-    <string name="nat_ctrl">nat_ctrl</string>
-    <string name="nat_preserve">nat_preserve</string>
-    <string name="nat_log">nat_log</string>
     <string name="lan_script">lan_script</string>
 
     <string-array name="channel_values">
@@ -139,10 +120,6 @@
         <item>Hero/Eris</item>
         <item>Samsung</item>
         <item>Aria/Liberty (see blog)</item>
-    </string-array>
-    <string-array name="wep_type">
-        <item>ASCII</item>
-        <item>Hex</item>
     </string-array>
 
     <string name="websiteUrl">http://szym.net/barnacle/</string>

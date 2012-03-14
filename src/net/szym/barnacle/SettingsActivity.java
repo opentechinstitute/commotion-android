@@ -21,19 +21,17 @@ package net.szym.barnacle;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
-import android.preference.PreferenceActivity;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.widget.Toast;
 
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
     final static int[] prefids = {
         R.string.if_lan, R.string.if_wan,
-        R.string.lan_gw, R.string.lan_netmask, R.string.lan_essid, R.string.lan_bssid, R.string.lan_wep, R.string.lan_channel,
-        R.string.dhcp_firsthost, R.string.dhcp_numhosts, R.string.dhcp_leasetime, R.string.dhcp_dns1, R.string.dhcp_dns2,
-        R.string.nat_firstport, R.string.nat_numports, R.string.nat_queue, R.string.nat_timeout, R.string.nat_timeout_tcp,
+        R.string.lan_gw, R.string.lan_netmask, R.string.lan_essid, R.string.lan_bssid, R.string.lan_channel,
         R.string.lan_script
     };
-    final static int[] checks = { R.string.nat_filter, R.string.nat_log, R.string.lan_wext };
+    final static int[] checks = { R.string.lan_wext };
 
     private void setSummary(Preference p, CharSequence s) {
         if ((s != null) && (s.length() > 0)) {

@@ -18,8 +18,6 @@
 
 package net.szym.barnacle;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,8 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
-import android.net.LocalSocket;
-import android.net.LocalSocketAddress;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -56,7 +52,6 @@ public class BarnacleService extends android.app.Service {
     final static int MSG_STOP       = 6;
     final static int MSG_ASSOC      = 7;
     final static int MSG_STATS      = 8;
-    final static int MSG_FILTER     = 9;
     // app states
     public final static int STATE_STOPPED  = 0;
     public final static int STATE_STARTING = 1;
@@ -65,7 +60,6 @@ public class BarnacleService extends android.app.Service {
     // private state
     private int state = STATE_STOPPED;
     private Process process = null; // the barnacle process
-    private LocalSocket nat_ctrl = null;
     // output monitoring threads
     private Thread[] threads = new Thread[2];
     private PowerManager.WakeLock wakeLock;
@@ -114,14 +108,6 @@ public class BarnacleService extends android.app.Service {
 
     public void assocRequest() {
         mHandler.sendEmptyMessage(MSG_ASSOC);
-    }
-
-    public void filterRequest(String mac, boolean allowed) {
-        mHandler.obtainMessage(MSG_FILTER, (allowed ? "MACA|" : "MACD|") + mac).sendToTarget();
-    }
-
-    public void dmzRequest(String ip) {
-        mHandler.obtainMessage(MSG_FILTER, "DMZ|" + ip).sendToTarget();
     }
 
     public void stopRequest() {
@@ -260,8 +246,6 @@ public class BarnacleService extends android.app.Service {
                 if_lan = parts[2];
                 if_mac = Util.MACAddress.parse(parts[3]);
                 if (state == STATE_STARTING) {
-                    connectToNat();
-
                     state = STATE_RUNNING;
                     log(false, getString(R.string.running));
                     clients.clear();
@@ -292,12 +276,16 @@ public class BarnacleService extends android.app.Service {
             Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, process == null ? "null" : "proc"));
             if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                 // wifi is good (or lost), we can start now...
-                if ((state == STATE_STARTING) && (process == null) && checkUplink()) {
+            	// TODO for mesh, we don't check the uplink first, but is it useful somehow else?
+                //if ((state == STATE_STARTING) && (process == null) && checkUplink()) {
+            	if ((state == STATE_STARTING) && (process == null)) {
                     log(false, getString(R.string.dataready));
                     if (!app.findIfWan()) {
-                        log(true, getString(R.string.wanerr));
-                        state = STATE_STOPPED;
-                        break;
+                    	// TODO if WAN found, then setup Hna4 routing
+                        ///log(true, getString(R.string.wanerr));
+                        //state = STATE_STOPPED;
+                        //break;
+                        log(false, "no active WAN interface found");
                     }
                     if (!app.prepareIni()) {
                         log(true, getString(R.string.inierr));
@@ -346,12 +334,6 @@ public class BarnacleService extends android.app.Service {
                 mHandler.removeMessages(MSG_ASSOC);
                 // rebeacon, in 5 seconds
                 mHandler.sendEmptyMessageDelayed(MSG_ASSOC, 5000);
-            }
-            break;
-        case MSG_FILTER:
-            if (state != STATE_RUNNING) return;
-            if (tellNat((String)msg.obj)) {
-                app.updateToast(getString(R.string.filterupdated), false);
             }
             break;
         case MSG_STATS:
@@ -411,9 +393,6 @@ public class BarnacleService extends android.app.Service {
         }
         clients.add(cd);
 
-        if (nat_ctrl == null)
-            connectToNat(); // re-attempt to connect
-
         log(false, String.format(getString(R.string.connected), cd.toNiceString()));
         app.clientAdded(cd);
 
@@ -447,62 +426,12 @@ public class BarnacleService extends android.app.Service {
         return true;
     }
 
-    private void connectToNat() {
-        nat_ctrl = new LocalSocket();
-        for (int i = 0; i < 3; ++i) {
-            try {
-                nat_ctrl.connect(
-                    new LocalSocketAddress(
-                        app.natCtrlPath(),
-                        LocalSocketAddress.Namespace.FILESYSTEM
-                    )
-                ); // NOTE: TIMEOUT IS NOT SUPPORTED!
-                log(false, getString(R.string.filterok));
-
-                if (app.prefs.getBoolean(getString(R.string.nat_filter), false)) {
-                    filteringEnabled = tellNat("FILT|1");
-                }
-                return;
-            } catch (java.io.IOException e) {
-                Log.e(TAG, "LocalSocket.connect to '" + app.natCtrlPath() +
-                          "' failed: " + e.toString());
-            }
-            try {
-                Thread.sleep(100); // this is so wrong -- service should not halt
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
-        log(false, getString(R.string.filtererr));
-        try {
-            nat_ctrl.close();
-        } catch (IOException e) {}
-        nat_ctrl = null;
-    }
-
     private boolean tellProcess(String msg) {
         if (process != null) {
             try {
                 process.getOutputStream().write((msg+"\n").getBytes());
                 return true;
             } catch (Exception e) {} // just ignore it
-        }
-        return false;
-    }
-
-    private boolean tellNat(String msg) {
-        if (nat_ctrl != null) {
-            Log.d(TAG, "tellNat " + msg);
-            try {
-                DataOutputStream dos = new DataOutputStream(nat_ctrl.getOutputStream());
-                assert msg.length() < 256;
-                dos.writeByte(msg.length());
-                dos.writeBytes(msg);
-                return true;
-            } catch (Exception e) {
-                log(true, getString(R.string.filtererr));
-                nat_ctrl = null;
-            }
         }
         return false;
     }
@@ -534,7 +463,6 @@ public class BarnacleService extends android.app.Service {
             process = null;
             threads[0].interrupt();
             threads[1].interrupt();
-            nat_ctrl = null;
         }
     }
 
