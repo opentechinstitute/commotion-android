@@ -29,7 +29,7 @@
 #define ERR(...) { fprintf(stderr, TAG __VA_ARGS__); fflush(stderr); }
 #define LOG(...) { flock(1, LOCK_EX); fprintf(stdout, TAG __VA_ARGS__); fflush(stdout); flock(1, LOCK_UN); }
 
-#ifdef ANDROID
+#ifdef __ANDROID__
 extern "C" {
 #include <android/log.h>
 }
