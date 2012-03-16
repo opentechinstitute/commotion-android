@@ -43,8 +43,6 @@
     <string name="wanerr">Could not find WAN interface</string>
     <string name="wanok">Mobile data interface found: </string>
     <string name="lanok">Wireless interface found: </string>
-    <string name="inierr">Could not prepare .ini</string>
-    <string name="iniok">.ini file prepared</string>
     <string name="starterr">Could not start the process!</string>
     <string name="unpackerr">Could not unpack binaries</string>
     <string name="unpackerr1">Could not unpack %s"</string>

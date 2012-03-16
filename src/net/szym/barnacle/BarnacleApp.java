@@ -280,49 +280,6 @@ public class BarnacleApp extends android.app.Application {
         }
     }
 
-    /** Prepare .ini file from preferences */
-    protected boolean prepareIni() {
-        StringBuilder sb = new StringBuilder();
-        final int[] ids = SettingsActivity.prefids;
-        for (int i = 0; i < ids.length; ++i) {
-            String k = getString(ids[i]);
-            String v = prefs.getString(k, null);
-            if (v != null && v.length() != 0) {
-                if (ids[i] == R.string.lan_essid) {
-                    v = '"'+v+'"';
-                }
-                sb.append("brncl_").append(k).append('=').append(v).append('\n');
-            }
-        }
-        // not included in prefids are checkboxes
-        final int[] checks = SettingsActivity.checks;
-        for (int i = 0; i < checks.length; ++i) {
-            String k = getString(checks[i]);
-            if (prefs.getBoolean(k, false))
-                sb.append("brncl_").append(k).append("=1\n");
-        }
-
-        sb.append("brncl_path=").append(getFilesDir()).append('\n');
-
-        /*
-        if (sb.length() == 0) {
-            // wow, no preferences?
-            updateToast(getString(R.string.noprefs), false);
-            PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
-            statusActivity.startActivity(new Intent(this, SettingsActivity.class));
-            return false;
-        }
-        */
-        try {
-            java.io.OutputStream os = openFileOutput(FILE_INI, MODE_PRIVATE);
-            os.write(sb.toString().getBytes());
-            os.close();
-            return true;
-        } catch (java.io.IOException e) {
-            return false;
-        }
-    }
-
     /** find default route interface */
     protected boolean findIfWan() {
         String if_wan = prefs.getString(getString(R.string.if_wan), "");

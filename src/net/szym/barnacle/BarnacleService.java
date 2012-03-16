@@ -21,12 +21,14 @@ package net.szym.barnacle;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -34,6 +36,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
@@ -264,7 +267,8 @@ public class BarnacleService extends android.app.Service {
             log.clear();
             log(false, getString(R.string.starting));
 
-            if (!app.prepareBinaries()) {
+            // TODO make this only overwrite on upgrade to new version
+            if (!NativeHelper.unzipAssets(this)) {
                 log(true, getString(R.string.unpackerr));
                 state = STATE_STOPPED;
                 break;
@@ -276,23 +280,16 @@ public class BarnacleService extends android.app.Service {
             Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, process == null ? "null" : "proc"));
             if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                 // wifi is good (or lost), we can start now...
-            	// TODO for mesh, we don't check the uplink first, but is it useful somehow else?
-                //if ((state == STATE_STARTING) && (process == null) && checkUplink()) {
             	if ((state == STATE_STARTING) && (process == null)) {
-                    log(false, getString(R.string.dataready));
-                    if (!app.findIfWan()) {
-                    	// TODO if WAN found, then setup Hna4 routing
+            		if (app.findIfWan()) {
+            			// TODO if WAN found with checkUplink(), then setup Hna4 routing
+            			log(false, "Found active WAN interface");
+            		} else {
                         ///log(true, getString(R.string.wanerr));
                         //state = STATE_STOPPED;
                         //break;
                         log(false, "no active WAN interface found");
                     }
-                    if (!app.prepareIni()) {
-                        log(true, getString(R.string.inierr));
-                        state = STATE_STOPPED;
-                        break;
-                    }
-                    log(false, getString(R.string.iniok));
                     if (!startProcess()) {
                         log(true, getString(R.string.starterr));
                         state = STATE_STOPPED;
@@ -407,19 +404,61 @@ public class BarnacleService extends android.app.Service {
         return (mobileInfo.isConnected() || ((wimaxInfo != null) && wimaxInfo.isConnected()));
     }
 
+    /** Prepare env vars for ./wifi from preferences */
+    protected String[] buildEnvFromPrefs() {
+    	ArrayList<String> envlist = new ArrayList<String>();
+
+    	// get the existing environment first, since many programs like 'su' require 
+    	// env vars like LD_LIBRARY_PATH to be set
+    	Map<String, String> env = System.getenv();
+    	for (String envName : env.keySet()) {
+    		envlist.add(envName + "=" + env.get(envName));
+    	}
+
+    	// initialize default values if not done this in the past
+    	PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+    	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+    	final int[] ids = SettingsActivity.prefids;
+    	for (int i = 0; i < ids.length; ++i) {
+    		String k = getString(ids[i]);
+    		String v = prefs.getString(k, null);
+    		if (v != null && v.length() != 0) {
+    			if (ids[i] == R.string.lan_essid) {
+    				v = '"'+v+'"';
+    			}
+    			envlist.add("brncl_" + k + "=" + v);
+    		}
+    	}
+    	// not included in prefids are checkboxes
+    	final int[] checks = SettingsActivity.checks;
+    	for (int i = 0; i < checks.length; ++i) {
+    		String k = getString(checks[i]);
+    		if (prefs.getBoolean(k, false))
+    			envlist.add("brncl_" + k + "=1");
+    	}
+    	envlist.add("brncl_path=" + NativeHelper.app_bin.getAbsolutePath());
+
+    	String[] ret = (String[]) envlist.toArray(new String[0]);
+    	for (String s : ret) {
+    		Log.i(TAG, "env var: " + s);
+    	}
+    	return ret;
+    }
+
     private boolean startProcess() {
-        // start the process
+    	String cmd = NativeHelper.SETUP;
         try {
-            ProcessBuilder pb = new ProcessBuilder();
-            pb.command("./" + BarnacleApp.FILE_SCRIPT).directory(getFilesDir());
-            // TODO: consider putting brncl.ini in pb.environment() instead of using ./setup
-            process = pb.start(); //Runtime.getRuntime().exec(cmd);
+            process = Runtime.getRuntime().exec(cmd,
+            		buildEnvFromPrefs(), NativeHelper.app_bin);
             threads[0] = new Thread(new OutputMonitor(MSG_OUTPUT, process.getInputStream()));
             threads[1] = new Thread(new OutputMonitor(MSG_ERROR, process.getErrorStream()));
             threads[0].start();
             threads[1].start();
+            log(false, "started " + cmd);
+            Log.i(TAG, "started " + cmd);
         } catch (Exception e) {
-            log(true, String.format(getString(R.string.execerr), BarnacleApp.FILE_SCRIPT));
+            log(true, String.format(getString(R.string.execerr), cmd));
             Log.e(TAG, "start failed " + e.toString());
             return false;
         }

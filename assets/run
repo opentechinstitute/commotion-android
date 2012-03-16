@@ -1,22 +1,50 @@
 #!/system/bin/sh
 # main runner (process manager) for barnacle, root required
 
-cd ${brncl_path:-.}
+echo "running $0"
+
+# set defaults
+: ${brncl_lan_gw:="192.168.5.1"}
+: ${brncl_lan_netmask:="255.255.255.0"}
+: ${brncl_if_lan:="`getprop wifi.interface`"}
+: ${brncl_path:=.}
+
+# for init.rc parsing
+: ${brncl_hardware:="`getprop ro.hardware`"}
+
+export brncl_lan_gw
+export brncl_lan_netmask
+export brncl_if_lan
+export brncl_path
+export brncl_hardware
+
+# log environment for debugging
+set > $brncl_path/../app_log/setup_environment.log 2>&1
+
+
+cd $brncl_path
 
 # load the driver
 # NOTE: Android's shell is ash and there is no "test" or "["
 : ${brncl_lan_script:=wifi}
+echo "./$brncl_lan_script load"
 ./$brncl_lan_script load
 
 # necessary hack for HTC phones
-type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
+#type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
 
 # ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
+echo "./wifi config"
 ./wifi config
 
+# run olsrd
+echo "starting olsrd"
+(./olsrd -f olsrd.conf -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
+
 # the association loop
+echo "./wifi assoc"
 ./wifi assoc
 
 # cleanup
+echo "./wifi unload"
 ./wifi unload
-
