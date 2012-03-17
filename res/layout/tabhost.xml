@@ -82,7 +82,8 @@
                 android:layout_width="fill_parent" android:layout_height="wrap_content">
                 <TextView android:id="@+id/log_text"
                     android:layout_width="fill_parent" android:layout_height="wrap_content"
-                    android:scrollHorizontally="false" android:gravity="top|left" />
+                    android:scrollHorizontally="false" android:gravity="top|left" 
+                    android:autoLink="web" />
             </ScrollView>
 
         </FrameLayout>
