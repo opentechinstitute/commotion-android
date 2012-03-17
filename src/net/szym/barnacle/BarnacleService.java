@@ -447,7 +447,8 @@ public class BarnacleService extends android.app.Service {
     }
 
     private boolean startProcess() {
-    	String cmd = NativeHelper.SETUP;
+    	// calling 'su -c' from Java doesn't work so we use a helper script
+    	String cmd = NativeHelper.SU_C;
         try {
             process = Runtime.getRuntime().exec(cmd,
             		buildEnvFromPrefs(), NativeHelper.app_bin);

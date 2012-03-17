@@ -18,7 +18,7 @@ public class NativeHelper {
 	public static File app_bin;
 	public static File app_log;
 
-    static String SETUP;
+    static String SU_C;
     static String RUN;
     static String OLSRD;
     static String WIFI;
@@ -26,7 +26,7 @@ public class NativeHelper {
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
 		app_log = context.getDir("log", Context.MODE_PRIVATE).getAbsoluteFile();
-		SETUP = new File(app_bin, "setup").getAbsolutePath();
+		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		RUN = new File(app_bin, "run").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		WIFI = new File(app_bin, "wifi").getAbsolutePath();
@@ -72,7 +72,7 @@ public class NativeHelper {
 			result = false;
 			Log.e(BarnacleApp.TAG, "Can't unzip", e);
 		}
-		chmod("0750", new File(SETUP));
+		chmod("0750", new File(SU_C));
 		chmod("0750", new File(RUN));
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(WIFI));

@@ -1,0 +1,5 @@
+#!/system/bin/sh
+#
+# calling 'su -c' from Java doesn't work so we use a helper script
+
+exec su -c ${1:-${brncl_path}/run}
