@@ -60,7 +60,7 @@
     <PreferenceCategory android:title="Advanced">
         <PreferenceScreen android:title="IPv4" android:summary="IPv4 Host Configuration">
             <net.szym.barnacle.IPPreference android:title="Gateway"
-                android:key="@string/lan_gw" android:defaultValue="192.168.5.1"
+                android:key="@string/lan_gw"
                 android:singleLine="true" />
             <net.szym.barnacle.IPPreference android:title="Netmask"
                 android:key="@string/lan_netmask" android:defaultValue="255.255.255.0"

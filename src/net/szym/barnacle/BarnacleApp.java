@@ -100,6 +100,15 @@ public class BarnacleApp extends android.app.Application {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
+        // if IP address isn't set, generate one
+        if (prefs.getString(getString(R.string.lan_gw), "").equals("")) {
+        	SharedPreferences.Editor e = prefs.edit();
+        	String myIP = "172.29." + String.valueOf((int)(Math.random() * 255)) + "." + String.valueOf((int)(Math.random() * 255));
+        	e.putString(getString(R.string.lan_gw), myIP);
+        	e.commit();
+        	Log.i(TAG, "Generated IP: " + myIP);
+        }
+        
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         notification = new Notification(R.drawable.barnacle, getString(R.string.notify_running), 0);

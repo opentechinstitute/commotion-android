@@ -4,8 +4,8 @@
 echo "running $0"
 
 # set defaults
-: ${brncl_lan_gw:="192.168.5.1"}
-: ${brncl_lan_netmask:="255.255.255.0"}
+: ${brncl_lan_gw:="172.29.5.1"}
+: ${brncl_lan_netmask:="255.255.0.0"}
 : ${brncl_if_lan:="`getprop wifi.interface`"}
 : ${brncl_path:=.}
 
