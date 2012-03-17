@@ -27,24 +27,21 @@ cd $brncl_path
 # load the driver
 # NOTE: Android's shell is ash and there is no "test" or "["
 : ${brncl_lan_script:=wifi}
-echo "./$brncl_lan_script load"
+
 ./$brncl_lan_script load
 
 # necessary hack for HTC phones
-#type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
+type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
 
 # ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
-echo "./wifi config"
 ./wifi config
 
 # run olsrd
-echo "starting olsrd"
 (./olsrd -f olsrd.conf -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
+echo "OLSR on http://${brncl_lan_gw}:8080"
 
 # the association loop
-echo "./wifi assoc"
 ./wifi assoc
 
 # cleanup
-echo "./wifi unload"
 ./wifi unload

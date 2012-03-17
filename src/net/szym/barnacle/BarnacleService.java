@@ -412,7 +412,12 @@ public class BarnacleService extends android.app.Service {
     	// env vars like LD_LIBRARY_PATH to be set
     	Map<String, String> env = System.getenv();
     	for (String envName : env.keySet()) {
-    		envlist.add(envName + "=" + env.get(envName));
+    		if (envName.equals("LD_LIBRARY_PATH")) {
+    			// set LD_LIBRARY_PATH to load olsrd plugins
+    			envlist.add(envName + "=" + NativeHelper.app_bin.getAbsolutePath() + ":" + env.get(envName));    			
+    		} else {
+    			envlist.add(envName + "=" + env.get(envName));
+    		}
     	}
 
     	// initialize default values if not done this in the past
@@ -424,9 +429,10 @@ public class BarnacleService extends android.app.Service {
     		String k = getString(ids[i]);
     		String v = prefs.getString(k, null);
     		if (v != null && v.length() != 0) {
-    			if (ids[i] == R.string.lan_essid) {
-    				v = '"'+v+'"';
-    			}
+    			// TODO some chars need to be escaped, but this seems to add "" to the ESSID name
+//    			if (ids[i] == R.string.lan_essid) {
+//    				v = '"'+v+'"';
+//    			}
     			envlist.add("brncl_" + k + "=" + v);
     		}
     	}
@@ -456,8 +462,6 @@ public class BarnacleService extends android.app.Service {
             threads[1] = new Thread(new OutputMonitor(MSG_ERROR, process.getErrorStream()));
             threads[0].start();
             threads[1].start();
-            log(false, "started " + cmd);
-            Log.i(TAG, "started " + cmd);
         } catch (Exception e) {
             log(true, String.format(getString(R.string.execerr), cmd));
             Log.e(TAG, "start failed " + e.toString());
