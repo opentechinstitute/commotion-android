@@ -63,7 +63,7 @@
                 android:key="@string/lan_gw"
                 android:singleLine="true" />
             <net.szym.barnacle.IPPreference android:title="Netmask"
-                android:key="@string/lan_netmask" android:defaultValue="255.255.255.0"
+                android:key="@string/lan_netmask" android:defaultValue="255.255.0.0"
                 android:singleLine="true" />
         </PreferenceScreen>
     </PreferenceCategory>
