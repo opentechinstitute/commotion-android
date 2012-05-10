@@ -65,6 +65,9 @@
             <net.szym.barnacle.IPPreference android:title="Netmask"
                 android:key="@string/lan_netmask" android:defaultValue="255.255.0.0"
                 android:singleLine="true" />
+            <net.szym.barnacle.IPPreference android:title="DNS Server"
+                android:key="@string/lan_dns_server" android:defaultValue="8.8.8.8"
+                android:singleLine="true" />
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="Interfaces">

@@ -28,7 +28,7 @@ import android.widget.Toast;
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
     final static int[] prefids = {
         R.string.if_lan, R.string.if_wan,
-        R.string.lan_gw, R.string.lan_netmask, R.string.lan_essid, R.string.lan_bssid, R.string.lan_channel,
+        R.string.lan_gw, R.string.lan_netmask, R.string.lan_dns_server, R.string.lan_essid, R.string.lan_bssid, R.string.lan_channel,
         R.string.lan_script
     };
     final static int[] checks = { R.string.lan_wext };

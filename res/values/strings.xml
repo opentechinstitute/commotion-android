@@ -66,6 +66,7 @@
     <string name="lan_channel">lan_channel</string>
     <string name="lan_wext">lan_wext</string>
     <string name="lan_script">lan_script</string>
+    <string name="lan_dns_server">lan_dns_server</string>
 
     <string-array name="channel_values">
         <item>1</item>

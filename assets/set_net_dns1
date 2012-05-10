@@ -1,0 +1,5 @@
+#!/system/bin/sh
+# set the system net.dns1 property.
+
+echo `getprop net.dns1`
+exec su -c "setprop net.dns1 $1"

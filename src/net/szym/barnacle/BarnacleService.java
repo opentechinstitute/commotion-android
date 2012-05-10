@@ -18,6 +18,7 @@
 
 package net.szym.barnacle;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class BarnacleService extends android.app.Service {
     final static int MSG_STOP       = 6;
     final static int MSG_ASSOC      = 7;
     final static int MSG_STATS      = 8;
+    final static int MSG_SET_DNS1_OUTPUT = 9;
     // app states
     public final static int STATE_STOPPED  = 0;
     public final static int STATE_STARTING = 1;
@@ -63,8 +65,9 @@ public class BarnacleService extends android.app.Service {
     // private state
     private int state = STATE_STOPPED;
     private Process process = null; // the barnacle process
+    private Process DnsProcess = null;
     // output monitoring threads
-    private Thread[] threads = new Thread[2];
+    private Thread[] threads = new Thread[3];
     private PowerManager.WakeLock wakeLock;
     private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         @Override
@@ -103,6 +106,7 @@ public class BarnacleService extends android.app.Service {
     private ConnectivityManager connManager;
     private boolean filteringEnabled = false;
     private Method mStartForeground = null;
+    private String mOldNetDns1Value = null;
 
     /** public service interface */
     public void startRequest() {
@@ -230,6 +234,24 @@ public class BarnacleService extends android.app.Service {
                 state = STATE_STOPPED;
             }
             break;
+        case MSG_SET_DNS1_OUTPUT:
+        {
+        	String line = (String)msg.obj;
+            if (line == null) {
+                break;
+            }
+            // log(false, "line: " + line);
+        	if (line.matches("([0-9]+\\.){3}[0-9]+"))
+        	{
+        		mOldNetDns1Value = line;
+        		//log(false, "mOldNetDns1Value: " + mOldNetDns1Value);
+        	}
+        	else
+        	{
+        		log(false, "Not setting mOldNetDns1Value because it does not match the regex: " + line);
+        	}
+        	break;
+        }
         case MSG_OUTPUT:
             if (state == STATE_STOPPED) return;
             if (process == null) return; // cut the gibberish
@@ -277,6 +299,7 @@ public class BarnacleService extends android.app.Service {
             // FALL THROUGH!
         case MSG_NETSCHANGE:
             int wifiState = wifiManager.getWifiState();
+            String preferredDnsValue = getPrefValue(getString(R.string.lan_dns_server));
             Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, process == null ? "null" : "proc"));
             if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                 // wifi is good (or lost), we can start now...
@@ -290,6 +313,22 @@ public class BarnacleService extends android.app.Service {
                         //break;
                         log(false, "no active WAN interface found");
                     }
+            		mOldNetDns1Value = System.getProperty("net.dns1");
+            		try {
+	            		DnsProcess = Runtime.getRuntime().exec(NativeHelper.SET_NET_DNS1 + " " + preferredDnsValue,
+	                    		null, NativeHelper.app_bin);
+	                    threads[2] = new Thread(new OutputMonitor(MSG_SET_DNS1_OUTPUT, DnsProcess.getInputStream()));
+	                    threads[2].start();
+	                    DnsProcess.waitFor();
+	                    DnsProcess.destroy();
+					} catch (IOException e) {
+                        log(false, "Error occurred while setting DNS server: " + e.getMessage());
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+                        log(false, "Error occurred while setting DNS server: " + e.getMessage());
+						e.printStackTrace();
+					}
+
                     if (!startProcess()) {
                         log(true, getString(R.string.starterr));
                         state = STATE_STOPPED;
@@ -319,6 +358,25 @@ public class BarnacleService extends android.app.Service {
         case MSG_STOP:
             if (state == STATE_STOPPED) return;
             stopProcess();
+            if (mOldNetDns1Value != null)
+            {
+            	try {
+            		DnsProcess = Runtime.getRuntime().exec(NativeHelper.SET_NET_DNS1 + " " + mOldNetDns1Value, 
+                    		null, NativeHelper.app_bin);
+                    threads[2] = new Thread(new OutputMonitor(MSG_SET_DNS1_OUTPUT, DnsProcess.getInputStream()));
+                    threads[2].start();
+                    DnsProcess.waitFor();
+                    DnsProcess.destroy();
+				} catch (IOException e) {
+                    log(false, "Error occurred while resetting DNS server: " + e.getMessage());
+					e.printStackTrace();
+				}
+        		catch (InterruptedException e)
+        		{
+                    log(false, "Error occurred while resetting DNS server: " + e.getMessage());
+        			e.printStackTrace();
+        		}            }
+            mOldNetDns1Value = null;
             log(false, getString(R.string.stopped));
             state = STATE_STOPPED;
             break;
@@ -404,6 +462,21 @@ public class BarnacleService extends android.app.Service {
         return (mobileInfo.isConnected() || ((wimaxInfo != null) && wimaxInfo.isConnected()));
     }
 
+    private String getPrefValue(String pref) {
+
+        	// initialize default values if not done this in the past
+        	PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        	SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        	final int[] ids = SettingsActivity.prefids;
+        	for (int i = 0; i < ids.length; ++i) {
+        		String k = getString(ids[i]);
+        		String v = prefs.getString(k, null);
+        		if (k.equalsIgnoreCase(pref))
+        			return v;
+        	}
+        	return null;
+    }
     /** Prepare env vars for ./wifi from preferences */
     protected String[] buildEnvFromPrefs() {
     	ArrayList<String> envlist = new ArrayList<String>();
@@ -532,7 +605,7 @@ public class BarnacleService extends android.app.Service {
             return;
         }
         // Fall back on the old API.
-        setForeground(true);
+        //setForeground(true);
     }
 
     public static boolean isSupplicantError(String msg) {
