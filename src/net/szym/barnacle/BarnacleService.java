@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.szym.barnacle.Util.MACAddress;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,6 +33,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
@@ -299,7 +301,7 @@ public class BarnacleService extends android.app.Service {
             // FALL THROUGH!
         case MSG_NETSCHANGE:
             int wifiState = wifiManager.getWifiState();
-            String preferredDnsValue = getPrefValue(getString(R.string.lan_dns_server));
+            String preferredDnsValue = getPrefValue(getString(R.string.adhoc_dns_server));
             Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, process == null ? "null" : "proc"));
             if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                 // wifi is good (or lost), we can start now...
@@ -506,6 +508,25 @@ public class BarnacleService extends android.app.Service {
 //    			if (ids[i] == R.string.lan_essid) {
 //    				v = '"'+v+'"';
 //    			}
+    			// Special handling for Mesh Prefix 
+    			if (k.equalsIgnoreCase(getString(R.string.adhoc_ip)))
+    			{
+    				if (v.matches("^[0-9]{1,3}$"))
+    				{
+    					// Convert the Mesh Prefix into a Mesh IP.
+    					WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+    					if (wifiManager != null)
+    					{
+    						WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+    						if (wifiInfo != null)
+    						{
+    							Log.d("BarnacleService", "Mac addr: " + wifiInfo.getMacAddress());
+    							MACAddress macAddress = MACAddress.parse(wifiInfo.getMacAddress());
+    							v += "." + macAddress.getOctet(4) + "." + macAddress.getOctet(5) + "." + macAddress.getOctet(6);
+    						}
+    					}
+    				}
+    			}
     			envlist.add("brncl_" + k + "=" + v);
     		}
     	}

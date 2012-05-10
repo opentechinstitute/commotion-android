@@ -29,9 +29,9 @@ int config() {
   {
     using namespace Config;
     Param params[] = {
-     { "brncl_if_lan",      new String(iflan, IFNAMSIZ),  true },
-     { "brncl_lan_gw",      new IP(lan_gw),               false },
-     { "brncl_lan_netmask", new IP(lan_netmask),          false },
+     { "brncl_if_lan",        new String(iflan, IFNAMSIZ),  true },
+     { "brncl_adhoc_ip",      new IP(lan_gw),               false },
+     { "brncl_adhoc_netmask", new IP(lan_netmask),          false },
      { 0, NULL, false }
     };
     if (!configure(params))

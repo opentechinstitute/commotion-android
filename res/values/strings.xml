@@ -59,14 +59,14 @@
     <!-- DO NOT TRANSLATE -->
     <string name="if_wan">if_wan</string>
     <string name="if_lan">if_lan</string>
-    <string name="lan_netmask">lan_netmask</string>
-    <string name="lan_gw">lan_gw</string>
+    <string name="adhoc_netmask">adhoc_netmask</string>
+    <string name="adhoc_ip">adhoc_ip</string>
     <string name="lan_essid">lan_essid</string>
     <string name="lan_bssid">lan_bssid</string>
     <string name="lan_channel">lan_channel</string>
     <string name="lan_wext">lan_wext</string>
     <string name="lan_script">lan_script</string>
-    <string name="lan_dns_server">lan_dns_server</string>
+    <string name="adhoc_dns_server">adhoc_dns_server</string>
 
     <string-array name="channel_values">
         <item>1</item>
@@ -119,5 +119,6 @@
     <string name="rootUrl">http://szym.net/barnacle/faq/#root</string>
     <string name="wikiUrl">http://github.com/szym/barnacle/wiki</string>
     <string name="paypalUrl">https://www.paypal.com/</string>
+    <string name="invalidmeship">Invalid Mesh Prefix or IP.</string>
 
 </resources>

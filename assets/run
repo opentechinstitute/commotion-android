@@ -4,16 +4,16 @@
 echo "running $0"
 
 # set defaults
-: ${brncl_lan_gw:="172.29.5.1"}
-: ${brncl_lan_netmask:="255.255.0.0"}
+: ${brncl_adhoc_ip:="172.29.5.1"}
+: ${brncl_adhoc_netmask:="255.255.0.0"}
 : ${brncl_if_lan:="`getprop wifi.interface`"}
 : ${brncl_path:=.}
 
 # for init.rc parsing
 : ${brncl_hardware:="`getprop ro.hardware`"}
 
-export brncl_lan_gw
-export brncl_lan_netmask
+export brncl_adhoc_ip
+export brncl_adhoc_netmask
 export brncl_if_lan
 export brncl_path
 export brncl_hardware
@@ -33,7 +33,7 @@ cd $brncl_path
 # necessary hack for HTC phones
 type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
 
-# ifconfig $brncl_if_lan $brncl_lan_gw netmask $brncl_lan_netmask up
+# ifconfig $brncl_if_lan $brncl_adhoc_ip netmask $brncl_adhoc_netmask up
 ./wifi config
 
 # Xperia X10 running Gingerbread needs extra time for wifi config to finish
@@ -41,7 +41,7 @@ sleep 1
 
 # run olsrd
 (./olsrd -f olsrd.conf -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
-echo "OLSR on http://${brncl_lan_gw}:8080"
+echo "OLSR on http://${brncl_adhoc_ip}:8080"
 
 # the association loop
 ./wifi assoc

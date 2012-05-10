@@ -58,15 +58,15 @@
             android:key="wan_nowait" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Advanced">
-        <PreferenceScreen android:title="IPv4" android:summary="IPv4 Host Configuration">
-            <net.szym.barnacle.IPPreference android:title="Gateway"
-                android:key="@string/lan_gw"
+        <PreferenceScreen android:title="Mesh" android:summary="Mesh Host Configuration">
+            <net.szym.barnacle.MeshIPPreference android:title="Mesh Node IP"
+                android:key="@string/adhoc_ip"
                 android:singleLine="true" />
-            <net.szym.barnacle.IPPreference android:title="Netmask"
-                android:key="@string/lan_netmask" android:defaultValue="255.255.0.0"
+            <net.szym.barnacle.IPPreference android:title="Mesh Node IP Mask"
+                android:key="@string/adhoc_netmask" android:defaultValue="255.0.0.0"
                 android:singleLine="true" />
             <net.szym.barnacle.IPPreference android:title="DNS Server"
-                android:key="@string/lan_dns_server" android:defaultValue="8.8.8.8"
+                android:key="@string/adhoc_dns_server" android:defaultValue="8.8.8.8"
                 android:singleLine="true" />
         </PreferenceScreen>
     </PreferenceCategory>

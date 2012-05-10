@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import android.util.Log;
 
 
+
 public class Util {
     static class StyledStringBuilder extends android.text.SpannableStringBuilder {
         public StyledStringBuilder() { super(); }
@@ -61,6 +62,9 @@ public class Util {
             byte[] v = value;
             return String.format("%02x:%02x:%02x:%02x:%02x:%02x",
                     v[0], v[1], v[2], v[3], v[4], v[5]);
+        }
+        public int getOctet(int octet) {
+        	return Math.abs((int)value[octet-1]);
         }
     }
 
