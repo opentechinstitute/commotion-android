@@ -1,3 +1,0 @@
-[submodule "external/olsrd"]
-	path = external/olsrd
-	url = https://github.com/guardianproject/olsrd.git
