@@ -1,0 +1,3 @@
+[submodule "external/olsrd"]
+	path = external/olsrd
+	url = http://olsr.org/git/olsrd.git
