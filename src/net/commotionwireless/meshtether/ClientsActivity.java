@@ -16,9 +16,11 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
+
+import net.commotionwireless.meshtether.R;
 
 import android.os.Bundle;
 import android.view.View;

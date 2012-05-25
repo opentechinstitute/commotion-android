@@ -16,8 +16,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
+import net.commotionwireless.meshtether.R;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;

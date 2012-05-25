@@ -1,4 +1,4 @@
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

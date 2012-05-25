@@ -16,10 +16,12 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import net.commotionwireless.meshtether.R;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -45,10 +47,10 @@ public class BarnacleApp extends android.app.Application {
 
     final static String FILE_INI    = "brncl.ini";
 
-    final static String ACTION_CLIENTS = "net.szym.barnacle.SHOW_CLIENTS";
-    final static String ACTION_TOGGLE = "net.szym.barnacle.TOGGLE_STATE";
-    final static String ACTION_CHECK = "net.szym.barnacle.CHECK_STATE";
-    final static String ACTION_CHANGED = "net.szym.barnacle.STATE_CHANGED";
+    final static String ACTION_CLIENTS = "net.commotionwireless.meshtether.SHOW_CLIENTS";
+    final static String ACTION_TOGGLE = "net.commotionwireless.meshtether.TOGGLE_STATE";
+    final static String ACTION_CHECK = "net.commotionwireless.meshtether.CHECK_STATE";
+    final static String ACTION_CHANGED = "net.commotionwireless.meshtether.STATE_CHANGED";
 
     final static int ERROR_ROOT = 1;
     final static int ERROR_OTHER = 2;
@@ -198,7 +200,7 @@ public class BarnacleApp extends android.app.Application {
     static void broadcastState(Context ctx, int state) {
         Intent intent = new Intent(ACTION_CHANGED);
         intent.putExtra("state", state);
-        ctx.sendBroadcast(intent, "net.szym.barnacle.ACCESS_STATE");
+        ctx.sendBroadcast(intent, "net.commotionwireless.meshtether.ACCESS_STATE");
     }
 
     void updateStatus() {

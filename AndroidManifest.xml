@@ -17,7 +17,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.szym.barnacle" android:versionName="0.0" android:versionCode="0">
+    package="net.commotionwireless.meshtether" android:versionName="0.0" android:versionCode="0">
 
     <uses-sdk android:minSdkVersion="7" />
 
@@ -27,17 +27,17 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <permission android:name="net.szym.barnacle.ACCESS_STATE"
+    <permission android:name="net.commotionwireless.meshtether.ACCESS_STATE"
         android:protectionLevel="normal"
         android:permissionGroup="android.permission-group.NETWORK"
         android:label="view Barnacle state"/>
-    <permission android:name="net.szym.barnacle.CHANGE_STATE"
+    <permission android:name="net.commotionwireless.meshtether.CHANGE_STATE"
         android:label="change Barnacle state"
         android:permissionGroup="android.permission-group.NETWORK"
         android:protectionLevel="dangerous" />
 
     <application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
-        android:name="BarnacleApp" android:description="@string/app_name">
+        android:name="net.commotionwireless.meshtether.BarnacleApp" android:description="@string/app_name">
         <activity android:launchMode="singleTask" android:name="StatusActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,17 +46,17 @@
             </intent-filter>
         </activity>
         <activity android:launchMode="singleTop" android:name="ClientsActivity" />
-        <activity android:launchMode="singleTop" android:name="SettingsActivity" />
+        <activity android:launchMode="singleTop" android:name="net.commotionwireless.meshtether.SettingsActivity" />
         <service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
-            android:name="BarnacleService" />
-        <receiver android:name="ToggleReceiver" android:permission="net.szym.barnacle.CHANGE_STATE">
+            android:name="net.commotionwireless.meshtether.BarnacleService" />
+        <receiver android:name="net.commotionwireless.meshtether.ToggleReceiver" android:permission="net.commotionwireless.meshtether.CHANGE_STATE">
             <intent-filter>
-                <action android:name="net.szym.barnacle.TOGGLE_STATE" />
+                <action android:name="net.commotionwireless.meshtether.TOGGLE_STATE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="ToggleReceiver" android:permission="net.szym.barnacle.ACCESS_STATE">
+        <receiver android:name="ToggleReceiver" android:permission="net.commotionwireless.meshtether.ACCESS_STATE">
             <intent-filter>
-                <action android:name="net.szym.barnacle.CHECK_STATE" />
+                <action android:name="net.commotionwireless.meshtether.CHECK_STATE" />
             </intent-filter>
         </receiver>
     </application>

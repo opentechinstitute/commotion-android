@@ -16,9 +16,11 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import java.text.NumberFormat;
+
+import net.commotionwireless.meshtether.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

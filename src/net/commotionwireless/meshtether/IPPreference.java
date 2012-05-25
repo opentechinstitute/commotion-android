@@ -16,8 +16,9 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
+import net.commotionwireless.meshtether.R;
 import android.content.Context;
 import android.preference.EditTextPreference;
 import android.util.AttributeSet;
@@ -29,10 +30,10 @@ import android.widget.Toast;
 /**
 * EditTextPreference that allows IP addresses only
 */
-public class MeshIPPreference extends EditTextPreference {
-    public MeshIPPreference(Context context, AttributeSet attrs, int defStyle) { super(context, attrs, defStyle); }
-    public MeshIPPreference(Context context, AttributeSet attrs) { super(context, attrs); }
-    public MeshIPPreference(Context context) { super(context); }
+public class IPPreference extends EditTextPreference {
+    public IPPreference(Context context, AttributeSet attrs, int defStyle) { super(context, attrs, defStyle); }
+    public IPPreference(Context context, AttributeSet attrs) { super(context, attrs); }
+    public IPPreference(Context context) { super(context); }
 
     @Override
     protected void onAddEditTextToDialogView(View dialogView, EditText editText) {
@@ -41,14 +42,6 @@ public class MeshIPPreference extends EditTextPreference {
     }
 
     public static boolean validate(String addr) {
-    	if (addr.matches("^[0-9]{1,3}$"))
-    	{
-    		int prefix = Integer.valueOf(addr).intValue();
-    		if (prefix > 0 && prefix < 255)
-    			return true;
-    		else
-    			return false;
-    	}
         try {
             //if(addr.length() == 0) // don't want empty address
             //	return false;
@@ -67,7 +60,7 @@ public class MeshIPPreference extends EditTextPreference {
             String addr = getEditText().getText().toString();
             if (!validate(addr)) {
                 Toast.makeText(getContext(),
-                              getContext().getString(R.string.invalidmeship),
+                              getContext().getString(R.string.invalidip),
                               Toast.LENGTH_SHORT).show();
                 positiveResult = false;
             }

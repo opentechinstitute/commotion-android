@@ -16,7 +16,7 @@
 *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -24,7 +24,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
 
-import net.szym.barnacle.Util.MACAddress;
+import net.commotionwireless.meshtether.Util.MACAddress;
+import net.commotionwireless.meshtether.R;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;

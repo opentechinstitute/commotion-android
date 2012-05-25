@@ -1,4 +1,4 @@
-package net.szym.barnacle;
+package net.commotionwireless.meshtether;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
