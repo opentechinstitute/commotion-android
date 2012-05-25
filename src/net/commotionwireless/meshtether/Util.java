@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -53,7 +53,7 @@ public class Util {
                     addr.value[i] = (byte)Integer.parseInt(parts[i], 16);
                 }
             } catch (NumberFormatException e) {
-                Log.e(BarnacleApp.TAG, "Unable to parse "+ s, e);
+                Log.e(MeshTetherApp.TAG, "Unable to parse "+ s, e);
                 return null;
             }
             return addr;
@@ -175,7 +175,7 @@ public class Util {
             p = Runtime.getRuntime().exec(cmd);
             return p.waitFor();
         } catch (Exception e) {
-            Log.e(BarnacleApp.TAG, "exec: " + cmd, e);
+            Log.e(MeshTetherApp.TAG, "exec: " + cmd, e);
             if (p != null) p.destroy();
             return -1;
         }
@@ -188,7 +188,7 @@ public class Util {
             p = Runtime.getRuntime().exec("getprop " + key);
             return toReader(p.getInputStream()).readLine();
         } catch (Exception e) {
-            Log.e(BarnacleApp.TAG, "getprop: " + key, e);
+            Log.e(MeshTetherApp.TAG, "getprop: " + key, e);
             if (p != null) p.destroy();
             return null;
         }

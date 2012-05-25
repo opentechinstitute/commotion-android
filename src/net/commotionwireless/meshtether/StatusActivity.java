@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -40,7 +40,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 public class StatusActivity extends android.app.TabActivity {
-    private BarnacleApp app;
+    private MeshTetherApp app;
 
     private TabHost tabs;
     private ToggleButton onoff;
@@ -70,7 +70,7 @@ public class StatusActivity extends android.app.TabActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        app = (BarnacleApp)getApplication();
+        app = (MeshTetherApp)getApplication();
 
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setProgressBarIndeterminate(true);
@@ -113,7 +113,7 @@ public class StatusActivity extends android.app.TabActivity {
                 update();
                 if ("traffic".equals(tabId)) {
                     // force refresh
-                    BarnacleService svc = app.service;
+                    MeshService svc = app.service;
                     if (svc != null)
                         svc.statsRequest(0);
                 }
@@ -160,9 +160,7 @@ public class StatusActivity extends android.app.TabActivity {
             return (new AlertDialog.Builder(this))
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle("Help")
-                .setMessage("Barnacle was developed by szym.net. Donations are welcome."
-                            +"\n\n"
-                            +"Press the 'Associate' button to re-announce the ad-hoc network. "
+                .setMessage("Press the 'Associate' button to re-announce the ad-hoc network. "
                             +"See Website for help and more info.")
                 .setPositiveButton("Donate", new DialogInterface.OnClickListener() {
                     @Override
@@ -185,7 +183,7 @@ public class StatusActivity extends android.app.TabActivity {
             return (new AlertDialog.Builder(this))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Root Access")
-                .setMessage("Barnacle requires 'su' to access the hardware! Please, make sure you have root access.")
+                .setMessage("MeshTether requires 'su' to access the hardware! Please, make sure you have root access.")
                 .setPositiveButton("Help", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -217,7 +215,7 @@ public class StatusActivity extends android.app.TabActivity {
             return (new AlertDialog.Builder(this))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Supplicant not available")
-                .setMessage("Barnacle had trouble starting wpa_supplicant. Try again but set 'Skip wpa_supplicant' in settings.")
+                .setMessage("MeshTether had trouble starting wpa_supplicant. Try again but set 'Skip wpa_supplicant' in settings.")
                 .setPositiveButton("Do it now!", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -253,7 +251,7 @@ public class StatusActivity extends android.app.TabActivity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (BarnacleApp.ACTION_CLIENTS.equals(intent.getAction())) {
+        if (MeshTetherApp.ACTION_CLIENTS.equals(intent.getAction())) {
             getTabHost().setCurrentTab(2); // show clients
         }
     }
@@ -269,23 +267,23 @@ public class StatusActivity extends android.app.TabActivity {
         if (app.log != null)
             logview.setText(app.log);
 
-        if (state == BarnacleService.STATE_STOPPED) {
+        if (state == MeshService.STATE_STOPPED) {
             announce.setEnabled(false);
             onoff.setChecked(false);
             return; // not ready yet! keep the old log
         }
 
-        BarnacleService svc = app.service;
+        MeshService svc = app.service;
         if (svc == null) return; // unexpected race condition
 
-        if (state == BarnacleService.STATE_STARTING) {
+        if (state == MeshService.STATE_STARTING) {
             setProgressBarIndeterminateVisibility(true);
             onoff.setPressed(true);
             onoff.setChecked(true);
             return;
         }
 
-        if (state != BarnacleService.STATE_RUNNING) {
+        if (state != MeshService.STATE_RUNNING) {
             // this is unexpected, but don't fail
             return;
         }

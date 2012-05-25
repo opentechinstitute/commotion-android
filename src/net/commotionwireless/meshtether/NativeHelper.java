@@ -51,7 +51,7 @@ public class NativeHelper {
 
 				if (file.exists()) {
 					file.delete();
-					Log.i(BarnacleApp.TAG, "DebiHelper.unzipDebiFiles() deleting "
+					Log.i(MeshTetherApp.TAG, "DebiHelper.unzipDebiFiles() deleting "
 							+ file.getAbsolutePath());
 				}
 
@@ -72,7 +72,7 @@ public class NativeHelper {
 			}
 		} catch (IOException e) {
 			result = false;
-			Log.e(BarnacleApp.TAG, "Can't unzip", e);
+			Log.e(MeshTetherApp.TAG, "Can't unzip", e);
 		}
 		chmod("0750", new File(SU_C));
 		chmod("0750", new File(RUN));

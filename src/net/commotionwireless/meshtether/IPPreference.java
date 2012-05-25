@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify

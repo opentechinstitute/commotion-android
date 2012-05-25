@@ -30,14 +30,14 @@
     <permission android:name="net.commotionwireless.meshtether.ACCESS_STATE"
         android:protectionLevel="normal"
         android:permissionGroup="android.permission-group.NETWORK"
-        android:label="view Barnacle state"/>
+        android:label="view the state of connection to mesh"/>
     <permission android:name="net.commotionwireless.meshtether.CHANGE_STATE"
-        android:label="change Barnacle state"
+        android:label="connect to or disconnect from the mesh"
         android:permissionGroup="android.permission-group.NETWORK"
         android:protectionLevel="dangerous" />
 
     <application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
-        android:name="net.commotionwireless.meshtether.BarnacleApp" android:description="@string/app_name">
+        android:name=".MeshTetherApp" android:description="@string/app_name">
         <activity android:launchMode="singleTask" android:name="StatusActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,7 +48,7 @@
         <activity android:launchMode="singleTop" android:name="ClientsActivity" />
         <activity android:launchMode="singleTop" android:name="net.commotionwireless.meshtether.SettingsActivity" />
         <service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
-            android:name="net.commotionwireless.meshtether.BarnacleService" />
+            android:name=".MeshService" />
         <receiver android:name="net.commotionwireless.meshtether.ToggleReceiver" android:permission="net.commotionwireless.meshtether.CHANGE_STATE">
             <intent-filter>
                 <action android:name="net.commotionwireless.meshtether.TOGGLE_STATE" />

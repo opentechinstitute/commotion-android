@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  This file is part of Barnacle Wifi Tether
+  This file is part of Commotion Mesh Tether
   Copyright (C) 2010 by Szymon Jakubczak
 
   This program is free software: you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 <resources>
 
     <string name="app_name">OLSR Mesh Tether</string>
-    <string name="clientview">Barnacle Clients</string>
+    <string name="clientview">Mesh links</string>
     <string name="notify_running">Sharing your connection</string>
     <string name="notify_client">Client connected</string>
     <string name="notify_error">Error occured</string>
@@ -29,7 +29,7 @@
     <string name="starting">Starting…</string>
     <string name="dataready">Data network is ready</string>
     <string name="disablewifi">Disabling Wifi Manager…</string>
-    <string name="conflictwifi">Wifi Manager is interfering with Barnacle!</string>
+    <string name="conflictwifi">Wifi Manager is interfering with MeshTether!</string>
     <string name="waitwifi">Waiting until Wifi is disabled</string>
     <string name="running">Running…</string>
     <string name="restarting">Restarting…</string>
@@ -114,7 +114,7 @@
         <item>Aria/Liberty (see blog)</item>
     </string-array>
 
-    <string name="websiteUrl">http://szym.net/barnacle/</string>
+    <string name="websiteUrl">https://commotionwireless.net/</string>
     <string name="fixUrl">http://szym.net/barnacle/fix/</string>
     <string name="rootUrl">http://szym.net/barnacle/faq/#root</string>
     <string name="wikiUrl">http://github.com/szym/barnacle/wiki</string>

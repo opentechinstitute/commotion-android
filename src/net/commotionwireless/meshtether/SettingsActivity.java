@@ -1,5 +1,5 @@
 /*
- *  This file is part of Barnacle Wifi Tether
+ *  This file is part of Commotion Mesh Tether
  *  Copyright (C) 2010 by Szymon Jakubczak
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -69,7 +69,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         String key = pref.getKey();
         if (key == null) return true;
 
-        if (((BarnacleApp)getApplication()).isRunning()) {
+        if (((MeshTetherApp)getApplication()).isRunning()) {
             Toast.makeText(this, getString(R.string.restartneeded), Toast.LENGTH_SHORT).show();
         }
 

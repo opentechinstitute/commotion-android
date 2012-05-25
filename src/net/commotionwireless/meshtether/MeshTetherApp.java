@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -42,8 +42,8 @@ import android.widget.Toast;
 /**
 * Manages preferences, activities and prepares the service
 */
-public class BarnacleApp extends android.app.Application {
-    final static String TAG = "BarnacleApp";
+public class MeshTetherApp extends android.app.Application {
+    final static String TAG = "MeshTetherApp";
 
     final static String FILE_INI    = "brncl.ini";
 
@@ -72,7 +72,7 @@ public class BarnacleApp extends android.app.Application {
     final static int NOTIFY_CLIENT = 1;
     final static int NOTIFY_ERROR = 2;
 
-    public BarnacleService service = null;
+    public MeshService service = null;
     public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
 
     private List<ScanResult> lastScanResult;
@@ -155,7 +155,7 @@ public class BarnacleApp extends android.app.Application {
 
     public void startService() {
         if (service == null)
-            startService(new Intent(this, BarnacleService.class));
+            startService(new Intent(this, MeshService.class));
     }
 
     public void stopService() {
@@ -166,19 +166,19 @@ public class BarnacleApp extends android.app.Application {
     public int getState() {
         if (service != null)
             return service.getState();
-        return BarnacleService.STATE_STOPPED;
+        return MeshService.STATE_STOPPED;
     }
 
     public boolean isChanging() {
-        return getState() == BarnacleService.STATE_STARTING;
+        return getState() == MeshService.STATE_STARTING;
     }
 
     public boolean isRunning() {
-        return getState() == BarnacleService.STATE_RUNNING;
+        return getState() == MeshService.STATE_RUNNING;
     }
 
     public boolean isStopped() {
-        return getState() == BarnacleService.STATE_STOPPED;
+        return getState() == MeshService.STATE_STOPPED;
     }
 
     void setStatusActivity(StatusActivity a) { // for updates
@@ -188,7 +188,7 @@ public class BarnacleApp extends android.app.Application {
         clientsActivity = a;
     }
 
-    void serviceStarted(BarnacleService s) {
+    void serviceStarted(MeshService s) {
         Log.w(TAG, "serviceStarted");
         service = s;
         log = service.log;
@@ -220,7 +220,7 @@ public class BarnacleApp extends android.app.Application {
         lastScanResult = result;
     }
 
-    void clientAdded(BarnacleService.ClientData cd) {
+    void clientAdded(MeshService.ClientData cd) {
         if (prefs.getBoolean("client_notify", true)) {
             notificationClientAdded.defaults = 0;
             if (prefs.getBoolean("client_light", false)) {
@@ -327,7 +327,7 @@ public class BarnacleApp extends android.app.Application {
     }
 
     void cleanUpNotifications() {
-        if ((service != null) && (service.getState() == BarnacleService.STATE_STOPPED))
+        if ((service != null) && (service.getState() == MeshService.STATE_STOPPED))
             processStopped(); // clean up notifications
     }
 }

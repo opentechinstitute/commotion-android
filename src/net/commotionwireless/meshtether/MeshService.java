@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -46,8 +46,8 @@ import android.util.Log;
 /**
 * Manages the running process, client list, and log
 */
-public class BarnacleService extends android.app.Service {
-    final static String TAG = "BarnacleService";
+public class MeshService extends android.app.Service {
+    final static String TAG = "MeshService";
     // messages from the process
     final static int MSG_OUTPUT     = 1;
     final static int MSG_ERROR      = 2;
@@ -67,7 +67,7 @@ public class BarnacleService extends android.app.Service {
 
     // private state
     private int state = STATE_STOPPED;
-    private Process process = null; // the barnacle process
+    private Process process = null; // native process for ad-hoc config
     private Process DnsProcess = null;
     // output monitoring threads
     private Thread[] threads = new Thread[3];
@@ -99,12 +99,12 @@ public class BarnacleService extends android.app.Service {
     public final Util.TrafficStats stats = new Util.TrafficStats();
 
     // WARNING: this is not entirely safe
-    public static BarnacleService singleton = null;
+    public static MeshService singleton = null;
 
     // cached for convenience
     private String if_lan = "";
     private Util.MACAddress if_mac = null;
-    private BarnacleApp app;
+    private MeshTetherApp app;
     private WifiManager wifiManager;
     private ConnectivityManager connManager;
     private boolean filteringEnabled = false;
@@ -155,11 +155,11 @@ public class BarnacleService extends android.app.Service {
         state = STATE_STOPPED;
         filteringEnabled = false;
 
-        app = (BarnacleApp)getApplication();
+        app = (MeshTetherApp)getApplication();
         app.serviceStarted(this);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "BarnacleService");
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MeshService");
         wakeLock.acquire();
 
         IntentFilter filter = new IntentFilter();
@@ -225,14 +225,14 @@ public class BarnacleService extends android.app.Service {
                 if ((state == STATE_STARTING)) {
                     String err = log.toString();
                     if (isRootError(err)) {
-                        app.failed(BarnacleApp.ERROR_ROOT);
+                        app.failed(MeshTetherApp.ERROR_ROOT);
                     } else if (isSupplicantError(err)) {
-                        app.failed(BarnacleApp.ERROR_SUPPLICANT);
+                        app.failed(MeshTetherApp.ERROR_SUPPLICANT);
                     } else {
-                        app.failed(BarnacleApp.ERROR_OTHER);
+                        app.failed(MeshTetherApp.ERROR_OTHER);
                     }
                 } else {
-                    app.failed(BarnacleApp.ERROR_OTHER);
+                    app.failed(MeshTetherApp.ERROR_OTHER);
                 }
                 state = STATE_STOPPED;
             }
@@ -521,7 +521,7 @@ public class BarnacleService extends android.app.Service {
     						WifiInfo wifiInfo = wifiManager.getConnectionInfo();
     						if (wifiInfo != null)
     						{
-    							Log.d("BarnacleService", "Mac addr: " + wifiInfo.getMacAddress());
+    							Log.d(TAG, "Mac addr: " + wifiInfo.getMacAddress());
     							MACAddress macAddress = MACAddress.parse(wifiInfo.getMacAddress());
     							v += "." + macAddress.getOctet(4) + "." + macAddress.getOctet(5) + "." + macAddress.getOctet(6);
     						}

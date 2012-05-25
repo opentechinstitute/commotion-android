@@ -1,5 +1,5 @@
 /*
-*  This file is part of Barnacle Wifi Tether
+*  This file is part of Commotion Mesh Tether
 *  Copyright (C) 2010 by Szymon Jakubczak
 *
 *  This program is free software: you can redistribute it and/or modify
@@ -32,9 +32,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class ClientsActivity extends android.app.ListActivity {
-    private BarnacleApp app;
+    private MeshTetherApp app;
     private BaseAdapter adapter;
-    private ArrayList<BarnacleService.ClientData> clients = new ArrayList<BarnacleService.ClientData>();
+    private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
 
     private static class ViewHolder {
         TextView macaddress;
@@ -47,7 +47,7 @@ public class ClientsActivity extends android.app.ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        app = (BarnacleApp)getApplication();
+        app = (MeshTetherApp)getApplication();
         app.setClientsActivity(this);
 
         adapter = new BaseAdapter(){
@@ -57,7 +57,7 @@ public class ClientsActivity extends android.app.ListActivity {
 
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
-                final BarnacleService.ClientData client = clients.get(position);
+                final MeshService.ClientData client = clients.get(position);
 
                 ViewHolder holder;
 
