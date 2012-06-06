@@ -18,7 +18,7 @@
 -->
 <resources>
 
-    <string name="app_name">OLSR Mesh Tether</string>
+    <string name="app_name">Mesh Tether</string>
     <string name="clientview">Mesh links</string>
     <string name="notify_running">Sharing your connection</string>
     <string name="notify_client">Client connected</string>
