@@ -18,9 +18,9 @@
 
 package net.commotionwireless.meshtether;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
-
-import net.commotionwireless.meshtether.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -150,9 +150,36 @@ public class StatusActivity extends android.app.TabActivity {
         case R.id.menu_about:
             showDialog(DLG_ABOUT);
             return true;
+        case R.id.menu_share_debug:
+        	zipAndShareFile(new File(NativeHelper.app_log, "olsrd.log"));
+            return true;
+        case R.id.menu_share_status:
+            return true;
         }
         return(super.onOptionsItemSelected(item));
     }
+
+    private void zipAndShareFile(File f) {
+    	if (! NativeHelper.isSdCardPresent()) {
+    		app.updateToast("Cannot find SD card, needed for saving the zip file.", true);
+    		return;
+    	}
+    	final File zipFile = new File(NativeHelper.publicFiles, f.getName() + ".zip");
+    	try {
+			NativeHelper.zip(f, zipFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		Intent i = new Intent(android.content.Intent.ACTION_SEND);
+		i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		i.setType("application/zip");
+		i.putExtra(Intent.EXTRA_SUBJECT, "log from Commotion Mesh Tether");
+		i.putExtra(Intent.EXTRA_TEXT, "Attached is an log sent by Commotion Mesh Tether.  For more info, see:\nhttps://code.commotionwireless.net/projects/commotion-android");
+	    i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(zipFile));
+	    startActivity(Intent.createChooser(i, "How do you want to share?"));
+    }
+    
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO: these should not create and remove dialogs, but restore and dismiss

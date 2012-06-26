@@ -1,20 +1,27 @@
 package net.commotionwireless.meshtether;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.util.Log;
 
 public class NativeHelper {
 	public static final String TAG = "NativeHelper";
 
+	public static File publicFiles;
 	public static File app_bin;
 	public static File app_log;
 
@@ -27,6 +34,9 @@ public class NativeHelper {
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
 		app_log = context.getDir("log", Context.MODE_PRIVATE).getAbsoluteFile();
+		// this is the same as android-8's getExternalFilesDir() but works on android-1
+		publicFiles = new File(Environment.getExternalStorageDirectory(),
+				"Android/data/" + context.getPackageName() + "/files/");
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		RUN = new File(app_bin, "run").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
@@ -107,5 +117,28 @@ public class NativeHelper {
 		} catch (NoSuchMethodException e) {
 			Log.i(TAG, "android.os.FileUtils.setPermissions() failed:", e);
 		}
+	}
+
+	public static boolean isSdCardPresent() {
+		return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+	}
+
+	public static void zip(File fileToZip, File zip)
+			throws FileNotFoundException, IOException {
+		final int BUFFER = 2048;
+		BufferedInputStream origin = null;
+		byte data[] = new byte[BUFFER];
+
+		FileInputStream fi = new FileInputStream(fileToZip);
+		origin = new BufferedInputStream(fi, BUFFER);
+
+		ZipOutputStream out;
+		out = new ZipOutputStream(new FileOutputStream(zip));
+		ZipEntry e = new ZipEntry(fileToZip.getName());
+		out.putNextEntry(e);
+		int count;
+		while ((count = origin.read(data, 0, BUFFER)) != -1)
+			out.write(data, 0, count);
+		out.close();
 	}
 }
