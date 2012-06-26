@@ -21,6 +21,9 @@ export brncl_hardware
 # log environment for debugging
 set > $brncl_path/../app_log/environment.log 2>&1
 
+# zero out debug log so it doesn't get huge
+echo "" > $brncl_path/../app_log/olsrd.log 2>&1
+
 
 cd $brncl_path
 
