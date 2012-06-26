@@ -19,8 +19,12 @@
 package net.commotionwireless.meshtether;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
+
+import net.commotionwireless.olsrinfo.JsonInfo;
+import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -154,11 +158,35 @@ public class StatusActivity extends android.app.TabActivity {
         	zipAndShareFile(new File(NativeHelper.app_log, "olsrd.log"));
             return true;
         case R.id.menu_share_status:
+        	getOlsrdStatusAndShare();
             return true;
         }
         return(super.onOptionsItemSelected(item));
     }
 
+    private void getOlsrdStatusAndShare() {
+        if (app.getState() == MeshService.STATE_RUNNING) {
+        	JsonInfo jsoninfo = new JsonInfo();
+        	OlsrDataDump dump = jsoninfo.all();
+        	final File f = new File(NativeHelper.publicFiles, "olsrd-status.json");
+        	FileWriter fw;
+			try {
+				fw = new FileWriter(f);
+        	fw.write(dump.toString());
+        	fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+			zipAndShareFile(f);
+        } else {
+        	// nothing to do, since we can't talk to olsrd
+    		app.updateToast("olsrd is not running, no status information available.", true);
+            return;
+        }
+
+    }
+    
     private void zipAndShareFile(File f) {
     	if (! NativeHelper.isSdCardPresent()) {
     		app.updateToast("Cannot find SD card, needed for saving the zip file.", true);
