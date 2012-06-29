@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import net.commotionwireless.meshtether.Util.MACAddress;
+import net.commotionwireless.olsrinfo.JsonInfo;
+import net.commotionwireless.olsrinfo.datatypes.Link;
+import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -435,6 +438,7 @@ public class MeshService extends android.app.Service {
     	
     	private boolean mRunning;
     	private Thread mIoThreads[] = new Thread[2];
+    	private OlsrInfoThread mOlsrInfoThread;
     	private Process mProcess = null;
     	private String mProg;
     	private String[] mEnvp;
@@ -456,9 +460,11 @@ public class MeshService extends android.app.Service {
     			
     			mIoThreads[INPUT_THREAD].interrupt();
     			mIoThreads[ERROR_THREAD].interrupt();
-    			
+    			mOlsrInfoThread.interrupt();
+
     			mIoThreads[INPUT_THREAD] = null;
     			mIoThreads[ERROR_THREAD] = null;
+    			mOlsrInfoThread = null;
 
     			mProcess.destroy();
     			mProcess.waitFor();
@@ -474,6 +480,8 @@ public class MeshService extends android.app.Service {
     		mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(errorTag, mProcess.getErrorStream()));
     		mIoThreads[INPUT_THREAD].start();
     		mIoThreads[ERROR_THREAD].start();
+    		mOlsrInfoThread = new OlsrInfoThread();
+    		mOlsrInfoThread.start();
     		mRunning = true;
     	}
     	
@@ -491,6 +499,9 @@ public class MeshService extends android.app.Service {
 			mIoThreads[INPUT_THREAD] = null;
 			mIoThreads[ERROR_THREAD] = null;
 			
+    		mOlsrInfoThread.interrupt();
+    		mOlsrInfoThread = null;
+
     		mProcess.destroy();
 			mExitValue = mProcess.exitValue();
 
@@ -714,5 +725,26 @@ public class MeshService extends android.app.Service {
     public static boolean isRootError(String msg) {
         return msg.contains("ermission") || msg.contains("su: not found");
     }
+
+    class OlsrInfoThread extends Thread {
+
+    	public void run() {
+    		JsonInfo jsoninfo = new JsonInfo();
+    		try {
+    			while(true) {
+    				Thread.sleep(5000);
+    				OlsrDataDump dump = jsoninfo.runtime();
+    				for (Link l : dump.links) {
+    					MeshService.ClientData cd = new ClientData(l.localIP, l.remoteIP, String.valueOf(l.linkQuality));
+    					clientAdded(cd);
+    				}
+    			}
+    		} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    }
+
 }
 
