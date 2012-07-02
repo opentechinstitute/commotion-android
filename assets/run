@@ -44,7 +44,9 @@ sleep 1
 
 # run olsrd
 (./olsrd -f olsrd.conf -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
+echo `ps | grep olsrd | awk '{print $2;}'` > $brncl_path/../app_log/olsrd.pid
 echo "OLSR on http://${brncl_adhoc_ip}:8080"
+
 
 # the association loop
 ./wifi assoc

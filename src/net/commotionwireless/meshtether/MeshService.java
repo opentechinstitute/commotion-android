@@ -18,6 +18,7 @@
 
 package net.commotionwireless.meshtether;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import net.commotionwireless.meshtether.Util.MACAddress;
-import net.commotionwireless.meshtether.R;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -60,6 +60,7 @@ public class MeshService extends android.app.Service {
     final static int MSG_ASSOC      = 7;
     final static int MSG_STATS      = 8;
     final static int MSG_SET_DNS1_OUTPUT = 9;
+    final static int MSG_STOP_OLSRD_OUTPUT = 10;
     // app states
     public final static int STATE_STOPPED  = 0;
     public final static int STATE_STARTING = 1;
@@ -67,10 +68,8 @@ public class MeshService extends android.app.Service {
 
     // private state
     private int state = STATE_STOPPED;
-    private Process process = null; // native process for ad-hoc config
-    private Process DnsProcess = null;
-    // output monitoring threads
-    private Thread[] threads = new Thread[3];
+    private MeshTetherProcess WifiProcess = null;
+
     private PowerManager.WakeLock wakeLock;
     private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
         @Override
@@ -206,7 +205,7 @@ public class MeshService extends android.app.Service {
             break;
         case MSG_ERROR:
             if (state == STATE_STOPPED) return;
-            if (process == null) return; // don't kill it again...
+            if (WifiProcess == null) return; // don't kill it again...
             if (msg.obj != null) {
                 String line = (String)msg.obj;
                 log(true, line); // just dump it and ignore it
@@ -257,7 +256,7 @@ public class MeshService extends android.app.Service {
         }
         case MSG_OUTPUT:
             if (state == STATE_STOPPED) return;
-            if (process == null) return; // cut the gibberish
+            if (WifiProcess == null) return; // cut the gibberish
             String line = (String)msg.obj;
             if (line == null) {
                 // ignore it, wait for MSG_ERROR(null)
@@ -303,10 +302,10 @@ public class MeshService extends android.app.Service {
         case MSG_NETSCHANGE:
             int wifiState = wifiManager.getWifiState();
             String preferredDnsValue = getPrefValue(getString(R.string.adhoc_dns_server));
-            Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, process == null ? "null" : "proc"));
+            Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, WifiProcess == null ? "null" : "proc"));
             if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
                 // wifi is good (or lost), we can start now...
-            	if ((state == STATE_STARTING) && (process == null)) {
+            	if ((state == STATE_STARTING) && (WifiProcess == null)) {
             		if (app.findIfWan()) {
             			// TODO if WAN found with checkUplink(), then setup Hna4 routing
             			log(false, "Found active WAN interface");
@@ -318,12 +317,9 @@ public class MeshService extends android.app.Service {
                     }
             		mOldNetDns1Value = System.getProperty("net.dns1");
             		try {
-	            		DnsProcess = Runtime.getRuntime().exec(NativeHelper.SET_NET_DNS1 + " " + preferredDnsValue,
+            			MeshTetherProcess DnsProcess = new MeshTetherProcess(NativeHelper.SET_NET_DNS1 + " " + preferredDnsValue,
 	                    		null, NativeHelper.app_bin);
-	                    threads[2] = new Thread(new OutputMonitor(MSG_SET_DNS1_OUTPUT, DnsProcess.getInputStream()));
-	                    threads[2].start();
-	                    DnsProcess.waitFor();
-	                    DnsProcess.destroy();
+            			DnsProcess.runUntilExit(mHandler, MSG_SET_DNS1_OUTPUT, MSG_SET_DNS1_OUTPUT);
 					} catch (IOException e) {
                         log(false, "Error occurred while setting DNS server: " + e.getMessage());
 						e.printStackTrace();
@@ -363,13 +359,11 @@ public class MeshService extends android.app.Service {
             stopProcess();
             if (mOldNetDns1Value != null)
             {
-            	try {
-            		DnsProcess = Runtime.getRuntime().exec(NativeHelper.SET_NET_DNS1 + " " + mOldNetDns1Value, 
-                    		null, NativeHelper.app_bin);
-                    threads[2] = new Thread(new OutputMonitor(MSG_SET_DNS1_OUTPUT, DnsProcess.getInputStream()));
-                    threads[2].start();
-                    DnsProcess.waitFor();
-                    DnsProcess.destroy();
+            	try {            		
+            		MeshTetherProcess DnsProcess = new MeshTetherProcess(NativeHelper.SET_NET_DNS1 + " " + mOldNetDns1Value, 
+            				null, NativeHelper.app_bin);
+            		DnsProcess.runUntilExit(mHandler, MSG_SET_DNS1_OUTPUT, MSG_SET_DNS1_OUTPUT);
+
 				} catch (IOException e) {
                     log(false, "Error occurred while resetting DNS server: " + e.getMessage());
 					e.printStackTrace();
@@ -433,6 +427,82 @@ public class MeshService extends android.app.Service {
                 mHandler.obtainMessage(MSG_EXCEPTION, e).sendToTarget();
             }
         }
+    }
+    
+    private class MeshTetherProcess {
+    	private final static int INPUT_THREAD = 0;
+    	private final static int ERROR_THREAD = 1;
+    	
+    	private boolean mRunning;
+    	private Thread mIoThreads[] = new Thread[2];
+    	private Process mProcess = null;
+    	private String mProg;
+    	private String[] mEnvp;
+    	private File mDirectory;
+    	private int mExitValue;
+    	
+    	public MeshTetherProcess(String prog, String[] envp, File directory) {
+    		mProg = prog;
+    		mEnvp = envp;
+    		mDirectory = directory;
+    		mRunning = false;
+    		mExitValue = 0;
+    	}
+    	
+    	public void stop() throws IOException, InterruptedException {
+    		if (mProcess != null) {
+    			mProcess.getOutputStream().close();
+    			mProcess.getErrorStream().close();
+    			
+    			mIoThreads[INPUT_THREAD].interrupt();
+    			mIoThreads[ERROR_THREAD].interrupt();
+    			
+    			mIoThreads[INPUT_THREAD] = null;
+    			mIoThreads[ERROR_THREAD] = null;
+
+    			mProcess.destroy();
+    			mProcess.waitFor();
+    			mExitValue = mProcess.exitValue();
+    			mProcess = null;
+    			mRunning = false;
+    		}
+    	}
+    	
+    	public void run(Handler handler, int outputTag, int errorTag) throws IOException {
+    		mProcess = Runtime.getRuntime().exec(mProg, mEnvp, mDirectory);
+    		mIoThreads[INPUT_THREAD] = new Thread(new OutputMonitor(outputTag, mProcess.getInputStream()));
+    		mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(errorTag, mProcess.getErrorStream()));
+    		mIoThreads[INPUT_THREAD].start();
+    		mIoThreads[ERROR_THREAD].start();
+    		mRunning = true;
+    	}
+    	
+    	public void tell(byte[] msg) throws IOException {
+    		if (mRunning)
+    			mProcess.getOutputStream().write(msg);
+    	}
+    	public void runUntilExit(Handler handler, int outputTag, int errorTag) throws IOException, InterruptedException {
+    		run(handler,outputTag,errorTag);
+    		mProcess.waitFor();
+    		
+			mIoThreads[INPUT_THREAD].interrupt();
+			mIoThreads[ERROR_THREAD].interrupt();
+			
+			mIoThreads[INPUT_THREAD] = null;
+			mIoThreads[ERROR_THREAD] = null;
+			
+    		mProcess.destroy();
+			mExitValue = mProcess.exitValue();
+
+    		mProcess = null;
+    		mRunning = false;
+    	}
+    	public int exitValue() {
+    		if (!mRunning)
+    			return mExitValue;
+    		else
+    			return 0;
+    	}
     }
 
     private void clientAdded(ClientData cd) {
@@ -551,12 +621,8 @@ public class MeshService extends android.app.Service {
     	// calling 'su -c' from Java doesn't work so we use a helper script
     	String cmd = NativeHelper.SU_C;
         try {
-            process = Runtime.getRuntime().exec(cmd,
-            		buildEnvFromPrefs(), NativeHelper.app_bin);
-            threads[0] = new Thread(new OutputMonitor(MSG_OUTPUT, process.getInputStream()));
-            threads[1] = new Thread(new OutputMonitor(MSG_ERROR, process.getErrorStream()));
-            threads[0].start();
-            threads[1].start();
+        	WifiProcess = new MeshTetherProcess(cmd, buildEnvFromPrefs(), NativeHelper.app_bin);
+        	WifiProcess.run(mHandler, MSG_OUTPUT, MSG_ERROR);
         } catch (Exception e) {
             log(true, String.format(getString(R.string.execerr), cmd));
             Log.e(TAG, "start failed " + e.toString());
@@ -564,45 +630,56 @@ public class MeshService extends android.app.Service {
         }
         return true;
     }
+    
+    private void stopProcess() {
+    	/*
+    	 * TODO: UN copy and paste!!
+    	 */
+    	if (state != STATE_STOPPED) {
+    		try {	
+    			MeshTetherProcess StopOlsrProcess = new MeshTetherProcess(NativeHelper.STOP_OLSRD,
+    					null, NativeHelper.app_bin);
+    			StopOlsrProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
+
+    		} catch (IOException e) {
+    			log(false, "Error occurred while stopping Olsrd: " + e.getMessage());
+    			e.printStackTrace();
+    		} catch (InterruptedException e) {
+    			log(false, "Error occurred while stopping Olsrd: " + e.getMessage());
+    			e.printStackTrace();
+    		}
+
+    		if (WifiProcess != null) {
+    			// first, just close the stream
+    			if (state != STATE_STOPPED) {
+    				try {
+    					WifiProcess.stop();
+    				} catch (Exception e) {
+    					Log.w(TAG, "Exception while closing process");
+    				}
+    			}
+
+    			try {
+    				int exit_status = WifiProcess.exitValue();
+    				Log.i(TAG, "Wifi Process exited with status: " + exit_status);
+    			} catch (IllegalThreadStateException e) {
+    				// this is not good
+    				log(true, getString(R.string.dirtystop));
+    			}
+    			WifiProcess = null;
+    		}
+    	}
+    }
+
 
     private boolean tellProcess(String msg) {
-        if (process != null) {
+        if (WifiProcess != null) {
             try {
-                process.getOutputStream().write((msg+"\n").getBytes());
+                WifiProcess.tell((msg+"\n").getBytes());
                 return true;
             } catch (Exception e) {} // just ignore it
         }
         return false;
-    }
-
-    private void stopProcess() {
-        if (process != null) {
-            // first, just close the stream
-            if (state != STATE_STOPPED) {
-                try {
-                    process.getOutputStream().close();
-                } catch (Exception e) {
-                    Log.w(TAG, "Exception while closing process");
-                }
-            }
-            try {
-                process.waitFor(); // blocking!
-            } catch (InterruptedException e) {
-                Log.e(TAG, "");
-            }
-
-            try {
-                int exit_status = process.exitValue();
-                Log.i(TAG, "Process exited with status: " + exit_status);
-            } catch (IllegalThreadStateException e) {
-                // this is not good
-                log(true, getString(R.string.dirtystop));
-            }
-            process.destroy();
-            process = null;
-            threads[0].interrupt();
-            threads[1].interrupt();
-        }
     }
 
     @Override

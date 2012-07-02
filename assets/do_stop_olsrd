@@ -1,0 +1,8 @@
+#!/system/bin/sh
+# main runner (process manager) for barnacle, root required
+
+: ${brncl_path:=.}
+
+export brncl_path
+
+kill -15 `cat $brncl_path/../app_log/olsrd.pid`
