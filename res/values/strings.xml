@@ -38,7 +38,6 @@
     <string name="filtererr">Could not connect to NAT, will retry later</string>
     <string name="filterupdated">Updated NAT filter</string>
     <string name="connected">Connected %s</string>
-    <string name="renewed">Renewed %s</string>
     <string name="stopped">Stopped</string>
     <string name="wanerr">Could not find WAN interface</string>
     <string name="wanok">Mobile data interface found: </string>

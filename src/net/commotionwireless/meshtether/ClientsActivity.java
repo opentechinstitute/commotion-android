@@ -20,15 +20,12 @@ package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
 
-import net.commotionwireless.meshtether.R;
-
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 public class ClientsActivity extends android.app.ListActivity {
@@ -37,10 +34,10 @@ public class ClientsActivity extends android.app.ListActivity {
     private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
 
     private static class ViewHolder {
-        TextView macaddress;
-        TextView ipaddress;
-        TextView hostname;
-        CheckBox allowed;
+        TextView remoteIP;
+        ProgressBar lqBar;
+        ProgressBar nlqBar;
+        RadioButton hnaIndicator;
     }
 
     /** Called when the activity is first created. */
@@ -62,35 +59,28 @@ public class ClientsActivity extends android.app.ListActivity {
                 ViewHolder holder;
 
                 if (convertView == null) {
-                    View view = getLayoutInflater().inflate(R.layout.clientrow, null);
+                    View view = getLayoutInflater().inflate(R.layout.linkrow, null);
                     holder = new ViewHolder();
-                    holder.macaddress = (TextView) view.findViewById(R.id.macaddress);
-                    holder.ipaddress  = (TextView) view.findViewById(R.id.ipaddress);
-                    holder.hostname   = (TextView) view.findViewById(R.id.hostname);
-                    holder.allowed    = (CheckBox) view.findViewById(R.id.allowed);
+                    holder.remoteIP = (TextView) view.findViewById(R.id.remoteip);
+                    holder.lqBar = (ProgressBar) view.findViewById(R.id.linkquality);
+                    holder.nlqBar = (ProgressBar) view.findViewById(R.id.neighborlinkquality);
+                    holder.hnaIndicator = (RadioButton) view.findViewById(R.id.hna);
                     view.setTag(holder);
+                    view.setClickable(false);
                     convertView = view;
                 } else {
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                holder.macaddress.setText(client.mac);
-                holder.ipaddress.setText(client.ip);
-                holder.hostname.setText(client.hostname != null ? client.hostname : "[ none ]");
-                holder.allowed.setChecked(client.allowed);
+                holder.remoteIP.setText(client.remoteIP);
+                holder.lqBar.setProgress((int)(client.linkQuality * 100));
+                holder.nlqBar.setProgress((int)(client.neighborLinkQuality * 100));
+                holder.hnaIndicator.setChecked(client.hasHna);
                 return convertView;
             }
         };
         setListAdapter(adapter);
         setTitle(getString(R.string.clientview));
-        getListView().setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View v, int arg2,
-                    long arg3) {
-                ViewHolder holder = (ViewHolder)v.getTag();
-                holder.allowed.performClick();
-            }
-        });
     }
     @Override
     protected void onDestroy() {

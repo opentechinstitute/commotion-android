@@ -23,13 +23,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import net.commotionwireless.meshtether.Util.MACAddress;
 import net.commotionwireless.olsrinfo.JsonInfo;
+import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.Link;
+import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -90,13 +90,22 @@ public class MeshService extends android.app.Service {
     final static int COLOR_TIME     = 0xffffffff;
 
     public static class ClientData {
-        final String mac;
-        final String ip;
-        final String hostname;
-        boolean allowed;
-        ClientData(String m, String i, String h) { mac = m; ip = i; hostname = h; allowed = false; }
-        public String toString() { return mac + " " + ip + " " + hostname; }
-        public String toNiceString() { return hostname != null ? hostname : mac; }
+        final String remoteIP;
+        final float linkQuality;
+        final float neighborLinkQuality;
+        final int linkCost;
+        final int validityTime;
+        boolean hasHna;
+        ClientData(String ip, float lq, float nlq, int lc, int vt) {
+        	remoteIP = ip;
+        	linkQuality = lq;
+        	neighborLinkQuality = nlq;
+        	linkCost = lc;
+        	validityTime = vt;
+        	hasHna = false;
+        }
+        public String toString() { return remoteIP + " " + linkQuality + " " + neighborLinkQuality; }
+        public String toNiceString() { return remoteIP; }
     }
     public final ArrayList<ClientData> clients = new ArrayList<ClientData>();
     public final Util.TrafficStats stats = new Util.TrafficStats();
@@ -211,15 +220,8 @@ public class MeshService extends android.app.Service {
             if (state == STATE_STOPPED) return;
             if (WifiProcess == null) return; // don't kill it again...
             if (msg.obj != null) {
-                String line = (String)msg.obj;
-                log(true, line); // just dump it and ignore it
-                if (line.startsWith("dnsmasq: DHCPACK")) {
-                    String[] vals = line.split(" +");
-                    if (vals.length > 3) {
-                        ClientData cd = new ClientData(vals[3], vals[2], vals.length > 4 ? vals[4] : null);
-                        clientAdded(cd);
-                    }
-                }
+            	String line = (String)msg.obj;
+            	log(true, line); // just dump it and ignore it
             } else {
                 // no message, means process died
                 log(true, getString(R.string.unexpected));
@@ -266,12 +268,7 @@ public class MeshService extends android.app.Service {
                 // ignore it, wait for MSG_ERROR(null)
                 break;
             }
-            if (line.startsWith("DHCP: ACK")) {
-                // DHCP: ACK <MAC> <IP> [<HOSTNAME>]
-                String[] vals = line.split(" +");
-                ClientData cd = new ClientData(vals[2], vals[3], vals.length > 4 ? vals[4] : null);
-                clientAdded(cd);
-            } else if (line.startsWith("WIFI: OK")) {
+            if (line.startsWith("WIFI: OK")) {
                 // WIFI: OK <IFNAME> <MAC>
                 String[] parts = line.split(" +");
                 if_lan = parts[2];
@@ -521,20 +518,19 @@ public class MeshService extends android.app.Service {
 
         for (int i = 0; i < clients.size(); ++i) {
             ClientData c = clients.get(i);
-            if (c.mac.equals(cd.mac)) {
-                if (c.ip.equals(cd.ip)) {
-                    log(false, String.format(getString(R.string.renewed), cd.toNiceString()));
+            if (c.remoteIP.equals(cd.remoteIP)) {
+                if (c.hasHna == cd.hasHna
+                		&& c.linkQuality == cd.linkQuality
+                		&& c.neighborLinkQuality == cd.neighborLinkQuality) {
                     return; // no change
                 }
-                cd.allowed = c.allowed;
+                cd.hasHna = c.hasHna;
                 clients.remove(i); // we'll add it at the end
                 break;
             }
         }
         clients.add(cd);
-
         app.clientAdded(cd);
-
     }
 
     private boolean checkUplink() {
@@ -734,27 +730,23 @@ public class MeshService extends android.app.Service {
     		try {
     			while(true) {
     				Thread.sleep(5000);
-    				/*
-    				OlsrDataDump dump = jsoninfo.links();
-    				for (Neighbor n : dump.neighbors)
-    					Log.i(TAG, "Neighbor: " + n.ipv4Address);
-    				for (Interface i : dump.interfaces)
-    					Log.i(TAG, "Interface: " + i.name);
+    				OlsrDataDump dump = jsoninfo.parseCommand("/links/hna");
     				for (Link l : dump.links) {
-    				 */
-    				Collection<Link> links = jsoninfo.links();
-    				for (Link l : links) {
-    					clientsToAdd.add(new ClientData(l.remoteIP,
-    							String.valueOf(l.linkQuality),
-    							String.valueOf(l.neighborLinkQuality)));
+    					MeshService.ClientData c = new MeshService.ClientData(l.remoteIP, l.linkQuality,
+    							l.neighborLinkQuality, l.linkCost, l.validityTime);
+    					for (HNA h : dump.hna) {
+    						if (l.remoteIP.contentEquals(h.gateway))
+    							c.hasHna = true;
+    					}
+    					clientsToAdd.add(c);
     				}
     				final ArrayList<MeshService.ClientData> updateList = new ArrayList<MeshService.ClientData>(clientsToAdd);
-    	                public void run() {
-    	                	for (MeshService.ClientData cd : updateList) {
-    	                		clientAdded(cd);
-    	    					Log.v(TAG, "Client Added: " + cd.toNiceString());
-    	                	}
-    	                }
+    				mHandler.post(new Runnable() {
+    					public void run() {
+    						for (MeshService.ClientData cd : updateList) {
+    							clientAdded(cd);
+    						}
+    					}
     	            });
     			}
     		} catch (InterruptedException e) {
