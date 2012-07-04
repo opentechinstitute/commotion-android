@@ -21,9 +21,15 @@
     android:layout_height="fill_parent">
 
     <include layout="@layout/control" android:id="@+id/control"
-        android:layout_height="fill_parent" android:layout_width="200sp"
+        android:layout_height="fill_parent" android:layout_width="151sp"
         android:layout_alignParentLeft="true"/>
-    <include layout="@layout/tabhost" android:id="@android:id/tabhost"
-        android:layout_width="fill_parent" android:layout_height="fill_parent"
-        android:layout_toRightOf="@id/control" android:layout_alignParentRight="true"/>
+
+    <include
+        android:id="@android:id/tabhost"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/control"
+        layout="@layout/tabhost" />
+
 </RelativeLayout>

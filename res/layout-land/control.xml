@@ -17,27 +17,21 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="fill_parent"
+    android:orientation="vertical" android:layout_width="fill_parent"
     android:gravity="top"
     android:layout_height="fill_parent"
     android:padding="5sp">
-
-    <ToggleButton
-        android:id="@+id/onoff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:minWidth="120dp"
-        android:textOff="Start"
-        android:textOn="Stop"
-        android:textSize="36dp"
-        android:textStyle="bold" />
+    <ToggleButton android:id="@+id/onoff"
+        android:textOff="Start" android:textOn="Stop"
+        android:textSize="22dp" android:textStyle="bold"
+        android:layout_height="wrap_content" android:layout_width="fill_parent" />
 
     <Button
         android:id="@+id/announce"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="left"
         android:text="@string/announce"
-        android:textSize="36dp" />
+        android:textSize="22dp" />
 
 </LinearLayout>
