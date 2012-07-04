@@ -108,8 +108,8 @@ public class StatusActivity extends android.app.TabActivity {
         tabs.addTab(tabs.newTabSpec("traffic")
                 .setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
                 .setContent(R.id.traffic));
-        tabs.addTab(tabs.newTabSpec("clients")
-                .setIndicator("clients", getResources().getDrawable(R.drawable.ic_tab_contacts))
+        tabs.addTab(tabs.newTabSpec("links")
+                .setIndicator("links", getResources().getDrawable(R.drawable.ic_tab_contacts))
                 .setContent(new Intent(this, ClientsActivity.class)));
         tabs.setOnTabChangedListener(new OnTabChangeListener() {
             @Override

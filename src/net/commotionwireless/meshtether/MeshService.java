@@ -23,12 +23,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import net.commotionwireless.meshtether.Util.MACAddress;
 import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.Link;
-import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -532,7 +533,6 @@ public class MeshService extends android.app.Service {
         }
         clients.add(cd);
 
-        log(false, String.format(getString(R.string.connected), cd.toNiceString()));
         app.clientAdded(cd);
 
     }
@@ -728,19 +728,36 @@ public class MeshService extends android.app.Service {
 
     class OlsrInfoThread extends Thread {
 
-    	public void run() {
+		public void run() {
     		JsonInfo jsoninfo = new JsonInfo();
+			ArrayList<MeshService.ClientData> clientsToAdd = new ArrayList<MeshService.ClientData>();
     		try {
     			while(true) {
     				Thread.sleep(5000);
-    				OlsrDataDump dump = jsoninfo.runtime();
+    				/*
+    				OlsrDataDump dump = jsoninfo.links();
+    				for (Neighbor n : dump.neighbors)
+    					Log.i(TAG, "Neighbor: " + n.ipv4Address);
+    				for (Interface i : dump.interfaces)
+    					Log.i(TAG, "Interface: " + i.name);
     				for (Link l : dump.links) {
-    					MeshService.ClientData cd = new ClientData(l.localIP, l.remoteIP, String.valueOf(l.linkQuality));
-    					clientAdded(cd);
+    				 */
+    				Collection<Link> links = jsoninfo.links();
+    				for (Link l : links) {
+    					clientsToAdd.add(new ClientData(l.remoteIP,
+    							String.valueOf(l.linkQuality),
+    							String.valueOf(l.neighborLinkQuality)));
     				}
+    				final ArrayList<MeshService.ClientData> updateList = new ArrayList<MeshService.ClientData>(clientsToAdd);
+    	                public void run() {
+    	                	for (MeshService.ClientData cd : updateList) {
+    	                		clientAdded(cd);
+    	    					Log.v(TAG, "Client Added: " + cd.toNiceString());
+    	                	}
+    	                }
+    	            });
     			}
     		} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     	}
