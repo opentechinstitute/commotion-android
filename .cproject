@@ -133,7 +133,7 @@
 					</scannerInfoProvider>
 				</profile>
 				<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.779378330;com.android.toolchain.gcc.779378330.1074007030;com.android.tool.compiler.c.1015988826;com.android.tool.compiler.c.input.863535732">
-					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
+					<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
 							<openAction enabled="true" filePath=""/>
@@ -216,7 +216,7 @@
 					</profile>
 				</scannerConfigBuildInfo>
 				<scannerConfigBuildInfo instanceId="com.android.toolchain.gcc.779378330;com.android.toolchain.gcc.779378330.1074007030;com.android.tool.compiler.g++.1909501110;com.android.tool.compiler.g++.input.956068844">
-					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
+					<autodiscovery enabled="false" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
 							<openAction enabled="true" filePath=""/>
