@@ -58,7 +58,7 @@
             android:summary="What to do when a client connects"
             android:title="New Client Actions" >
             <CheckBoxPreference
-                android:defaultValue="true"
+                android:defaultValue="false"
                 android:disableDependentsState="false"
                 android:key="client_notify"
                 android:summary="Show notification in status bar"
@@ -68,11 +68,12 @@
                 android:dependency="client_notify"
                 android:key="client_sound"
                 android:ringtoneType="notification"
-                android:showDefault="true"
+                android:showDefault="false"
                 android:summary="Play a ringtone"
                 android:title="Sound" />
 
             <CheckBoxPreference
+                android:defaultValue="false"
                 android:dependency="client_notify"
                 android:key="client_light"
                 android:summary="Blink status light"

@@ -221,7 +221,7 @@ public class MeshTetherApp extends android.app.Application {
 	}
 
 	void clientAdded(MeshService.ClientData cd) {
-		if (prefs.getBoolean("client_notify", true)) {
+		if (prefs.getBoolean("client_notify", false)) {
 			notificationClientAdded.defaults = 0;
 			if (prefs.getBoolean("client_light", false)) {
 				notificationClientAdded.flags |= Notification.FLAG_SHOW_LIGHTS;
