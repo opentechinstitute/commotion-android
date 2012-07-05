@@ -52,7 +52,6 @@
                     <TextView
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:gravity="center"
                         android:text="Download"
                         android:textColor="#FFFFFFFF"
@@ -62,7 +61,6 @@
                     <TextView
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:gravity="center"
                         android:text="Upload"
                         android:textColor="#FFFFFFFF"
@@ -76,7 +74,6 @@
                         android:id="@+id/download"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
                         android:gravity="center"
                         android:text="---"
                         android:textColor="#FFa4c639"
@@ -87,7 +84,6 @@
                         android:id="@+id/upload"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
                         android:gravity="center"
                         android:text="---"
                         android:textColor="#FFf05414"
