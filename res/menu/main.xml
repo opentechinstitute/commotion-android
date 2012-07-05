@@ -16,10 +16,25 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<menu
-  xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@+id/menu_prefs" android:icon="@android:drawable/ic_menu_preferences" android:title="Settings"></item>
-<item android:id="@+id/menu_about" android:icon="@android:drawable/ic_menu_help" android:title="Help"></item>
-<item android:id="@+id/menu_share_debug" android:title="Share Debug"></item>
-<item android:id="@+id/menu_share_status" android:title="Share Status"></item>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_prefs"
+        android:icon="@android:drawable/ic_menu_preferences"
+        android:title="Settings">
+    </item>
+    <item
+        android:id="@+id/menu_about"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Help">
+    </item>
+    <item
+        android:id="@+id/menu_share_debug"
+        android:title="Share Debug">
+    </item>
+    <item
+        android:id="@+id/menu_share_status"
+        android:title="Share Status">
+    </item>
+
 </menu>

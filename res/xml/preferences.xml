@@ -16,68 +16,108 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <PreferenceCategory android:title="Wireless LAN">
-        <EditTextPreference android:title="SSID (Network Name)"
-            android:key="@string/lan_essid" android:defaultValue="commotionwireless.net"
-            android:singleLine="true" />
-        <net.commotionwireless.meshtether.MACPreference android:title="BSSID (Optional)"
-            android:key="@string/lan_bssid" android:singleLine="true"
-            android:hint="unique MAC address" />
-        <ListPreference android:title="Channel"
-            android:key="@string/lan_channel" android:defaultValue="5"
-            android:entries="@array/channel_names" android:entryValues="@array/channel_values" />
-        <ListPreference android:title="Custom Wifi Ad-hoc"
-            android:key="@string/lan_script" android:defaultValue=""
-            android:entries="@array/script_names" android:entryValues="@array/script_values" />
-        <CheckBoxPreference android:title="Skip wpa_supplicant"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="Wireless LAN" >
+        <EditTextPreference
+            android:defaultValue="commotionwireless.net"
+            android:key="@string/lan_essid"
+            android:singleLine="true"
+            android:title="SSID (Network Name)" />
+
+        <net.commotionwireless.meshtether.MACPreference
+            android:hint="unique MAC address"
+            android:key="@string/lan_bssid"
+            android:singleLine="true"
+            android:title="BSSID (Optional)" />
+
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/channel_names"
+            android:entryValues="@array/channel_values"
+            android:key="@string/lan_channel"
+            android:title="Channel" />
+        <ListPreference
+            android:defaultValue=""
+            android:entries="@array/script_names"
+            android:entryValues="@array/script_values"
+            android:key="@string/lan_script"
+            android:title="Custom Wifi Ad-hoc" />
+
+        <CheckBoxPreference
+            android:key="@string/lan_wext"
             android:summary="Configure wifi directly"
-            android:key="@string/lan_wext" />
-        <CheckBoxPreference android:title="Auto Associate"
+            android:title="Skip wpa_supplicant" />
+        <CheckBoxPreference
+            android:key="lan_autoassoc"
             android:summary="Associate every 5 seconds until a client connects"
-            android:key="lan_autoassoc" />
+            android:title="Auto Associate" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Clients">
-        <PreferenceScreen android:title="New Client Actions"
-                          android:summary="What to do when a client connects">
-            <CheckBoxPreference android:key="client_notify" android:title="Notify"
-                                android:summary="Show notification in status bar"
-                                android:defaultValue="true"
-                                android:disableDependentsState="false" />
-            <RingtonePreference android:key="client_sound" android:title="Sound"
-                                android:summary="Play a ringtone"
-                                android:ringtoneType="notification"
-                                android:showDefault="true"
-                                android:dependency="client_notify" />
-            <CheckBoxPreference android:key="client_light" android:title="Light"
-                                android:summary="Blink status light"
-                                android:dependency="client_notify" />
+    <PreferenceCategory android:title="Clients" >
+        <PreferenceScreen
+            android:summary="What to do when a client connects"
+            android:title="New Client Actions" >
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:disableDependentsState="false"
+                android:key="client_notify"
+                android:summary="Show notification in status bar"
+                android:title="Notify" />
+
+            <RingtonePreference
+                android:dependency="client_notify"
+                android:key="client_sound"
+                android:ringtoneType="notification"
+                android:showDefault="true"
+                android:summary="Play a ringtone"
+                android:title="Sound" />
+
+            <CheckBoxPreference
+                android:dependency="client_notify"
+                android:key="client_light"
+                android:summary="Blink status light"
+                android:title="Light" />
         </PreferenceScreen>
-        <CheckBoxPreference android:title="Local Mode"
-            android:summary="Don't wait for data connection"
-            android:key="wan_nowait" />
+
+        <CheckBoxPreference
+            android:key="wan_nowait"
+            android:summary="Don&apos;t wait for data connection"
+            android:title="Local Mode" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Advanced">
-        <PreferenceScreen android:title="Mesh" android:summary="Mesh Host Configuration">
-            <net.commotionwireless.meshtether.MeshIPPreference android:title="Mesh Node IP"
+    <PreferenceCategory android:title="Advanced" >
+        <PreferenceScreen
+            android:summary="Mesh Host Configuration"
+            android:title="Mesh" >
+            <net.commotionwireless.meshtether.MeshIPPreference
                 android:key="@string/adhoc_ip"
-                android:singleLine="true" />
-            <net.commotionwireless.meshtether.IPPreference android:title="Mesh Node IP Mask"
-                android:key="@string/adhoc_netmask" android:defaultValue="255.0.0.0"
-                android:singleLine="true" />
-            <net.commotionwireless.meshtether.IPPreference android:title="DNS Server"
-                android:key="@string/adhoc_dns_server" android:defaultValue="8.8.8.8"
-                android:singleLine="true" />
+                android:singleLine="true"
+                android:title="Mesh Node IP" />
+
+            <net.commotionwireless.meshtether.IPPreference
+                android:defaultValue="255.0.0.0"
+                android:key="@string/adhoc_netmask"
+                android:singleLine="true"
+                android:title="Mesh Node IP Mask" />
+            <net.commotionwireless.meshtether.IPPreference
+                android:defaultValue="8.8.8.8"
+                android:key="@string/adhoc_dns_server"
+                android:singleLine="true"
+                android:title="DNS Server" />
         </PreferenceScreen>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Interfaces">
-        <EditTextPreference android:title="WAN"
-            android:key="@string/if_wan" android:defaultValue=""
+    <PreferenceCategory android:title="Interfaces" >
+        <EditTextPreference
+            android:defaultValue=""
             android:hint="leave empty to autodetect"
-            android:singleLine="true" />
-        <EditTextPreference android:title="LAN"
-            android:key="@string/if_lan" android:defaultValue=""
+            android:key="@string/if_wan"
+            android:singleLine="true"
+            android:title="WAN" />
+        <EditTextPreference
+            android:defaultValue=""
             android:hint="leave empty to autodetect"
-            android:singleLine="true" />
+            android:key="@string/if_lan"
+            android:singleLine="true"
+            android:title="LAN" />
     </PreferenceCategory>
+
 </PreferenceScreen>

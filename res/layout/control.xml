@@ -17,10 +17,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="fill_parent"
-    android:gravity="top"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:padding="5sp">
+    android:gravity="top"
+    android:orientation="horizontal"
+    android:padding="5sp" >
 
     <ToggleButton
         android:id="@+id/onoff"

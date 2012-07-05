@@ -99,7 +99,6 @@
         <item>13 – 2472 MHz</item>
         <!-- <item>14 - 2484 MHz</item> -->
     </string-array>
-
     <string-array name="script_values">
         <item></item>
         <item>script_hero</item>
