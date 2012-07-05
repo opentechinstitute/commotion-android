@@ -1,3 +1,6 @@
 [submodule "external/olsrd"]
 	path = external/olsrd
 	url = http://olsr.org/git/olsrd.git
+[submodule "external/olsrinfo"]
+	path = external/olsrinfo
+	url = https://github.com/guardianproject/OlsrInfo.git
