@@ -675,6 +675,7 @@ public class MeshService extends android.app.Service {
     			}
     			WifiProcess = null;
     		}
+    		clients.clear();
     	}
     }
 
