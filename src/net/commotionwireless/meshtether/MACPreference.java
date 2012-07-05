@@ -18,45 +18,44 @@
 
 package net.commotionwireless.meshtether;
 
-import net.commotionwireless.meshtether.R;
 import android.content.Context;
 import android.preference.EditTextPreference;
+import android.text.method.DigitsKeyListener;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
-import android.text.method.DigitsKeyListener;
 import android.widget.Toast;
 
 /**
  * EditTextPreference that allows MAC addresses only
  */
 public class MACPreference extends EditTextPreference {
-    public MACPreference(Context context, AttributeSet attrs, int defStyle) { super(context, attrs, defStyle); }
-    public MACPreference(Context context, AttributeSet attrs) { super(context, attrs); }
-    public MACPreference(Context context) { super(context); }
+	public MACPreference(Context context, AttributeSet attrs, int defStyle) { super(context, attrs, defStyle); }
+	public MACPreference(Context context, AttributeSet attrs) { super(context, attrs); }
+	public MACPreference(Context context) { super(context); }
 
-    @Override
-    protected void onAddEditTextToDialogView(View dialogView, EditText editText) {
-        editText.setKeyListener(DigitsKeyListener.getInstance("0123456789ABCDEFabcdef:-."));
-        super.onAddEditTextToDialogView(dialogView, editText);
-    }
+	@Override
+	protected void onAddEditTextToDialogView(View dialogView, EditText editText) {
+		editText.setKeyListener(DigitsKeyListener.getInstance("0123456789ABCDEFabcdef:-."));
+		super.onAddEditTextToDialogView(dialogView, editText);
+	}
 
-    public static boolean validate(String addr) {
-        return Util.MACAddress.parse(addr) != null;
-    }
-    
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        if (positiveResult) {
-            // verify now that it's an IP
-            String addr = getEditText().getText().toString();
-            if (addr.length() != 0 && !validate(addr)) { // note empty address is fine
-                Toast.makeText(getContext(), 
-                               getContext().getString(R.string.invalidmac),
-                               Toast.LENGTH_SHORT).show();
-                positiveResult = false;
-            }
-        }
-        super.onDialogClosed(positiveResult);
-    }
+	public static boolean validate(String addr) {
+		return Util.MACAddress.parse(addr) != null;
+	}
+
+	@Override
+	protected void onDialogClosed(boolean positiveResult) {
+		if (positiveResult) {
+			// verify now that it's an IP
+			String addr = getEditText().getText().toString();
+			if (addr.length() != 0 && !validate(addr)) { // note empty address is fine
+				Toast.makeText(getContext(), 
+						getContext().getString(R.string.invalidmac),
+						Toast.LENGTH_SHORT).show();
+				positiveResult = false;
+			}
+		}
+		super.onDialogClosed(positiveResult);
+	}
 }

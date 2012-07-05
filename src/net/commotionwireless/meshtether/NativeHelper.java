@@ -25,13 +25,13 @@ public class NativeHelper {
 	public static File app_bin;
 	public static File app_log;
 
-    static String SU_C;
-    static String RUN;
-    static String STOP_OLSRD;
-    static String DO_STOP_OLSRD;
-    static String OLSRD;
-    static String WIFI;
-    static String SET_NET_DNS1;
+	static String SU_C;
+	static String RUN;
+	static String STOP_OLSRD;
+	static String DO_STOP_OLSRD;
+	static String OLSRD;
+	static String WIFI;
+	static String SET_NET_DNS1;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -130,7 +130,7 @@ public class NativeHelper {
 	}
 
 	public static void zip(File fileToZip, File zip)
-			throws FileNotFoundException, IOException {
+	throws FileNotFoundException, IOException {
 		final int BUFFER = 2048;
 		BufferedInputStream origin = null;
 		byte data[] = new byte[BUFFER];
