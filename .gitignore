@@ -1,6 +1,6 @@
 bin/
 gen/
 obj/
-libs/olsrinfo.jar
 native/libs/armeabi/libhardware_legacy.so
 native/libs/armeabi/wifi
+external/olsrd-build-stamp

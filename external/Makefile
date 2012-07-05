@@ -1,5 +1,5 @@
 
-all: olsrd/olsrd olsrinfo
+all: olsrd
 
 clean:
 	make -C olsrd OS=android clean_all
