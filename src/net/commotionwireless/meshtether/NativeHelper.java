@@ -39,6 +39,7 @@ public class NativeHelper {
 		// this is the same as android-8's getExternalFilesDir() but works on android-1
 		publicFiles = new File(Environment.getExternalStorageDirectory(),
 				"Android/data/" + context.getPackageName() + "/files/");
+		publicFiles.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
