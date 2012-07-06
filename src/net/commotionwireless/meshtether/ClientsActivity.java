@@ -20,7 +20,13 @@ package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
 
+import net.commotionwireless.meshtether.MeshService.ClientData;
+import net.commotionwireless.olsrinfo.JsonInfo;
+import net.commotionwireless.olsrinfo.datatypes.HNA;
+import net.commotionwireless.olsrinfo.datatypes.Link;
+import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -32,6 +38,11 @@ public class ClientsActivity extends android.app.ListActivity {
 	private MeshTetherApp app;
 	private BaseAdapter adapter;
 	private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
+
+	private OlsrInfoThread mOlsrInfoThread;
+	private boolean mPauseOlsrInfoThread = false;
+	JsonInfo mJsonInfo;
+	private final Handler mHandler = new Handler();
 
 	private static class ViewHolder {
 		TextView remoteIP;
@@ -81,10 +92,17 @@ public class ClientsActivity extends android.app.ListActivity {
 		};
 		setListAdapter(adapter);
 		setTitle(getString(R.string.clientview));
+
+		mJsonInfo = new JsonInfo();
+		mOlsrInfoThread = new OlsrInfoThread();
+		mOlsrInfoThread.start();
 	}
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		mJsonInfo = null;
+		mOlsrInfoThread = null;
 		app.setClientsActivity(null);
 	}
 
@@ -96,6 +114,13 @@ public class ClientsActivity extends android.app.ListActivity {
 
 		if (hasWindowFocus() && clients.isEmpty())
 			app.updateToast(getString(R.string.noclients), false);
+		mPauseOlsrInfoThread = false;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mPauseOlsrInfoThread = true;
 	}
 
 	public void update() {
@@ -103,4 +128,59 @@ public class ClientsActivity extends android.app.ListActivity {
 			clients = app.service.clients;
 		adapter.notifyDataSetChanged();
 	}
+
+	class OlsrInfoThread extends Thread {
+
+		public void run() {
+			ArrayList<MeshService.ClientData> clientsToAdd = new ArrayList<MeshService.ClientData>();
+			try {
+				while(true) {
+					OlsrDataDump dump = mJsonInfo.parseCommand("/links/hna");
+					for (Link l : dump.links) {
+						MeshService.ClientData c = new MeshService.ClientData(l.remoteIP, l.linkQuality,
+								l.neighborLinkQuality, l.linkCost, l.validityTime);
+						for (HNA h : dump.hna) {
+							if (l.remoteIP.contentEquals(h.gateway))
+								c.hasHna = true;
+						}
+						clientsToAdd.add(c);
+					}
+					final ArrayList<MeshService.ClientData> updateList = new ArrayList<MeshService.ClientData>(clientsToAdd);
+					mHandler.post(new Runnable() {
+						public void run() {
+							for (MeshService.ClientData cd : updateList) {
+								clientAdded(cd);
+							}
+						}
+					});
+					while (mPauseOlsrInfoThread) {
+						Thread.sleep(500);
+					}
+					Thread.sleep(5000);
+				}
+			} catch (InterruptedException e) {
+				// fall through
+			}
+		}
+	}
+
+	private void clientAdded(ClientData cd) {
+
+		for (int i = 0; i < clients.size(); ++i) {
+			ClientData c = clients.get(i);
+			if (c.remoteIP.equals(cd.remoteIP)) {
+				if (c.hasHna == cd.hasHna
+						&& c.linkQuality == cd.linkQuality
+						&& c.neighborLinkQuality == cd.neighborLinkQuality) {
+					return; // no change
+				}
+				cd.hasHna = c.hasHna;
+				clients.remove(i); // we'll add it at the end
+				break;
+			}
+		}
+		clients.add(cd);
+		app.clientAdded(cd);
+	}
+
 }
