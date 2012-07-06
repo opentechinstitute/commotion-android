@@ -55,8 +55,8 @@ public class MeshTetherApp extends android.app.Application {
 	final static int ERROR_SUPPLICANT = 3;
 
 	SharedPreferences prefs;
-	private StatusActivity  statusActivity = null;
-	private ClientsActivity clientsActivity = null;
+	StatusActivity  statusActivity = null;
+	ClientsActivity clientsActivity = null;
 	private Toast toast;
 
 	private WifiManager wifiManager;

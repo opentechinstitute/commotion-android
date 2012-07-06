@@ -40,7 +40,7 @@ public class ClientsActivity extends android.app.ListActivity {
 	private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
 
 	private OlsrInfoThread mOlsrInfoThread;
-	private boolean mPauseOlsrInfoThread = false;
+	boolean mPauseOlsrInfoThread = false;
 	JsonInfo mJsonInfo;
 	private final Handler mHandler = new Handler();
 
@@ -153,9 +153,8 @@ public class ClientsActivity extends android.app.ListActivity {
 							}
 						}
 					});
-					while (mPauseOlsrInfoThread) {
+					while (mPauseOlsrInfoThread)
 						Thread.sleep(500);
-					}
 					Thread.sleep(5000);
 				}
 			} catch (InterruptedException e) {

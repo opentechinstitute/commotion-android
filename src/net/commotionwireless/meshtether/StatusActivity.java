@@ -61,6 +61,10 @@ public class StatusActivity extends android.app.TabActivity {
 	final static int DLG_ERROR = 2;
 	final static int DLG_SUPPLICANT = 3;
 
+	private final static String LINKS = "links";
+	private final static String LOG = "log";
+	private final static String TRAFFIC = "traffic";
+
 	static NumberFormat nf = NumberFormat.getInstance();
 	static {
 		nf.setMaximumFractionDigits(2);
@@ -101,25 +105,30 @@ public class StatusActivity extends android.app.TabActivity {
 		});
 
 		tabs = getTabHost();
-		tabs.addTab(tabs.newTabSpec("log")
+		tabs.addTab(tabs.newTabSpec(LOG)
 				.setIndicator("log", getResources().getDrawable(R.drawable.ic_tab_recent))
 				.setContent(R.id.logview));
-		tabs.addTab(tabs.newTabSpec("traffic")
+		tabs.addTab(tabs.newTabSpec(TRAFFIC)
 				.setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
 				.setContent(R.id.traffic));
-		tabs.addTab(tabs.newTabSpec("links")
-				.setIndicator("links", getResources().getDrawable(R.drawable.ic_tab_contacts))
+		tabs.addTab(tabs.newTabSpec(LINKS)
+				.setIndicator(LINKS, getResources().getDrawable(R.drawable.ic_tab_contacts))
 				.setContent(new Intent(this, ClientsActivity.class)));
 		tabs.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {
 				update();
-				if ("traffic".equals(tabId)) {
+				if (TRAFFIC.equals(tabId)) {
 					// force refresh
 					MeshService svc = app.service;
 					if (svc != null)
 						svc.statsRequest(0);
 				}
+				if (app.clientsActivity != null)
+					if (LINKS.equals(tabId))
+						app.clientsActivity.mPauseOlsrInfoThread = false;
+					else
+						app.clientsActivity.mPauseOlsrInfoThread = true;
 			}
 		});
 
