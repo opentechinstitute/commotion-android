@@ -55,6 +55,12 @@
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
 
+    <!-- Share OLSR Status -->
+    <string name="gettingolsrinfo">Getting info from olsrd…</string>
+    <string name="writingfile">Writing info to file…</string>
+    <string name="zippingfile">Zipping up file…</string>
+    <string name="olsrdnotrunning">olsrd is not running, no status information available!</string>
+
     <!-- DO NOT TRANSLATE -->
     <string name="if_wan">if_wan</string>
     <string name="if_lan">if_lan</string>

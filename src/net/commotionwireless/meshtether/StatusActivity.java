@@ -27,10 +27,13 @@ import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,6 +74,13 @@ public class StatusActivity extends android.app.TabActivity {
 		nf.setMinimumFractionDigits(2);
 		nf.setMinimumIntegerDigits(1);
 	}
+
+    ProgressDialog mProgressDialog;
+    final Handler mHandler = new Handler() {
+        public void handleMessage(Message msg) {
+            mProgressDialog.setMessage(msg.getData().getString("message"));
+        }
+    };
 
 	/** Called when the activity is first created. */
 	@Override
@@ -174,25 +184,51 @@ public class StatusActivity extends android.app.TabActivity {
 
 	private void getOlsrdStatusAndShare() {
 		if (app.getState() == MeshService.STATE_RUNNING) {
-			JsonInfo jsoninfo = new JsonInfo();
-			OlsrDataDump dump = jsoninfo.all();
-			final File f = new File(NativeHelper.publicFiles, "olsrd-status.json");
-			FileWriter fw;
-			try {
-				fw = new FileWriter(f);
-				fw.write(dump.toString());
-				fw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-			zipAndShareFile(f);
+			app.clientsActivity.mPauseOlsrInfoThread = true;
+			mProgressDialog = new ProgressDialog(this);
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			mProgressDialog.setMessage("Generating...");
+			mProgressDialog.show();
+			new Thread() {
+
+				private void showMessage(int messageId) {
+					String message = getString(messageId);
+					Message msg = mHandler.obtainMessage();
+					Bundle b = new Bundle();
+					b.putString("message", message);
+					msg.setData(b);
+					mHandler.sendMessage(msg);
+				}
+
+				public void run() {
+					try {
+						showMessage(R.string.gettingolsrinfo);
+						JsonInfo jsoninfo = new JsonInfo();
+						OlsrDataDump dump = jsoninfo.all();
+						showMessage(R.string.writingfile);
+						String filename;
+						if (dump.uuid == null || dump.uuid.contentEquals(""))
+							filename = new String("olsrd-status-" + dump.systemTime + ".json");
+						else
+							filename = new String("olsrd-status-" + dump.systemTime + "_" + dump.uuid + ".json");
+						final File f = new File(NativeHelper.app_log, filename);
+						FileWriter fw = new FileWriter(f);
+						fw.write(dump.toString());
+						fw.close();
+						showMessage(R.string.zippingfile);
+						zipAndShareFile(f);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					mProgressDialog.dismiss();
+					app.clientsActivity.mPauseOlsrInfoThread = false;
+				}
+			}.start();
 		} else {
 			// nothing to do, since we can't talk to olsrd
-			app.updateToast("olsrd is not running, no status information available.", true);
+			app.updateToast(getString(R.string.olsrdnotrunning), true);
 			return;
 		}
-
 	}
 
 	private void zipAndShareFile(File f) {
