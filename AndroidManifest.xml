@@ -17,45 +17,69 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.commotionwireless.meshtether" android:versionName="0.0" android:versionCode="0">
+    package="net.commotionwireless.meshtether"
+    android:versionCode="0"
+    android:versionName="0.0" >
 
-    <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="8" />
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="8" />
 
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
-    <permission android:name="net.commotionwireless.meshtether.ACCESS_STATE"
-        android:protectionLevel="normal"
+    <permission
+        android:name="net.commotionwireless.meshtether.ACCESS_STATE"
+        android:label="view the state of connection to mesh"
         android:permissionGroup="android.permission-group.NETWORK"
-        android:label="view the state of connection to mesh"/>
-    <permission android:name="net.commotionwireless.meshtether.CHANGE_STATE"
+        android:protectionLevel="normal" />
+    <permission
+        android:name="net.commotionwireless.meshtether.CHANGE_STATE"
         android:label="connect to or disconnect from the mesh"
         android:permissionGroup="android.permission-group.NETWORK"
         android:protectionLevel="dangerous" />
 
-    <application android:label="@string/app_name" android:icon="@drawable/barnacle_head"
-        android:name=".MeshTetherApp" android:description="@string/app_name">
-        <activity android:launchMode="singleTask" android:name="StatusActivity">
+    <application
+        android:name=".MeshTetherApp"
+        android:description="@string/app_name"
+        android:icon="@drawable/barnacle_head"
+        android:label="@string/app_name" >
+        <activity
+            android:name="StatusActivity"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.VOICE_LAUNCH" />
             </intent-filter>
         </activity>
-        <activity android:launchMode="singleTop" android:name="ClientsActivity" />
-        <activity android:launchMode="singleTop" android:name="net.commotionwireless.meshtether.SettingsActivity" />
-        <service android:label="Barnacle Wifi Tether" android:icon="@drawable/barnacle_head"
-            android:name=".MeshService" />
-        <receiver android:name="net.commotionwireless.meshtether.ToggleReceiver" android:permission="net.commotionwireless.meshtether.CHANGE_STATE">
+        <activity
+            android:name="ClientsActivity"
+            android:launchMode="singleTop" />
+        <activity
+            android:name="net.commotionwireless.meshtether.SettingsActivity"
+            android:launchMode="singleTop" />
+
+        <service
+            android:name=".MeshService"
+            android:icon="@drawable/barnacle_head"
+            android:label="Barnacle Wifi Tether" />
+
+        <receiver
+            android:name="net.commotionwireless.meshtether.ToggleReceiver"
+            android:permission="net.commotionwireless.meshtether.CHANGE_STATE" >
             <intent-filter>
                 <action android:name="net.commotionwireless.meshtether.TOGGLE_STATE" />
             </intent-filter>
         </receiver>
-        <receiver android:name="ToggleReceiver" android:permission="net.commotionwireless.meshtether.ACCESS_STATE">
+        <receiver
+            android:name="ToggleReceiver"
+            android:permission="net.commotionwireless.meshtether.ACCESS_STATE" >
             <intent-filter>
                 <action android:name="net.commotionwireless.meshtether.CHECK_STATE" />
             </intent-filter>

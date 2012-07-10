@@ -17,13 +17,23 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <include layout="@layout/control" android:id="@+id/control"
-        android:layout_width="fill_parent" android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"/>
-    <include layout="@layout/tabhost" android:id="@android:id/tabhost"
-        android:layout_width="fill_parent" android:layout_height="fill_parent"
-        android:layout_below="@id/control" android:layout_alignParentBottom="true"/>
+    <include
+        android:id="@+id/control"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/control" />
+
+    <include
+        android:id="@android:id/tabhost"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/control"
+        layout="@layout/tabhost" />
+
 </RelativeLayout>
