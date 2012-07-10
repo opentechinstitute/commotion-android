@@ -102,6 +102,7 @@ public class ClientsActivity extends android.app.ListActivity {
 	protected void onDestroy() {
 		super.onDestroy();
 		mJsonInfo = null;
+		mOlsrInfoThread.interrupt();
 		mOlsrInfoThread = null;
 		app.setClientsActivity(null);
 	}
