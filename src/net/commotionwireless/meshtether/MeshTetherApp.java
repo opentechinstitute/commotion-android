@@ -154,8 +154,10 @@ public class MeshTetherApp extends android.app.Application {
 	}
 
 	public void startService() {
-		if (service == null)
+		if (service == null) {
+			showProgressMessage(R.string.servicestarting);
 			startService(new Intent(this, MeshService.class));
+		}
 	}
 
 	public void stopService() {
@@ -329,6 +331,24 @@ public class MeshTetherApp extends android.app.Application {
 	void cleanUpNotifications() {
 		if ((service != null) && (service.getState() == MeshService.STATE_STOPPED))
 			processStopped(); // clean up notifications
+	}
+
+	void showProgressMessage(int resId) {
+		showProgressMessage(getString(resId));
+	}
+
+	void showProgressMessage(String messageText) {
+		// TODO implement sending message to ProgressDialog
+		Log.i(TAG, "MSG_PROGRESSDIALOG");
+		statusActivity.mProgressDialog.setMessage(messageText);
+		if ( !statusActivity.mProgressDialog.isShowing())
+			statusActivity.mProgressDialog.show();
+	}
+
+	void hideProgressDialog() {
+		Log.i(TAG, "MSG_PROGRESSDIALOG_DISMISS");
+		// TODO implement sending message to ProgressDialog
+		statusActivity.mProgressDialog.dismiss();
 	}
 }
 

@@ -61,6 +61,9 @@ public class MeshService extends android.app.Service {
 	final static int MSG_STATS      = 8;
 	final static int MSG_SET_DNS1_OUTPUT = 9;
 	final static int MSG_STOP_OLSRD_OUTPUT = 10;
+	// messages for the ProgressDialog
+	final static int MSG_SHOW_PROGRESSDIALOG = 11;
+	final static int MSG_HIDE_PROGRESSDIALOG = 12;
 	// app states
 	public final static int STATE_STOPPED  = 0;
 	public final static int STATE_STARTING = 1;
@@ -196,6 +199,7 @@ public class MeshService extends android.app.Service {
 		super.onDestroy();
 	}
 
+
 	// our handler
 	private final Handler mHandler = new Handler() {
 		@Override
@@ -204,6 +208,12 @@ public class MeshService extends android.app.Service {
 
 	private void handle(Message msg) {
 		switch (msg.what) {
+		case MSG_SHOW_PROGRESSDIALOG:
+			app.showProgressMessage((String)msg.obj);
+			break;
+		case MSG_HIDE_PROGRESSDIALOG:
+			app.hideProgressDialog();
+			break;
 		case MSG_EXCEPTION:
 			if (state == STATE_STOPPED) return;
 			Throwable thr = (Throwable)msg.obj;
@@ -277,6 +287,7 @@ public class MeshService extends android.app.Service {
 					//app.foundIfLan(if_lan); // this will allow 3G <-> 4G with simple restart
 					app.processStarted();
 					mHandler.sendEmptyMessage(MSG_ASSOC);
+					mHandler.sendEmptyMessage(MSG_HIDE_PROGRESSDIALOG);
 				}
 			} else {
 				log(false, line);
@@ -310,7 +321,7 @@ public class MeshService extends android.app.Service {
 						///log(true, getString(R.string.wanerr));
 						//state = STATE_STOPPED;
 						//break;
-						log(false, "no active WAN interface found");
+						log(false, "No active WAN interface found");
 					}
 					mOldNetDns1Value = System.getProperty("net.dns1");
 					try {
@@ -392,8 +403,10 @@ public class MeshService extends android.app.Service {
 			break;
 		}
 		app.updateStatus();
-		if (state == STATE_STOPPED)
+		if (state == STATE_STOPPED) {
 			app.processStopped();
+			app.hideProgressDialog();
+		}
 	}
 
 	protected void log(boolean error, String msg) {
@@ -403,6 +416,10 @@ public class MeshService extends android.app.Service {
 		log.append(COLOR_TIME, time.format("%H:%M:%S\t"))
 		.append(error ? COLOR_ERROR : COLOR_LOG, msg)
 		.append("\n");
+		Message message = mHandler.obtainMessage();
+		message.what = MSG_SHOW_PROGRESSDIALOG;
+		message.obj = msg;
+		mHandler.sendMessage(message);
 	}
 
 	/** Worker Threads */
@@ -595,6 +612,7 @@ public class MeshService extends android.app.Service {
 
 	private boolean startProcess() {
 		// calling 'su -c' from Java doesn't work so we use a helper script
+		app.showProgressMessage(R.string.startingolsrd);
 		String cmd = NativeHelper.SU_C;
 		try {
 			WifiProcess = new MeshTetherProcess(cmd, buildEnvFromPrefs(), NativeHelper.app_bin);
@@ -612,6 +630,7 @@ public class MeshService extends android.app.Service {
 		 * TODO: UN copy and paste!!
 		 */
 		if (state != STATE_STOPPED) {
+			app.showProgressMessage(R.string.servicestopping);
 			try {	
 				MeshTetherProcess StopOlsrProcess = new MeshTetherProcess(NativeHelper.STOP_OLSRD,
 						null, NativeHelper.app_bin);
@@ -645,6 +664,7 @@ public class MeshService extends android.app.Service {
 				WifiProcess = null;
 			}
 			clients.clear();
+			app.hideProgressDialog();
 		}
 	}
 

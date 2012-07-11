@@ -114,20 +114,6 @@
                         android:textStyle="bold" />
                 </TableRow>
             </TableLayout>
-
-            <ScrollView
-                android:id="@+id/logview"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    android:id="@+id/log_text"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:autoLink="web"
-                    android:gravity="top|left"
-                    android:scrollHorizontally="false" />
-            </ScrollView>
         </FrameLayout>
     </LinearLayout>
 

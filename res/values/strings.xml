@@ -55,6 +55,11 @@
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
 
+    <!-- messages for the ProgressDialog -->
+    <string name="servicestarting">Mesh service starting…</string>
+    <string name="startingolsrd">Starting olsrd…</string>
+    <string name="servicestopping">Mesh service stopping…</string>
+
     <!-- Share OLSR Status -->
     <string name="gettingolsrinfo">Getting info from olsrd…</string>
     <string name="writingfile">Writing info to file…</string>

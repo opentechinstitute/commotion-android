@@ -51,7 +51,6 @@ public class StatusActivity extends android.app.TabActivity {
 	private TabHost tabs;
 	private ToggleButton onoff;
 	private Button announce;
-	private TextView logview;
 	private boolean paused;
 
 	private TextView textDownload;
@@ -65,7 +64,6 @@ public class StatusActivity extends android.app.TabActivity {
 	final static int DLG_SUPPLICANT = 3;
 
 	private final static String LINKS = "links";
-	private final static String LOG = "log";
 	private final static String TRAFFIC = "traffic";
 
 	static NumberFormat nf = NumberFormat.getInstance();
@@ -115,9 +113,6 @@ public class StatusActivity extends android.app.TabActivity {
 		});
 
 		tabs = getTabHost();
-		tabs.addTab(tabs.newTabSpec(LOG)
-				.setIndicator("log", getResources().getDrawable(R.drawable.ic_tab_recent))
-				.setContent(R.id.logview));
 		tabs.addTab(tabs.newTabSpec(TRAFFIC)
 				.setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
 				.setContent(R.id.traffic));
@@ -142,7 +137,6 @@ public class StatusActivity extends android.app.TabActivity {
 			}
 		});
 
-		logview = (TextView) findViewById(R.id.log_text);
 		app.setStatusActivity(this);
 		paused = false;
 		//onoff.setEnabled(false);
@@ -152,6 +146,9 @@ public class StatusActivity extends android.app.TabActivity {
 		textUpload = ((TextView)findViewById(R.id.upload));
 		textDownloadRate = ((TextView)findViewById(R.id.download_rate));
 		textUploadRate = ((TextView)findViewById(R.id.upload_rate));
+
+		mProgressDialog = new ProgressDialog(this);
+		mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	}
 	@Override
 	protected void onDestroy() {
@@ -185,8 +182,6 @@ public class StatusActivity extends android.app.TabActivity {
 	private void getOlsrdStatusAndShare() {
 		if (app.getState() == MeshService.STATE_RUNNING) {
 			app.clientsActivity.mPauseOlsrInfoThread = true;
-			mProgressDialog = new ProgressDialog(this);
-			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			mProgressDialog.setMessage("Generating...");
 			mProgressDialog.show();
 			new Thread() {
@@ -362,9 +357,6 @@ public class StatusActivity extends android.app.TabActivity {
 
 	void update() {
 		int state = app.getState();
-
-		if (app.log != null)
-			logview.setText(app.log);
 
 		if (state == MeshService.STATE_STOPPED) {
 			announce.setEnabled(false);
