@@ -31,7 +31,6 @@ public class NativeHelper {
 	static String DO_STOP_OLSRD;
 	static String OLSRD;
 	static String WIFI;
-	static String SET_NET_DNS1;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -46,7 +45,6 @@ public class NativeHelper {
 		RUN = new File(app_bin, "run").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		WIFI = new File(app_bin, "wifi").getAbsolutePath();
-		SET_NET_DNS1 = new File(app_bin, "set_net_dns1").getAbsolutePath();
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -95,7 +93,6 @@ public class NativeHelper {
 		chmod("0750", new File(DO_STOP_OLSRD));
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(WIFI));
-		chmod("0750", new File(SET_NET_DNS1));
 		chmod("0750", new File(app_bin, "script_aria"));
 		chmod("0750", new File(app_bin, "script_hero"));
 		chmod("0750", new File(app_bin, "script_samsung"));

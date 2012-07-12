@@ -59,7 +59,6 @@ public class MeshService extends android.app.Service {
 	final static int MSG_STOP       = 6;
 	final static int MSG_ASSOC      = 7;
 	final static int MSG_STATS      = 8;
-	final static int MSG_SET_DNS1_OUTPUT = 9;
 	final static int MSG_STOP_OLSRD_OUTPUT = 10;
 	// messages for the ProgressDialog
 	final static int MSG_SHOW_PROGRESSDIALOG = 11;
@@ -120,7 +119,6 @@ public class MeshService extends android.app.Service {
 	private ConnectivityManager connManager;
 	private boolean filteringEnabled = false;
 	private Method mStartForeground = null;
-	private String mOldNetDns1Value = null;
 
 	/** public service interface */
 	public void startRequest() {
@@ -248,24 +246,6 @@ public class MeshService extends android.app.Service {
 				state = STATE_STOPPED;
 			}
 			break;
-		case MSG_SET_DNS1_OUTPUT:
-		{
-			String line = (String)msg.obj;
-			if (line == null) {
-				break;
-			}
-			// log(false, "line: " + line);
-			if (line.matches("([0-9]+\\.){3}[0-9]+"))
-			{
-				mOldNetDns1Value = line;
-				//log(false, "mOldNetDns1Value: " + mOldNetDns1Value);
-			}
-			else
-			{
-				log(false, "Not setting mOldNetDns1Value because it does not match the regex: " + line);
-			}
-			break;
-		}
 		case MSG_OUTPUT:
 			if (state == STATE_STOPPED) return;
 			if (WifiProcess == null) return; // cut the gibberish
@@ -350,23 +330,6 @@ public class MeshService extends android.app.Service {
 		case MSG_STOP:
 			if (state == STATE_STOPPED) return;
 			stopProcess();
-			if (mOldNetDns1Value != null)
-			{
-				try {            		
-					MeshTetherProcess DnsProcess = new MeshTetherProcess(NativeHelper.SET_NET_DNS1 + " " + mOldNetDns1Value, 
-							null, NativeHelper.app_bin);
-					DnsProcess.runUntilExit(mHandler, MSG_SET_DNS1_OUTPUT, MSG_SET_DNS1_OUTPUT);
-
-				} catch (IOException e) {
-					log(false, "Error occurred while resetting DNS server: " + e.getMessage());
-					e.printStackTrace();
-				}
-				catch (InterruptedException e)
-				{
-					log(false, "Error occurred while resetting DNS server: " + e.getMessage());
-					e.printStackTrace();
-				}            }
-			mOldNetDns1Value = null;
 			log(false, getString(R.string.stopped));
 			state = STATE_STOPPED;
 			break;
