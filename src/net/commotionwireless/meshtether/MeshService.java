@@ -309,9 +309,8 @@ public class MeshService extends android.app.Service {
 			// FALL THROUGH!
 		case MSG_NETSCHANGE:
 			int wifiState = wifiManager.getWifiState();
-			String preferredDnsValue = getPrefValue(getString(R.string.adhoc_dns_server));
 			Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, WifiProcess == null ? "null" : "proc"));
-			if (wifiState == WifiManager.WIFI_STATE_DISABLED) {
+			if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
 				// wifi is good (or lost), we can start now...
 				if ((state == STATE_STARTING) && (WifiProcess == null)) {
 					if (app.findIfWan()) {
@@ -323,18 +322,6 @@ public class MeshService extends android.app.Service {
 						//break;
 						log(false, "No active WAN interface found");
 					}
-					mOldNetDns1Value = System.getProperty("net.dns1");
-					try {
-						MeshTetherProcess DnsProcess = new MeshTetherProcess(NativeHelper.SET_NET_DNS1 + " " + preferredDnsValue,
-								null, NativeHelper.app_bin);
-						DnsProcess.runUntilExit(mHandler, MSG_SET_DNS1_OUTPUT, MSG_SET_DNS1_OUTPUT);
-					} catch (IOException e) {
-						log(false, "Error occurred while setting DNS server: " + e.getMessage());
-						e.printStackTrace();
-					} catch (InterruptedException e) {
-						log(false, "Error occurred while setting DNS server: " + e.getMessage());
-						e.printStackTrace();
-					}
 
 					if (!startProcess()) {
 						log(true, getString(R.string.starterr));
@@ -342,22 +329,20 @@ public class MeshService extends android.app.Service {
 						break;
 					}
 				} // if not checkUpLink then we simply wait...
-			} else {
+			} else { // not WIFI_STATE_ENABLED
 				if (state == STATE_RUNNING) {
-					// this is super bad, will have to restart!
-					app.updateToast(getString(R.string.conflictwifi), true);
-					log(true, getString(R.string.conflictwifi));
-					log(false, getString(R.string.restarting));
+					app.updateToast("wifi disabled and state running", true);
+					log(false, "wifi disabled and state running");
 					stopProcess(); // this tears down wifi
-					wifiManager.setWifiEnabled(false); // this will send MSG_NETSCHANGE
+					wifiManager.setWifiEnabled(true); // this will send MSG_NETSCHANGE
 					// we should wait until wifi is disabled...
 					state = STATE_STARTING;
 				} else if (state == STATE_STARTING) {
 					if ((wifiState == WifiManager.WIFI_STATE_ENABLED) ||
 							(wifiState == WifiManager.WIFI_STATE_ENABLING)) {
-						app.updateToast(getString(R.string.disablewifi), false);
+						app.updateToast("", false);
 						wifiManager.setWifiEnabled(false);
-						log(false, getString(R.string.waitwifi));
+						log(false, "");
 					}
 				}
 			}
