@@ -338,8 +338,8 @@ public class MeshTetherApp extends android.app.Application {
 	}
 
 	void showProgressMessage(String messageText) {
-		// TODO implement sending message to ProgressDialog
 		Log.i(TAG, "MSG_PROGRESSDIALOG");
+		if (messageText == null) messageText = "(null)";
 		statusActivity.mProgressDialog.setMessage(messageText);
 		if ( !statusActivity.mProgressDialog.isShowing())
 			statusActivity.mProgressDialog.show();
@@ -347,7 +347,6 @@ public class MeshTetherApp extends android.app.Application {
 
 	void hideProgressDialog() {
 		Log.i(TAG, "MSG_PROGRESSDIALOG_DISMISS");
-		// TODO implement sending message to ProgressDialog
 		statusActivity.mProgressDialog.dismiss();
 	}
 }
