@@ -28,12 +28,14 @@ import java.util.Map;
 import net.commotionwireless.meshtether.Util.MACAddress;
 import android.app.Notification;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -41,6 +43,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 
 /**
@@ -116,6 +119,7 @@ public class MeshService extends android.app.Service {
 	private Util.MACAddress if_mac = null;
 	private MeshTetherApp app;
 	private WifiManager wifiManager;
+	private int currentNetId = -1;
 	private ConnectivityManager connManager;
 	private boolean filteringEnabled = false;
 	private Method mStartForeground = null;
@@ -303,6 +307,37 @@ public class MeshService extends android.app.Service {
 						log(false, "No active WAN interface found");
 					}
 
+					WifiConfiguration wc = new WifiConfiguration();
+					wc.priority = 100000;
+					wc.hiddenSSID = false;
+					wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+					String ssid = getPrefValue(getString(R.string.lan_essid));
+					wc.SSID = "\"".concat(ssid).concat("\"");
+					wc.BSSID = getPrefValue(getString(R.string.lan_bssid));
+					currentNetId = wifiManager.addNetwork(wc);
+					if(currentNetId < 0) {
+						System.out.println("Unable to add network configuration for " + ssid);
+						return;
+					}
+					wifiManager.enableNetwork(currentNetId, true);
+
+					// set up the static IP settings
+					// TODO read and store the current settings so they can be restored on stop
+					final ContentResolver cr = getContentResolver();
+					Settings.System.putInt(cr, Settings.System.WIFI_USE_STATIC_IP, 1);
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_IP,
+							getPrefValue(getString(R.string.adhoc_ip)));
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_NETMASK,
+							getPrefValue(getString(R.string.adhoc_netmask)));
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_GATEWAY,
+							getPrefValue(getString(R.string.adhoc_ip)));
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_DNS1,
+							getPrefValue(getString(R.string.adhoc_dns_server)));
+
+					// meshing works very poorly with wifi sleep enabled
+					Settings.System.putInt(cr, Settings.System.WIFI_SLEEP_POLICY,
+							Settings.System.WIFI_SLEEP_POLICY_NEVER);
+
 					if (!startProcess()) {
 						log(true, getString(R.string.starterr));
 						state = STATE_STOPPED;
@@ -330,6 +365,10 @@ public class MeshService extends android.app.Service {
 		case MSG_STOP:
 			if (state == STATE_STOPPED) return;
 			stopProcess();
+			wifiManager.disableNetwork(currentNetId);
+			wifiManager.removeNetwork(currentNetId);
+			final ContentResolver cr = getContentResolver();
+			Settings.System.putInt(cr, Settings.System.WIFI_USE_STATIC_IP, 0);
 			log(false, getString(R.string.stopped));
 			state = STATE_STOPPED;
 			break;
