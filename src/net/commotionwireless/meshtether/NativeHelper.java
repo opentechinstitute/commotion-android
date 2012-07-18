@@ -55,7 +55,7 @@ public class NativeHelper {
 
 			for (String asset : assetList) {
 				if (asset.equals("images") || asset.equals("sounds")
-						|| asset.equals("webkit"))
+						|| asset.equals("webkit") || asset.equals("databases"))
 					continue;
 
 				int BUFFER = 2048;
