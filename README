@@ -23,7 +23,8 @@ project (i.e. /path/to/commotion-android):
  git submodule init
  git submodule update
  ndk-build
- make -C externals
+ make -C external
+ make -C external/olsrd
  
 To build the Android app, import the existing project into Eclipse and export 
 an .apk file.  If you ran the NDK build after already having the project in
