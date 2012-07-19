@@ -40,4 +40,31 @@
         android:text="@string/announce"
         android:textSize="22dp" />
 
+    <TextView
+        android:id="@+id/upload_rate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawableLeft="@drawable/upload"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="---"
+        android:textColor="#FFf05414"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/download_rate"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:drawableLeft="@drawable/download"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="---"
+        android:textColor="#FFa4c639"
+        android:textSize="20sp"
+        android:textStyle="bold" >
+    </TextView>
+
 </LinearLayout>

@@ -38,82 +38,12 @@
 
             <!-- views go here -->
 
-            <TableLayout
-                android:id="@+id/traffic"
+            <TextView
+                android:id="@+id/info"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="20sp"
-                android:shrinkColumns="*"
-                android:stretchColumns="*" >
-
-                <TableRow android:layout_width="fill_parent" >
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Download"
-                        android:textColor="#FFFFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="Upload"
-                        android:textColor="#FFFFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </TableRow>
-
-                <TableRow android:layout_width="fill_parent" >
-
-                    <TextView
-                        android:id="@+id/download"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="---"
-                        android:textColor="#FFa4c639"
-                        android:textSize="30sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/upload"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="---"
-                        android:textColor="#FFf05414"
-                        android:textSize="30sp"
-                        android:textStyle="bold" />
-                </TableRow>
-
-                <TableRow android:layout_width="fill_parent" >
-
-                    <TextView
-                        android:id="@+id/download_rate"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="2dp"
-                        android:textColor="#FFFFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/upload_rate"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:padding="2dp"
-                        android:textColor="#FFFFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </TableRow>
-            </TableLayout>
+                android:textSize="13sp"
+                android:typeface="monospace" />
         </FrameLayout>
     </LinearLayout>
 

@@ -53,8 +53,6 @@ public class StatusActivity extends android.app.TabActivity {
 	private Button announce;
 	private boolean paused;
 
-	private TextView textDownload;
-	private TextView textUpload;
 	private TextView textDownloadRate;
 	private TextView textUploadRate;
 
@@ -64,7 +62,7 @@ public class StatusActivity extends android.app.TabActivity {
 	final static int DLG_SUPPLICANT = 3;
 
 	private final static String LINKS = "links";
-	private final static String TRAFFIC = "traffic";
+	private final static String INFO = "info";
 
 	static NumberFormat nf = NumberFormat.getInstance();
 	static {
@@ -113,9 +111,9 @@ public class StatusActivity extends android.app.TabActivity {
 		});
 
 		tabs = getTabHost();
-		tabs.addTab(tabs.newTabSpec(TRAFFIC)
-				.setIndicator("traffic", getResources().getDrawable(R.drawable.ic_tab_starred))
-				.setContent(R.id.traffic));
+		tabs.addTab(tabs.newTabSpec(INFO)
+				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_starred))
+				.setContent(R.id.info));
 		tabs.addTab(tabs.newTabSpec(LINKS)
 				.setIndicator(LINKS, getResources().getDrawable(R.drawable.ic_tab_contacts))
 				.setContent(new Intent(this, ClientsActivity.class)));
@@ -123,7 +121,7 @@ public class StatusActivity extends android.app.TabActivity {
 			@Override
 			public void onTabChanged(String tabId) {
 				update();
-				if (TRAFFIC.equals(tabId)) {
+				if (INFO.equals(tabId)) {
 					// force refresh
 					MeshService svc = app.service;
 					if (svc != null)
@@ -142,8 +140,6 @@ public class StatusActivity extends android.app.TabActivity {
 		//onoff.setEnabled(false);
 		announce.setEnabled(false);
 
-		textDownload = ((TextView)findViewById(R.id.download));
-		textUpload = ((TextView)findViewById(R.id.upload));
 		textDownloadRate = ((TextView)findViewById(R.id.download_rate));
 		textUploadRate = ((TextView)findViewById(R.id.upload_rate));
 
@@ -385,12 +381,12 @@ public class StatusActivity extends android.app.TabActivity {
 		onoff.setPressed(false);
 		onoff.setChecked(true);
 		Util.TrafficStats stats = svc.stats;
-		textDownload.setText(format(stats.total.tx_bytes));
-		textUpload.setText(format(stats.total.rx_bytes));
-		textDownloadRate.setText(format(stats.rate.tx_bytes)+"/s");
-		textUploadRate.setText(format(stats.rate.rx_bytes)+"/s");
+		if (textDownloadRate != null)
+			textDownloadRate.setText(format(stats.rate.tx_bytes)+"/s");
+		if (textUploadRate != null)
+			textUploadRate.setText(format(stats.rate.rx_bytes)+"/s");
 		// only request stats when visible
-		if (!paused && (getTabHost().getCurrentTab() == 1))
+		if (!paused)
 			svc.statsRequest(1000);
 	}
 }
