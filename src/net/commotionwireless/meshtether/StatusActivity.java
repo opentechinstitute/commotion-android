@@ -40,16 +40,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 public class StatusActivity extends android.app.TabActivity {
 	private MeshTetherApp app;
 
 	private TabHost tabs;
-	private ToggleButton onoff;
+	private ImageButton onoff;
 	private Button chooseProfile;
 	private boolean paused;
 
@@ -90,14 +90,18 @@ public class StatusActivity extends android.app.TabActivity {
 		setContentView(R.layout.main);
 
 		// control interface
-		onoff = (ToggleButton) findViewById(R.id.onoff);
+		onoff = (ImageButton) findViewById(R.id.onoff);
 		onoff.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onoff.setPressed(true);
-				if (onoff.isChecked()) app.startService();
-				else {
+				int state = app.getState();
+				if (state == MeshService.STATE_STOPPED) {
+					onoff.setImageResource(R.drawable.comlogo_sm_on);
+					app.startService();
+				} else {
 					app.stopService();
+					onoff.setImageResource(R.drawable.comlogo_sm_off);
+					update();
 				}
 			}
 		});
@@ -356,7 +360,6 @@ public class StatusActivity extends android.app.TabActivity {
 		int state = app.getState();
 
 		if (state == MeshService.STATE_STOPPED) {
-			onoff.setChecked(false);
 			return; // not ready yet! keep the old log
 		}
 
@@ -365,8 +368,6 @@ public class StatusActivity extends android.app.TabActivity {
 
 		if (state == MeshService.STATE_STARTING) {
 			setProgressBarIndeterminateVisibility(true);
-			onoff.setPressed(true);
-			onoff.setChecked(true);
 			return;
 		}
 
@@ -377,8 +378,7 @@ public class StatusActivity extends android.app.TabActivity {
 
 		// STATE_RUNNING
 		setProgressBarIndeterminateVisibility(false);
-		onoff.setPressed(false);
-		onoff.setChecked(true);
+
 		Util.TrafficStats stats = svc.stats;
 		if (textDownloadRate != null)
 			textDownloadRate.setText(format(stats.rate.tx_bytes)+"/s");

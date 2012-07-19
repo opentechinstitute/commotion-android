@@ -54,6 +54,7 @@
     <string name="invalidmac">Invalid MAC address</string>
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
+    <string name="onoff">on/off</string>
     <string name="defaultprofile">(default)</string>
 
     <!-- messages for the ProgressDialog -->

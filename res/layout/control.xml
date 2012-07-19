@@ -32,15 +32,13 @@
         android:text="@string/defaultprofile"
         android:textSize="18dp" />
 
-    <ToggleButton
+    <ImageButton
         android:id="@+id/onoff"
+        android:contentDescription="@string/onoff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:minWidth="120dp"
-        android:textOff="Start"
-        android:textOn="Stop"
-        android:textSize="36dp"
-        android:textStyle="bold" />
+        android:src="@drawable/comlogo_sm_off"
+ />
 
 </LinearLayout>
