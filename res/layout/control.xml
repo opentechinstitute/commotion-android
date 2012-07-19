@@ -23,22 +23,24 @@
     android:orientation="horizontal"
     android:padding="5sp" >
 
+    <Button
+        android:id="@+id/choose_profile"
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:text="@string/defaultprofile"
+        android:textSize="18dp" />
+
     <ToggleButton
         android:id="@+id/onoff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:minWidth="120dp"
         android:textOff="Start"
         android:textOn="Stop"
         android:textSize="36dp"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/announce"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/announce"
-        android:textSize="36dp" />
 
 </LinearLayout>

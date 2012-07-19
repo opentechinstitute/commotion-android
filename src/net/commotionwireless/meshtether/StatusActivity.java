@@ -50,7 +50,7 @@ public class StatusActivity extends android.app.TabActivity {
 
 	private TabHost tabs;
 	private ToggleButton onoff;
-	private Button announce;
+	private Button chooseProfile;
 	private boolean paused;
 
 	private TextView textDownloadRate;
@@ -101,12 +101,14 @@ public class StatusActivity extends android.app.TabActivity {
 				}
 			}
 		});
-		announce = (Button) findViewById(R.id.announce);
-		announce.setOnClickListener(new OnClickListener() {
+		chooseProfile = (Button) findViewById(R.id.choose_profile);
+		chooseProfile.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (app.service != null) app.service.assocRequest();
-				else v.setEnabled(false);
+				int state = app.getState();
+				if (state == MeshService.STATE_STOPPED) {
+					// TODO implement profile list and picker aka spinner
+				}
 			}
 		});
 
@@ -138,7 +140,6 @@ public class StatusActivity extends android.app.TabActivity {
 		app.setStatusActivity(this);
 		paused = false;
 		//onoff.setEnabled(false);
-		announce.setEnabled(false);
 
 		textDownloadRate = ((TextView)findViewById(R.id.download_rate));
 		textUploadRate = ((TextView)findViewById(R.id.upload_rate));
@@ -355,7 +356,6 @@ public class StatusActivity extends android.app.TabActivity {
 		int state = app.getState();
 
 		if (state == MeshService.STATE_STOPPED) {
-			announce.setEnabled(false);
 			onoff.setChecked(false);
 			return; // not ready yet! keep the old log
 		}
@@ -377,7 +377,6 @@ public class StatusActivity extends android.app.TabActivity {
 
 		// STATE_RUNNING
 		setProgressBarIndeterminateVisibility(false);
-		announce.setEnabled(true);
 		onoff.setPressed(false);
 		onoff.setChecked(true);
 		Util.TrafficStats stats = svc.stats;
