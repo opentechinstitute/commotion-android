@@ -111,12 +111,12 @@ public class StatusActivity extends android.app.TabActivity {
 		});
 
 		tabs = getTabHost();
-		tabs.addTab(tabs.newTabSpec(INFO)
-				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_starred))
-				.setContent(R.id.info));
 		tabs.addTab(tabs.newTabSpec(LINKS)
 				.setIndicator(LINKS, getResources().getDrawable(R.drawable.ic_tab_contacts))
 				.setContent(new Intent(this, ClientsActivity.class)));
+		tabs.addTab(tabs.newTabSpec(INFO)
+				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_recent))
+				.setContent(R.id.info));
 		tabs.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {
@@ -342,7 +342,7 @@ public class StatusActivity extends android.app.TabActivity {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		if (MeshTetherApp.ACTION_CLIENTS.equals(intent.getAction())) {
-			getTabHost().setCurrentTab(2); // show clients
+			getTabHost().setCurrentTab(0); // show links
 		}
 	}
 
