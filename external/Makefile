@@ -1,19 +1,19 @@
 
 all: olsrd
 
-clean:
-	make -C olsrd OS=android clean_all
-	rm -f -- $(OLSRINFO_JAR)
+clean: olsrd-clean olsrinfo-clean
 
-.PHONY: olsrinfo
+.PHONY: olsrd olsrd-clean olsrinfo olsrinfo-clean
 .SUFFIXES: .java .class
 
 #--olsrd-----------------------------------------------------------------------#
 
-OLSRD_SOURCE := $(wildcard olsrd/*/*.[cho]) \
-		$(wildcard olsrd/*/*/*.[cho])
+OLSRD_SOURCE := $(wildcard olsrd/[*/*.[ch]) \
+		$(wildcard olsrd/*/*/*.[ch])
 
-olsrd/olsrd: $(OLSRD_SOURCE)
+olsrd: olsrd-build-stamp
+
+olsrd-build-stamp: $(OLSRD_SOURCE)
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 all
 # build only the plugins we are likely to use to keep the build stable
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 arprefresh
@@ -27,6 +27,11 @@ olsrd/olsrd: $(OLSRD_SOURCE)
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 secure
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 txtinfo
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 watchdog
+	touch olsrd-build-stamp
+
+olsrd-clean:
+	make -C olsrd OS=android clean_all
+	rm -f olsrd-build-stamp
 
 #--olsrinfo--------------------------------------------------------------------#
 
