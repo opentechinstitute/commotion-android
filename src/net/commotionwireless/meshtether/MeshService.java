@@ -201,6 +201,22 @@ public class MeshService extends android.app.Service {
 		super.onDestroy();
 	}
 
+	private static String getWifiStateString(int state) {
+		switch (state) {
+		case WifiManager.WIFI_STATE_ENABLED:
+			return "WIFI_STATE_ENABLED";
+		case WifiManager.WIFI_STATE_ENABLING:
+			return "WIFI_STATE_ENABLING";
+		case WifiManager.WIFI_STATE_DISABLED:
+			return "WIFI_STATE_DISABLED";
+		case WifiManager.WIFI_STATE_DISABLING:
+			return "WIFI_STATE_DISABLING";
+		case WifiManager.WIFI_STATE_UNKNOWN:
+			return "WIFI_STATE_UNKNOWN";
+		default:
+			return "(none)";
+		}
+	}
 
 	// our handler
 	private final Handler mHandler = new Handler() {
@@ -211,12 +227,15 @@ public class MeshService extends android.app.Service {
 	private void handle(Message msg) {
 		switch (msg.what) {
 		case MSG_SHOW_PROGRESSDIALOG:
+			Log.i(TAG, "handle MSG_SHOW_PROGRESSDIALOG");
 			app.showProgressMessage((String)msg.obj);
 			break;
 		case MSG_HIDE_PROGRESSDIALOG:
+			Log.i(TAG, "handle MSG_HIDE_PROGRESSDIALOG");
 			app.hideProgressDialog();
 			break;
 		case MSG_EXCEPTION:
+			Log.i(TAG, "handle MSG_EXCEPTION");
 			if (state == STATE_STOPPED) return;
 			Throwable thr = (Throwable)msg.obj;
 			log(true, getString(R.string.exception) + " " + thr.getMessage());
@@ -225,6 +244,7 @@ public class MeshService extends android.app.Service {
 			state = STATE_STOPPED;
 			break;
 		case MSG_ERROR:
+			Log.i(TAG, "handle MSG_ERROR");
 			if (state == STATE_STOPPED) return;
 			if (WifiProcess == null) return; // don't kill it again...
 			if (msg.obj != null) {
@@ -251,6 +271,7 @@ public class MeshService extends android.app.Service {
 			}
 			break;
 		case MSG_OUTPUT:
+			Log.i(TAG, "handle MSG_OUTPUT");
 			if (state == STATE_STOPPED) return;
 			if (WifiProcess == null) return; // cut the gibberish
 			String line = (String)msg.obj;
@@ -278,6 +299,7 @@ public class MeshService extends android.app.Service {
 			}
 			break;
 		case MSG_START:
+			Log.i(TAG, "handle MSG_START");
 
 			if (state != STATE_STOPPED) return;
 			log.clear();
@@ -292,8 +314,10 @@ public class MeshService extends android.app.Service {
 			state = STATE_STARTING;
 			// FALL THROUGH!
 		case MSG_NETSCHANGE:
+			Log.i(TAG, "handle MSG_NETSCHANGE");
 			int wifiState = wifiManager.getWifiState();
-			Log.e(TAG, String.format("NETSCHANGE: %d %d %s", wifiState, state, WifiProcess == null ? "null" : "proc"));
+			Log.e(TAG, String.format("NETSCHANGE: wifiState: %s state: %d WifiProcess: %s",
+					getWifiStateString(wifiState), state, WifiProcess == null ? "null" : "proc"));
 			if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
 				// wifi is good (or lost), we can start now...
 				if ((state == STATE_STARTING) && (WifiProcess == null)) {
@@ -363,6 +387,7 @@ public class MeshService extends android.app.Service {
 			}
 			break;
 		case MSG_STOP:
+			Log.i(TAG, "handle MSG_STOP");
 			if (state == STATE_STOPPED) return;
 			stopProcess();
 			wifiManager.disableNetwork(currentNetId);
@@ -373,6 +398,7 @@ public class MeshService extends android.app.Service {
 			state = STATE_STOPPED;
 			break;
 		case MSG_ASSOC:
+			Log.i(TAG, "handle MSG_ASSOC");
 			if (state != STATE_RUNNING) return;
 			if (tellProcess("WLAN")) {
 				app.updateToast(getString(R.string.beaconing), true);
@@ -384,6 +410,7 @@ public class MeshService extends android.app.Service {
 			}
 			break;
 		case MSG_STATS:
+			Log.i(TAG, "handle MSG_STATS");
 			mHandler.removeMessages(MSG_STATS);
 			if (state != STATE_RUNNING || if_lan.length() == 0) return;
 			stats.update(Util.fetchTrafficData(if_lan));
