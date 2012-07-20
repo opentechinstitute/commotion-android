@@ -351,9 +351,11 @@ public class StatusActivity extends android.app.TabActivity {
 		}
 	}
 
-	static String format(long v) {
-		if (v < 1000000) return nf.format(v /    1000.0f) + " kB";
-		else             return nf.format(v / 1000000.0f) + " MB";
+	static String formatRate(long v) {
+		if (v < 1048576)
+			return nf.format(v /    1024.0f) + " KB";
+		else
+			return nf.format(v / 1048576.0f) + " MB";
 	}
 
 	void update() {
@@ -381,9 +383,9 @@ public class StatusActivity extends android.app.TabActivity {
 
 		Util.TrafficStats stats = svc.stats;
 		if (textDownloadRate != null)
-			textDownloadRate.setText(format(stats.rate.tx_bytes)+"/s");
+			textDownloadRate.setText(formatRate(stats.rate.tx_bytes)+"/s");
 		if (textUploadRate != null)
-			textUploadRate.setText(format(stats.rate.rx_bytes)+"/s");
+			textUploadRate.setText(formatRate(stats.rate.rx_bytes)+"/s");
 		// only request stats when visible
 		if (!paused)
 			svc.statsRequest(1000);
