@@ -125,6 +125,7 @@ int assoc_loop () {
         fprintf(f, "ctrl_interface=%s\nap_scan=2\n", iflan);
         fclose(f);
       }
+      chmod("wpa.conf" , S_IRUSR | S_IWUSR | S_IRGRP| S_IWGRP | S_IROTH);
 
       atexit(cleanup);
       if (!Wifi::init())
