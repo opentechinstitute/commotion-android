@@ -1,9 +1,49 @@
 
-all: olsrd
+CWD = $(shell pwd)
+PROJECT_ROOT = $(CWD)/..
+EXTERNAL_ROOT = $(PROJECT_ROOT)/external
+ASSETS = $(PROJECT_ROOT)/assets
 
-clean: olsrd-clean olsrinfo-clean
+# Android NDK setup
+NDK_BASE ?=  /opt/android-ndk
+NDK_PLATFORM_LEVEL ?= 9
+NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_LEVEL)/arch-arm
+NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
+NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
 
-.PHONY: olsrd olsrd-clean olsrinfo olsrinfo-clean
+# to use the real HOST tag, you need the latest libtool files:
+# http://stackoverflow.com/questions/4594736/configure-does-not-recognize-androideabi
+HOST := arm-linux-androideabi
+
+# install root for built files
+DESTDIR = $(CWD)
+# TODO try adding the Android-style /data/app.name here
+prefix = /data/data/info.guardianproject.lildebi/app_opt
+LOCAL := $(DESTDIR)$(prefix)
+
+PATH := ${PATH}:$(NDK_TOOLCHAIN)/bin:$(LOCAL)/bin
+
+CC := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-gcc --sysroot=$(NDK_SYSROOT)
+CXX := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-g++
+CPP := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-cpp
+LD := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-ld
+AR := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-ar
+RANLIB := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-ranlib
+STRIP := $(NDK_TOOLCHAIN)/bin/arm-linux-androideabi-strip \
+	--strip-unneeded -R .note -R .comment
+
+ALL_CFLAGS = -DANDROID -I$(LOCAL)/include
+ALL_LDFLAGS = -L$(LOCAL)/lib -Wl,--rpath,$(LOCAL)/lib
+
+# build as small as possible, mostly useful for static binaries
+ALL_CFLAGS += -fdata-sections -ffunction-sections -Os
+ALL_LDFLAGS += -Wl,--gc-sections
+
+all: olsrd busybox
+
+clean: olsrd-clean olsrinfo-clean busybox-clean
+
+.PHONY: olsrd olsrd-clean olsrinfo olsrinfo-clean busybox busybox-clean
 .SUFFIXES: .java .class
 
 #--olsrd-----------------------------------------------------------------------#
@@ -58,3 +98,19 @@ olsrinfo/bin:
 		-d bin \
 		-classpath $(OLSRINFO_CLASSPATH) \
 		$(<:olsrinfo/%=%)
+
+
+#--busybox--------------------------------------------------------------------#
+
+busybox: $(EXTERNAL_ROOT)/busybox/busybox
+
+$(EXTERNAL_ROOT)/busybox/.config: $(EXTERNAL_ROOT)/busybox_config
+	cp $(EXTERNAL_ROOT)/busybox_config $(EXTERNAL_ROOT)/busybox/.config
+
+$(EXTERNAL_ROOT)/busybox/busybox: $(EXTERNAL_ROOT)/busybox/.config
+	make -C $(EXTERNAL_ROOT)/busybox/
+
+busybox-clean:
+	rm -f -- $(EXTERNAL_ROOT)/busybox/.config
+	rm -f -- $(EXTERNAL_ROOT)/busybox/busybox
+	make -C $(EXTERNAL_ROOT)/busybox/ clean

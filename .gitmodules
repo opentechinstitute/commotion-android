@@ -4,3 +4,6 @@
 [submodule "external/olsrinfo"]
 	path = external/olsrinfo
 	url = https://github.com/guardianproject/OlsrInfo.git
+[submodule "external/busybox"]
+	path = external/busybox
+	url = git://busybox.net/busybox.git

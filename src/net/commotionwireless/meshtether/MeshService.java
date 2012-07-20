@@ -306,7 +306,7 @@ public class MeshService extends android.app.Service {
 			log(false, getString(R.string.starting));
 
 			// TODO make this only overwrite on upgrade to new version
-			if (!NativeHelper.unzipAssets(this)) {
+			if (!NativeHelper.unzipAssets(this) || !NativeHelper.installBusyboxSymlinks()) {
 				log(true, getString(R.string.unpackerr));
 				state = STATE_STOPPED;
 				break;

@@ -31,6 +31,7 @@ public class NativeHelper {
 	static String DO_STOP_OLSRD;
 	static String OLSRD;
 	static String WIFI;
+	static String BUSYBOX;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -45,6 +46,7 @@ public class NativeHelper {
 		RUN = new File(app_bin, "run").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		WIFI = new File(app_bin, "wifi").getAbsolutePath();
+		BUSYBOX = new File(app_bin, "busybox").getAbsolutePath();
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -93,10 +95,31 @@ public class NativeHelper {
 		chmod("0750", new File(DO_STOP_OLSRD));
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(WIFI));
+		chmod("0750", new File(BUSYBOX));
 		chmod("0750", new File(app_bin, "script_aria"));
 		chmod("0750", new File(app_bin, "script_hero"));
 		chmod("0750", new File(app_bin, "script_samsung"));
 		return result;
+	}
+
+	public static boolean installBusyboxSymlinks() {
+		File testFile = new File(NativeHelper.app_bin, "awk");
+		if (testFile.exists()) {
+			Log.v(TAG, "busybox test file exists: " + testFile);
+		} else {
+			// setup busybox so we have the utils we need, guaranteed
+			String command = new File(NativeHelper.app_bin, "busybox").getAbsolutePath()
+					+ " --install -s " + NativeHelper.app_bin.getAbsolutePath();
+			Log.i(TAG, "Running " + command);
+			try {
+				Process sh = Runtime.getRuntime().exec(command);
+				sh.waitFor();
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static void chmod(String modestr, File path) {
