@@ -362,7 +362,11 @@ public class StatusActivity extends android.app.TabActivity {
 		int state = app.getState();
 
 		if (state == MeshService.STATE_STOPPED) {
-			return; // not ready yet! keep the old log
+			if (textDownloadRate != null)
+				textDownloadRate.setText("---");
+			if (textUploadRate != null)
+				textUploadRate.setText("---");
+			return;
 		}
 
 		MeshService svc = app.service;

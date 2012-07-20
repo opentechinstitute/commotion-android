@@ -13,7 +13,6 @@
         android:drawableLeft="@drawable/download"
         android:gravity="center"
         android:padding="2dp"
-        android:text="---"
         android:textColor="#FFa4c639"
         android:textSize="20sp"
         android:textStyle="bold" >
@@ -27,7 +26,6 @@
         android:drawableLeft="@drawable/upload"
         android:gravity="center"
         android:padding="2dp"
-        android:text="---"
         android:textColor="#FFf05414"
         android:textSize="20sp"
         android:textStyle="bold" />
