@@ -316,8 +316,9 @@ public class MeshService extends android.app.Service {
 		case MSG_NETSCHANGE:
 			Log.i(TAG, "handle MSG_NETSCHANGE");
 			int wifiState = wifiManager.getWifiState();
+			String wifiStateString = getWifiStateString(wifiState);
 			Log.e(TAG, String.format("NETSCHANGE: wifiState: %s state: %d WifiProcess: %s",
-					getWifiStateString(wifiState), state, WifiProcess == null ? "null" : "proc"));
+					wifiStateString, state, WifiProcess == null ? "null" : "proc"));
 			if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
 				// wifi is good (or lost), we can start now...
 				if ((state == STATE_STARTING) && (WifiProcess == null)) {
@@ -369,20 +370,21 @@ public class MeshService extends android.app.Service {
 					}
 				} // if not checkUpLink then we simply wait...
 			} else { // not WIFI_STATE_ENABLED
-				if (state == STATE_RUNNING) {
-					app.updateToast("wifi disabled and state running", true);
-					log(false, "wifi disabled and state running");
-					stopProcess(); // this tears down wifi
-					wifiManager.setWifiEnabled(true); // this will send MSG_NETSCHANGE
-					// we should wait until wifi is disabled...
+				app.updateToast("WIFI: " + wifiStateString, false); log(false, "WIFI: " + wifiStateString);
+				switch (state) {
+				case STATE_RUNNING:
+					app.updateToast("STATE_RUNNING", true); log(false, "STATE_RUNNING");
+					stopProcess(); // this tears down everything
 					state = STATE_STARTING;
-				} else if (state == STATE_STARTING) {
-					if ((wifiState == WifiManager.WIFI_STATE_ENABLED) ||
-							(wifiState == WifiManager.WIFI_STATE_ENABLING)) {
-						app.updateToast("", false);
-						wifiManager.setWifiEnabled(false);
-						log(false, "");
-					}
+					break;
+				case STATE_STARTING:
+					app.updateToast("STATE_STARTING", false); log(false, "STATE_STARTING");
+					break;
+				case STATE_STOPPED:
+					app.updateToast("STATE_STOPPED", false); log(false, "STATE_STOPPED");
+					break;
+				default:
+					app.updateToast("Something went wrong...", false); 	log(false, "Something went wrong...");
 				}
 			}
 			break;
