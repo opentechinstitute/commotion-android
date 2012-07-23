@@ -306,11 +306,18 @@ public class MeshService extends android.app.Service {
 			log(false, getString(R.string.starting));
 
 			// TODO make this only overwrite on upgrade to new version
+			log(false, getString(R.string.unpacking));
 			if (!NativeHelper.unzipAssets(this) || !NativeHelper.installBusyboxSymlinks()) {
 				log(true, getString(R.string.unpackerr));
 				state = STATE_STOPPED;
 				break;
 			}
+
+			if ( !wifiManager.isWifiEnabled()) {
+				log(false, getString(R.string.enablingwifi));
+				wifiManager.setWifiEnabled(true); // this will send MSG_NETSCHANGE
+			}
+
 			state = STATE_STARTING;
 			// FALL THROUGH!
 		case MSG_NETSCHANGE:
