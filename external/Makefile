@@ -105,7 +105,7 @@ olsrinfo/bin:
 busybox: $(EXTERNAL_ROOT)/busybox/busybox
 
 $(EXTERNAL_ROOT)/busybox/.config: $(EXTERNAL_ROOT)/busybox_config
-	cp $(EXTERNAL_ROOT)/busybox_config $(EXTERNAL_ROOT)/busybox/.config
+	sed s/^CONFIG_SYSROOT.*$$/CONFIG_SYSROOT=\"$(subst /,\\/,$(NDK_SYSROOT))\"/ busybox_config > $(EXTERNAL_ROOT)/busybox/.config
 
 $(EXTERNAL_ROOT)/busybox/busybox: $(EXTERNAL_ROOT)/busybox/.config
 	make -C $(EXTERNAL_ROOT)/busybox/
