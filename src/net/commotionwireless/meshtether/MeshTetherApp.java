@@ -19,18 +19,14 @@
 package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -73,23 +69,6 @@ public class MeshTetherApp extends android.app.Application {
 	public MeshService service = null;
 	public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
 
-	private List<ScanResult> lastScanResult;
-	private boolean shouldDisableWifi;
-
-	private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (WifiManager.SCAN_RESULTS_AVAILABLE_ACTION.equals(intent.getAction())) {
-				scanResultsAvailable(wifiManager.getScanResults());
-				if (shouldDisableWifi) {
-					wifiManager.setWifiEnabled(false);
-				} // else stop disabling it
-				shouldDisableWifi = false;
-			}
-		}
-	};
-
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -126,13 +105,10 @@ public class MeshTetherApp extends android.app.Application {
 				PendingIntent.getActivity(this, 0, new Intent(this, StatusActivity.class), 0));
 		notificationError.flags = Notification.FLAG_AUTO_CANCEL;
 
-		registerReceiver(scanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		if (!wifiManager.isWifiEnabled()) {
 			wifiManager.setWifiEnabled(true);
-			shouldDisableWifi = true;
 		}
-		wifiManager.startScan();
 	}
 
 	@Override
@@ -140,15 +116,6 @@ public class MeshTetherApp extends android.app.Application {
 		if (service != null) {
 			Log.e(TAG, "The app is terminated while the service is running!");
 			service.stopRequest();
-		}
-		// clean up after yourself
-		if (shouldDisableWifi) {
-			wifiManager.setWifiEnabled(false);
-		}
-		try {
-			unregisterReceiver(scanReceiver);
-		} catch (Exception e) {
-			// ignore IntentReceiverLeaked
 		}
 		super.onTerminate();
 	}
@@ -216,10 +183,6 @@ public class MeshTetherApp extends android.app.Application {
 		toast.setText(msg);
 		toast.setDuration(islong ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
 		toast.show();
-	}
-
-	private void scanResultsAvailable(List<ScanResult> result) {
-		lastScanResult = result;
 	}
 
 	void clientAdded(MeshService.ClientData cd) {
