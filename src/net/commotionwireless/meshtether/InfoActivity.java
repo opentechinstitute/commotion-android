@@ -116,6 +116,12 @@ public class InfoActivity extends android.app.ListActivity {
 		adapter.notifyDataSetChanged();
 	}
 
+	private String[] makeStringArray(List<String> l) {
+		String[] ret = new String[l.size()];
+		ret = l.toArray(ret);
+		return ret;
+	}
+
 	private String[] generateConfigList() {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		List<String> stringList = new ArrayList<String>();
@@ -141,10 +147,9 @@ public class InfoActivity extends android.app.ListActivity {
 		OlsrDataDump dump = app.mJsonInfo.parseCommand("/config");
 		if (dump == null || dump.config == null
 				|| dump.config.unicastSourceIpAddress == null) {
-			String[] nodata = new String[2];
-			nodata[0] = getString(R.string.waiting_for_olsrd);
-			nodata[1] = getString(R.string.no_data_yet);
-			return nodata;
+			stringList.add(getString(R.string.waiting_for_olsrd));
+			stringList.add(getString(R.string.no_data_yet));
+			return makeStringArray(stringList);
 		}
 
 		Config config = dump.config;
@@ -220,8 +225,6 @@ public class InfoActivity extends android.app.ListActivity {
 			// remove the last, trailing \n
 			stringList.add(value.substring(0, value.length() - 1));
 		}
-		String[] ret = new String[stringList.size()];
-		ret = stringList.toArray(ret);
-		return ret;
+		return makeStringArray(stringList);
 	}
 }
