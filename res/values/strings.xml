@@ -20,7 +20,7 @@
 
     <string name="app_name">Mesh Tether</string>
     <string name="clientview">Mesh links</string>
-    <string name="notify_running">Sharing your connection</string>
+    <string name="notify_running">Connecting to the mesh…</string>
     <string name="notify_client">Client connected</string>
     <string name="notify_error">Error occured</string>
     <string name="announce">Associate</string>
@@ -60,6 +60,20 @@
     <string name="defaultprofile">(default)</string>
     <string name="waiting_for_olsrd">waiting for olsrd to start…</string>
     <string name="no_data_yet">(no data yet)</string>
+
+    <!-- messages for the Settings/Preferences -->
+    <string name="mesh_profile">Default Mesh Profile</string>
+    <string name="ssid">SSID (Network Name)</string>
+    <string name="bssid">BSSID (Network ID)</string>
+    <string name="bssid_hint">unique MAC address</string>
+    <string name="channel">Wifi Channel</string>
+    <string name="mesh_ip">Mesh Node IP</string>
+    <string name="mesh_netmask">Mesh Node Netmask</string>
+    <string name="mesh_nameserver">DNS Server</string>
+    <string name="adhoc_settings">Adhoc Wifi Setup</string>
+<!-- 
+     <string name=""></string>
+-->
 
     <!-- messages for the ProgressDialog -->
     <string name="servicestarting">Mesh service starting…</string>

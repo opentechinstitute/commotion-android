@@ -18,25 +18,44 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="Wireless LAN" >
+    <PreferenceCategory android:title="@string/mesh_profile" >
         <EditTextPreference
             android:defaultValue="commotionwireless.net"
             android:key="@string/lan_essid"
             android:singleLine="true"
-            android:title="SSID (Network Name)" />
+            android:title="@string/ssid" />
 
         <net.commotionwireless.meshtether.MACPreference
-            android:hint="unique MAC address"
+            android:defaultValue="02:CA:FF:EE:BA:BE"
+            android:hint="@string/bssid_hint"
             android:key="@string/lan_bssid"
             android:singleLine="true"
-            android:title="BSSID (Optional)" />
+            android:title="@string/bssid" />
 
         <ListPreference
             android:defaultValue="5"
             android:entries="@array/channel_names"
             android:entryValues="@array/channel_values"
             android:key="@string/lan_channel"
-            android:title="Channel" />
+            android:title="@string/channel" />
+
+        <net.commotionwireless.meshtether.MeshIPPreference
+            android:key="@string/adhoc_ip"
+            android:singleLine="true"
+            android:title="@string/mesh_ip" />
+
+        <net.commotionwireless.meshtether.IPPreference
+            android:defaultValue="255.0.0.0"
+            android:key="@string/adhoc_netmask"
+            android:singleLine="true"
+            android:title="@string/mesh_netmask" />
+        <net.commotionwireless.meshtether.IPPreference
+            android:defaultValue="8.8.8.8"
+            android:key="@string/adhoc_dns_server"
+            android:singleLine="true"
+            android:title="@string/mesh_nameserver" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/adhoc_settings" >
         <ListPreference
             android:defaultValue=""
             android:entries="@array/script_names"
@@ -84,27 +103,6 @@
             android:key="wan_nowait"
             android:summary="Don&apos;t wait for data connection"
             android:title="Local Mode" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="Advanced" >
-        <PreferenceScreen
-            android:summary="Mesh Host Configuration"
-            android:title="Mesh" >
-            <net.commotionwireless.meshtether.MeshIPPreference
-                android:key="@string/adhoc_ip"
-                android:singleLine="true"
-                android:title="Mesh Node IP" />
-
-            <net.commotionwireless.meshtether.IPPreference
-                android:defaultValue="255.0.0.0"
-                android:key="@string/adhoc_netmask"
-                android:singleLine="true"
-                android:title="Mesh Node IP Mask" />
-            <net.commotionwireless.meshtether.IPPreference
-                android:defaultValue="8.8.8.8"
-                android:key="@string/adhoc_dns_server"
-                android:singleLine="true"
-                android:title="DNS Server" />
-        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="Interfaces" >
         <EditTextPreference
