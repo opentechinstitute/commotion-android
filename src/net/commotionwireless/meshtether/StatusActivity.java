@@ -121,7 +121,7 @@ public class StatusActivity extends android.app.TabActivity {
 				.setContent(new Intent(this, ClientsActivity.class)));
 		tabs.addTab(tabs.newTabSpec(INFO)
 				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_recent))
-				.setContent(R.id.info));
+				.setContent(new Intent(this, InfoActivity.class)));
 		tabs.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {

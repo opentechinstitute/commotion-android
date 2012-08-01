@@ -58,6 +58,8 @@
     <string name="restartneeded">Restart for changes to take effect</string>
     <string name="onoff">on/off</string>
     <string name="defaultprofile">(default)</string>
+    <string name="waiting_for_olsrd">waiting for olsrd to start…</string>
+    <string name="no_data_yet">(no data yet)</string>
 
     <!-- messages for the ProgressDialog -->
     <string name="servicestarting">Mesh service starting…</string>

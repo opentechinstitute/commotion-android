@@ -66,6 +66,9 @@
             android:name="ClientsActivity"
             android:launchMode="singleTop" />
         <activity
+            android:name="InfoActivity"
+            android:launchMode="singleTop" />
+        <activity
             android:name="net.commotionwireless.meshtether.SettingsActivity"
             android:launchMode="singleTop" />
 
