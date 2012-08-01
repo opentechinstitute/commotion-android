@@ -48,7 +48,7 @@
     <application
         android:name=".MeshTetherApp"
         android:description="@string/app_name"
-        android:icon="@drawable/barnacle_head"
+        android:icon="@drawable/comlogo_sm_on"
         android:label="@string/app_name" >
         <activity
             android:name="StatusActivity"
@@ -74,7 +74,7 @@
 
         <service
             android:name=".MeshService"
-            android:icon="@drawable/barnacle_head"
+            android:icon="@drawable/comlogo_sm_on"
             android:label="Barnacle Wifi Tether" />
 
         <receiver
