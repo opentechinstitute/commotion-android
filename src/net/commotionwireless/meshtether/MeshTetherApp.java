@@ -56,7 +56,7 @@ public class MeshTetherApp extends android.app.Application {
 	ClientsActivity clientsActivity = null;
 	private Toast toast;
 
-	private WifiManager wifiManager;
+	WifiManager wifiManager;
 
 	// notifications
 	private NotificationManager notificationManager;

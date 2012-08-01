@@ -33,6 +33,7 @@ import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.LinkQualityMultiplier;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import net.commotionwireless.olsrinfo.datatypes.Plugin;
+import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,6 +114,24 @@ public class InfoActivity extends android.app.ListActivity {
 	private String[] generateConfigList() {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		List<String> stringList = new ArrayList<String>();
+
+		// add wifi info first
+		WifiInfo wi = app.wifiManager.getConnectionInfo();
+		String wifiInfoString = "\n";
+		wifiInfoString += "SSID: " + wi.getSSID() + "\n";
+		wifiInfoString += "BSSID: " + wi.getBSSID() + "\n";
+		int ipInt = wi.getIpAddress();
+		String ipString = String.format("%d.%d.%d.%d",
+				(ipInt & 0xff),
+				(ipInt >> 8 & 0xff),
+				(ipInt >> 16 & 0xff),
+				(ipInt >> 24 & 0xff));
+		wifiInfoString += "ip: " + ipString + "\n";
+		wifiInfoString += "MAC: "  + wi.getMacAddress() + "\n";
+		wifiInfoString += "speed: " + wi.getLinkSpeed() + " Mbps\n";
+		wifiInfoString += "RSSI: " + wi.getRssi() + " dBm";
+		stringList.add("wifi info");   // key
+		stringList.add(wifiInfoString);// value
 
 		OlsrDataDump dump = app.mJsonInfo.parseCommand("/config");
 		if (dump == null || dump.config == null
