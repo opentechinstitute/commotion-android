@@ -73,6 +73,7 @@ public class MeshService extends android.app.Service {
 
 	// private state
 	private int state = STATE_STOPPED;
+	private WifiManager.WifiLock wifiLock;
 	private MeshTetherProcess WifiProcess = null;
 
 	private PowerManager.WakeLock wakeLock;
@@ -174,6 +175,9 @@ public class MeshService extends android.app.Service {
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MeshService");
 		wakeLock.acquire();
+
+		wifiLock = wifiManager.createWifiLock (WifiManager.WIFI_MODE_FULL, "MeshService");
+		// WifiManager.WIFI_MODE_FULL_HIGH_PERF is only available at API level 12
 
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
@@ -636,6 +640,7 @@ public class MeshService extends android.app.Service {
 	private boolean startProcess() {
 		// calling 'su -c' from Java doesn't work so we use a helper script
 		app.showProgressMessage(R.string.startingolsrd);
+		wifiLock.acquire();
 		String cmd = NativeHelper.SU_C;
 		try {
 			WifiProcess = new MeshTetherProcess(cmd, buildEnvFromPrefs(), NativeHelper.app_bin);
@@ -686,6 +691,7 @@ public class MeshService extends android.app.Service {
 				}
 				WifiProcess = null;
 			}
+			wifiLock.release();
 			clients.clear();
 			app.hideProgressDialog();
 		}
