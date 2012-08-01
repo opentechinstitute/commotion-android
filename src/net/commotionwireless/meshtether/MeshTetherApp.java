@@ -20,6 +20,7 @@ package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
 
+import net.commotionwireless.olsrinfo.JsonInfo;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -66,6 +67,8 @@ public class MeshTetherApp extends android.app.Application {
 	final static int NOTIFY_CLIENT = 1;
 	final static int NOTIFY_ERROR = 2;
 
+	JsonInfo mJsonInfo = null;
+
 	public MeshService service = null;
 	public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
 
@@ -104,6 +107,8 @@ public class MeshTetherApp extends android.app.Application {
 				getString(R.string.notify_error),
 				PendingIntent.getActivity(this, 0, new Intent(this, StatusActivity.class), 0));
 		notificationError.flags = Notification.FLAG_AUTO_CANCEL;
+
+		mJsonInfo = new JsonInfo();
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		if (!wifiManager.isWifiEnabled()) {

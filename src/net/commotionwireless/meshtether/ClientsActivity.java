@@ -21,7 +21,6 @@ package net.commotionwireless.meshtether;
 import java.util.ArrayList;
 
 import net.commotionwireless.meshtether.MeshService.ClientData;
-import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.Link;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
@@ -41,7 +40,6 @@ public class ClientsActivity extends android.app.ListActivity {
 
 	private OlsrInfoThread mOlsrInfoThread;
 	boolean mPauseOlsrInfoThread = false;
-	JsonInfo mJsonInfo;
 	private final Handler mHandler = new Handler();
 
 	private static class ViewHolder {
@@ -93,7 +91,6 @@ public class ClientsActivity extends android.app.ListActivity {
 		setListAdapter(adapter);
 		setTitle(getString(R.string.clientview));
 
-		mJsonInfo = new JsonInfo();
 		mOlsrInfoThread = new OlsrInfoThread();
 		mOlsrInfoThread.start();
 	}
@@ -101,7 +98,6 @@ public class ClientsActivity extends android.app.ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mJsonInfo = null;
 		mOlsrInfoThread.interrupt();
 		mOlsrInfoThread = null;
 		app.setClientsActivity(null);
@@ -136,7 +132,7 @@ public class ClientsActivity extends android.app.ListActivity {
 			ArrayList<MeshService.ClientData> clientsToAdd = new ArrayList<MeshService.ClientData>();
 			try {
 				while(true) {
-					OlsrDataDump dump = mJsonInfo.parseCommand("/links/hna");
+					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
 					for (Link l : dump.links) {
 						MeshService.ClientData c = new MeshService.ClientData(l.remoteIP, l.linkQuality,
 								l.neighborLinkQuality, l.linkCost, l.validityTime);

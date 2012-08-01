@@ -23,7 +23,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
 
-import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -199,8 +198,7 @@ public class StatusActivity extends android.app.TabActivity {
 				public void run() {
 					try {
 						showMessage(R.string.gettingolsrinfo);
-						JsonInfo jsoninfo = new JsonInfo();
-						OlsrDataDump dump = jsoninfo.all();
+						OlsrDataDump dump = app.mJsonInfo.all();
 						showMessage(R.string.writingfile);
 						String filename;
 						if (dump.uuid == null || dump.uuid.contentEquals(""))
