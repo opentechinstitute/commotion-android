@@ -126,12 +126,9 @@ public class StatusActivity extends android.app.TabActivity {
 			@Override
 			public void onTabChanged(String tabId) {
 				update();
-				if (INFO.equals(tabId)) {
-					// force refresh
-					MeshService svc = app.service;
-					if (svc != null)
-						svc.statsRequest(0);
-				}
+				// force refresh of up/down stats
+				if (app.service != null)
+					app.service.statsRequest(0);
 				if (INFO.equals(tabId))
 					app.infoActivity.update();
 				if (app.clientsActivity != null)
