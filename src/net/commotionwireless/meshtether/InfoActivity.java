@@ -58,6 +58,7 @@ public class InfoActivity extends android.app.ListActivity {
 		super.onCreate(savedInstanceState);
 
 		app = (MeshTetherApp) getApplication();
+		app.setInfoActivity(this);
 		adapter = new BaseAdapter() {
 
 			public int getCount() {
@@ -107,6 +108,10 @@ public class InfoActivity extends android.app.ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
+		update();
+	}
+
+	void update() {
 		info = generateConfigList();
 		adapter.notifyDataSetChanged();
 	}

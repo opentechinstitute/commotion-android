@@ -54,6 +54,7 @@ public class MeshTetherApp extends android.app.Application {
 	SharedPreferences prefs;
 	StatusActivity  statusActivity = null;
 	ClientsActivity clientsActivity = null;
+	InfoActivity infoActivity = null;
 	private Toast toast;
 
 	WifiManager wifiManager;
@@ -158,8 +159,13 @@ public class MeshTetherApp extends android.app.Application {
 	void setStatusActivity(StatusActivity a) { // for updates
 		statusActivity = a;
 	}
+
 	void setClientsActivity(ClientsActivity a) { // for updates
 		clientsActivity = a;
+	}
+
+	void setInfoActivity(InfoActivity a) { // for updates
+		infoActivity = a;
 	}
 
 	void serviceStarted(MeshService s) {
@@ -169,6 +175,8 @@ public class MeshTetherApp extends android.app.Application {
 		service.startRequest();
 		if (clientsActivity != null)
 			clientsActivity.update();
+		if (infoActivity != null)
+			infoActivity.update();
 	}
 
 	static void broadcastState(Context ctx, int state) {

@@ -132,6 +132,8 @@ public class StatusActivity extends android.app.TabActivity {
 					if (svc != null)
 						svc.statsRequest(0);
 				}
+				if (INFO.equals(tabId))
+					app.infoActivity.update();
 				if (app.clientsActivity != null)
 					if (LINKS.equals(tabId))
 						app.clientsActivity.mPauseOlsrInfoThread = false;
