@@ -19,6 +19,10 @@
 package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import net.commotionwireless.olsrinfo.JsonInfo;
 import android.app.Notification;
@@ -69,6 +73,8 @@ public class MeshTetherApp extends android.app.Application {
 	final static int NOTIFY_ERROR = 2;
 
 	JsonInfo mJsonInfo = null;
+	Set<String> profiles;
+	Map<String, String> profileProperties;
 	String activeProfile;
 
 	public MeshService service = null;
@@ -113,6 +119,9 @@ public class MeshTetherApp extends android.app.Application {
 		activeProfile = getString(R.string.defaultprofile);
 
 		mJsonInfo = new JsonInfo();
+		profiles = new CopyOnWriteArraySet<String>();
+		profiles.add(activeProfile);
+		profileProperties = new HashMap<String, String>();
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 	}

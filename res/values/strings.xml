@@ -62,6 +62,7 @@
 
     <!-- messages related to the mesh profiles -->
     <string name="choose_profile">Choose a mesh profile</string>
+    <string name="profile_load_error">Failed to load profile!</string>
     <string name="defaultprofile">(default)</string>
 
     <!-- messages for the Settings/Preferences -->

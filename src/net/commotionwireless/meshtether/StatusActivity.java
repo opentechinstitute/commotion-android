@@ -19,9 +19,13 @@
 package net.commotionwireless.meshtether;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import android.app.AlertDialog;
@@ -33,6 +37,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,6 +55,8 @@ public class StatusActivity extends android.app.TabActivity {
 	private TabHost tabs;
 	private ImageButton onoff;
 	private Button chooseProfile;
+	private AlertDialog.Builder profileDialogBuilder;
+
 	private boolean paused;
 
 	private TextView textDownloadRate;
@@ -95,23 +102,35 @@ public class StatusActivity extends android.app.TabActivity {
 			public void onClick(View v) {
 				int state = app.getState();
 				if (state == MeshService.STATE_STOPPED) {
+					chooseProfile.setEnabled(false);
 					onoff.setImageResource(R.drawable.comlogo_sm_on);
 					app.startService();
 				} else {
 					app.stopService();
 					onoff.setImageResource(R.drawable.comlogo_sm_off);
+					chooseProfile.setEnabled(true);
 					update();
 				}
 			}
 		});
+
+		profileDialogBuilder = new AlertDialog.Builder(this);
+		profileDialogBuilder.setTitle(R.string.choose_profile);
+
 		chooseProfile = (Button) findViewById(R.id.choose_profile);
 		chooseProfile.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				int state = app.getState();
-				if (state == MeshService.STATE_STOPPED) {
-					// TODO implement profile list and picker aka spinner
-				}
+				findProfilesOnDisk();
+				final String[] profilesArray = app.profiles.toArray(new String[0]);
+				profileDialogBuilder.setItems(profilesArray, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						app.activeProfile = profilesArray[which];
+						chooseProfile.setText(app.activeProfile);
+					}
+				});
+				profileDialogBuilder.create().show();
 			}
 		});
 
@@ -141,7 +160,6 @@ public class StatusActivity extends android.app.TabActivity {
 
 		app.setStatusActivity(this);
 		paused = false;
-		//onoff.setEnabled(false);
 
 		textDownloadRate = ((TextView)findViewById(R.id.download_rate));
 		textUploadRate = ((TextView)findViewById(R.id.upload_rate));
@@ -176,6 +194,28 @@ public class StatusActivity extends android.app.TabActivity {
 			return true;
 		}
 		return(super.onOptionsItemSelected(item));
+	}
+
+	private void findProfilesOnDisk() {
+		FileFilter filter = new FileFilter() {
+			
+			@Override
+			public boolean accept(File pathname) {
+				if (pathname.getAbsolutePath().endsWith(".properties"))
+					return true;
+				return false;
+			}
+		};
+		Collection<File> all = new ArrayList<File>();
+		Collections.addAll(all, NativeHelper.app_bin.listFiles(filter));
+		Collections.addAll(all, NativeHelper.profileDir.listFiles(filter));
+		for (File f : all) {
+			Log.i(MeshTetherApp.TAG, "Searching for profile: " + f.getAbsolutePath());
+			String path = f.getAbsolutePath();
+			String profileName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".properties"));
+			app.profiles.add(profileName);
+			app.profileProperties.put(profileName, path);
+		}
 	}
 
 	private void getOlsrdStatusAndShare() {

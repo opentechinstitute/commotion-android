@@ -22,6 +22,7 @@ public class NativeHelper {
 	public static final String TAG = "NativeHelper";
 
 	public static File publicFiles;
+	public static File profileDir;
 	public static File app_bin;
 	public static File app_log;
 
@@ -40,6 +41,8 @@ public class NativeHelper {
 		publicFiles = new File(Environment.getExternalStorageDirectory(),
 				"Android/data/" + context.getPackageName() + "/files/");
 		publicFiles.mkdirs();
+		profileDir = new File(Environment.getExternalStorageDirectory(), "MeshTether");
+		profileDir.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();

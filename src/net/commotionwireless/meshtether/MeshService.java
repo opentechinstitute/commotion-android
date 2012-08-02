@@ -19,11 +19,13 @@
 package net.commotionwireless.meshtether;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
 
 import net.commotionwireless.meshtether.Util.MACAddress;
 import android.app.Notification;
@@ -81,6 +83,7 @@ public class MeshService extends android.app.Service {
 	private String activeIP = "";
 	private String activeNetmask = "";
 	private String activeDNS = "";
+	private String activeOlsrdConf = "";
 
 	private PowerManager.WakeLock wakeLock;
 	private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
@@ -314,7 +317,8 @@ public class MeshService extends android.app.Service {
 			if (state != STATE_STOPPED) return;
 			log.clear();
 
-			setMeshProfile();
+			if ( !setMeshProfile())
+				break;
 			log(false, getString(R.string.starting) + " " + activeSSID);
 
 			// TODO make this only overwrite on upgrade to new version
@@ -379,6 +383,8 @@ public class MeshService extends android.app.Service {
 					Settings.System.putString(cr, Settings.System.WIFI_STATIC_DNS1, activeDNS);
 
 					// meshing works very poorly with wifi sleep enabled
+					// TODO check if this sticks after the app quits, if so
+					// save the current value and restore it on stopping
 					Settings.System.putInt(cr, Settings.System.WIFI_SLEEP_POLICY,
 							Settings.System.WIFI_SLEEP_POLICY_NEVER);
 
@@ -637,7 +643,8 @@ public class MeshService extends android.app.Service {
 				envlist.add("brncl_" + k + "=1");
 		}
 		envlist.add("brncl_path=" + NativeHelper.app_bin.getAbsolutePath());
-
+		envlist.add("olsrd_conf_path=" + activeOlsrdConf);
+		
 		String[] ret = (String[]) envlist.toArray(new String[0]);
 		for (String s : ret) {
 			Log.i(TAG, "env var: " + s);
@@ -651,7 +658,8 @@ public class MeshService extends android.app.Service {
 		return "\"".concat(ssid).concat("\"");
 	}
 
-	private void setMeshProfile() {
+	private boolean setMeshProfile() {
+		activeOlsrdConf = new File(NativeHelper.app_bin, "olsrd.conf").getAbsolutePath();
 		if (app.activeProfile.equals(getString(R.string.defaultprofile))) {
 			activeSSID = formatSSID(getPrefValue(getString(R.string.lan_essid)));
 			activeBSSID = getPrefValue(getString(R.string.lan_bssid));
@@ -660,7 +668,25 @@ public class MeshService extends android.app.Service {
 			activeDNS = getPrefValue(getString(R.string.adhoc_dns_server));
 		} else {
 			// TODO
+			Properties prop = new Properties();
+			String propFilename = app.profileProperties.get(app.activeProfile);
+			String confFilename = propFilename.replace(".properties", ".conf");
+			if (new File(confFilename).exists())
+				activeOlsrdConf = confFilename;
+			try {
+				prop.load(new FileInputStream(propFilename));
+			} catch (Exception e) {
+				e.printStackTrace();
+				app.updateToast(getString(R.string.profile_load_error) + " " + propFilename, false);
+				return false;
+			}
+			activeSSID = formatSSID(prop.getProperty("ssid"));
+			activeBSSID = prop.getProperty("bssid");
+			activeIP = prop.getProperty("ip");
+			activeNetmask = prop.getProperty("netmask");
+			activeDNS = prop.getProperty("dns");
 		}
+		return true;
 	}
 
 	private boolean startProcess() {
