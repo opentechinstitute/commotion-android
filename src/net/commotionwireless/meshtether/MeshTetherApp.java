@@ -112,9 +112,6 @@ public class MeshTetherApp extends android.app.Application {
 		mJsonInfo = new JsonInfo();
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if (!wifiManager.isWifiEnabled()) {
-			wifiManager.setWifiEnabled(true);
-		}
 	}
 
 	@Override

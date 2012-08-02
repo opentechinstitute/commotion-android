@@ -321,6 +321,8 @@ public class MeshService extends android.app.Service {
 				log(false, getString(R.string.enablingwifi));
 				wifiManager.setWifiEnabled(true); // this will send MSG_NETSCHANGE
 			}
+			if (wifiManager.getConnectionInfo().getIpAddress() != 0) // if connected, disconnect
+				wifiManager.disconnect(); // this will send MSG_NETSCHANGE
 
 			state = STATE_STARTING;
 			// FALL THROUGH!
@@ -345,7 +347,8 @@ public class MeshService extends android.app.Service {
 
 					WifiConfiguration wc = new WifiConfiguration();
 					wc.priority = 100000;
-					wc.hiddenSSID = false;
+					wc.hiddenSSID = true; // Android won't see Adhoc SSIDs
+					wc.status = WifiConfiguration.Status.ENABLED;
 					wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 					String ssid = getPrefValue(getString(R.string.lan_essid));
 					wc.SSID = "\"".concat(ssid).concat("\"");
@@ -423,7 +426,7 @@ public class MeshService extends android.app.Service {
 			}
 			break;
 		case MSG_STATS:
-			Log.i(TAG, "handle MSG_STATS");
+			//Log.i(TAG, "handle MSG_STATS");
 			mHandler.removeMessages(MSG_STATS);
 			if (state != STATE_RUNNING || if_lan.length() == 0) return;
 			stats.update(Util.fetchTrafficData(if_lan));
@@ -691,8 +694,10 @@ public class MeshService extends android.app.Service {
 				}
 				WifiProcess = null;
 			}
+			wifiManager.disconnect();
 			wifiLock.release();
 			clients.clear();
+			app.clientsActivity.update();
 			app.hideProgressDialog();
 		}
 	}
