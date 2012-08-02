@@ -26,7 +26,7 @@
     <string name="announce">Associate</string>
     <string name="noprefs">Please, set your preferences</string>
     <string name="noclients">No clients connected</string>
-    <string name="starting">Starting…</string>
+    <string name="starting">Starting</string>
     <string name="dataready">Data network is ready</string>
     <string name="disablewifi">Disabling Wifi Manager…</string>
     <string name="conflictwifi">Wifi Manager is interfering with MeshTether!</string>
@@ -57,9 +57,12 @@
     <string name="current">Current: </string>
     <string name="restartneeded">Restart for changes to take effect</string>
     <string name="onoff">on/off</string>
-    <string name="defaultprofile">(default)</string>
     <string name="waiting_for_olsrd">waiting for olsrd to start…</string>
     <string name="no_data_yet">(no data yet)</string>
+
+    <!-- messages related to the mesh profiles -->
+    <string name="choose_profile">Choose a mesh profile</string>
+    <string name="defaultprofile">(default)</string>
 
     <!-- messages for the Settings/Preferences -->
     <string name="mesh_profile">Default Mesh Profile</string>
@@ -71,9 +74,6 @@
     <string name="mesh_netmask">Mesh Node Netmask</string>
     <string name="mesh_nameserver">DNS Server</string>
     <string name="adhoc_settings">Adhoc Wifi Setup</string>
-<!-- 
-     <string name=""></string>
--->
 
     <!-- messages for the ProgressDialog -->
     <string name="servicestarting">Mesh service starting…</string>

@@ -76,6 +76,12 @@ public class MeshService extends android.app.Service {
 	private WifiManager.WifiLock wifiLock;
 	private MeshTetherProcess WifiProcess = null;
 
+	private String activeSSID = "";
+	private String activeBSSID = "";
+	private String activeIP = "";
+	private String activeNetmask = "";
+	private String activeDNS = "";
+
 	private PowerManager.WakeLock wakeLock;
 	private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
 		@Override
@@ -307,7 +313,9 @@ public class MeshService extends android.app.Service {
 
 			if (state != STATE_STOPPED) return;
 			log.clear();
-			log(false, getString(R.string.starting));
+
+			setMeshProfile();
+			log(false, getString(R.string.starting) + " " + activeSSID);
 
 			// TODO make this only overwrite on upgrade to new version
 			log(false, getString(R.string.unpacking));
@@ -345,33 +353,30 @@ public class MeshService extends android.app.Service {
 						log(false, "No active WAN interface found");
 					}
 
+					log(false, "Enabling wifi for " + activeSSID);
 					WifiConfiguration wc = new WifiConfiguration();
 					wc.priority = 100000;
 					wc.hiddenSSID = true; // Android won't see Adhoc SSIDs
 					wc.status = WifiConfiguration.Status.ENABLED;
 					wc.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-					String ssid = getPrefValue(getString(R.string.lan_essid));
-					wc.SSID = "\"".concat(ssid).concat("\"");
-					wc.BSSID = getPrefValue(getString(R.string.lan_bssid));
+					wc.SSID = activeSSID;
+					wc.BSSID = activeBSSID;
 					currentNetId = wifiManager.addNetwork(wc);
 					if(currentNetId < 0) {
-						System.out.println("Unable to add network configuration for " + ssid);
+						System.out.println("Unable to add network configuration for " + activeSSID);
 						return;
 					}
 					wifiManager.enableNetwork(currentNetId, true);
 
 					// set up the static IP settings
 					// TODO read and store the current settings so they can be restored on stop
+					log(false, "Setting up IP config");
 					final ContentResolver cr = getContentResolver();
 					Settings.System.putInt(cr, Settings.System.WIFI_USE_STATIC_IP, 1);
-					Settings.System.putString(cr, Settings.System.WIFI_STATIC_IP,
-							getPrefValue(getString(R.string.adhoc_ip)));
-					Settings.System.putString(cr, Settings.System.WIFI_STATIC_NETMASK,
-							getPrefValue(getString(R.string.adhoc_netmask)));
-					Settings.System.putString(cr, Settings.System.WIFI_STATIC_GATEWAY,
-							getPrefValue(getString(R.string.adhoc_ip)));
-					Settings.System.putString(cr, Settings.System.WIFI_STATIC_DNS1,
-							getPrefValue(getString(R.string.adhoc_dns_server)));
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_IP, activeIP);
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_NETMASK, activeNetmask);
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_GATEWAY, activeIP);
+					Settings.System.putString(cr, Settings.System.WIFI_STATIC_DNS1, activeDNS);
 
 					// meshing works very poorly with wifi sleep enabled
 					Settings.System.putInt(cr, Settings.System.WIFI_SLEEP_POLICY,
@@ -640,10 +645,29 @@ public class MeshService extends android.app.Service {
 		return ret;
 	}
 
+	private String formatSSID(String ssid) {
+		if (ssid == null)
+			return null;
+		return "\"".concat(ssid).concat("\"");
+	}
+
+	private void setMeshProfile() {
+		if (app.activeProfile.equals(getString(R.string.defaultprofile))) {
+			activeSSID = formatSSID(getPrefValue(getString(R.string.lan_essid)));
+			activeBSSID = getPrefValue(getString(R.string.lan_bssid));
+			activeIP = getPrefValue(getString(R.string.adhoc_ip));
+			activeNetmask = getPrefValue(getString(R.string.adhoc_netmask));
+			activeDNS = getPrefValue(getString(R.string.adhoc_dns_server));
+		} else {
+			// TODO
+		}
+	}
+
 	private boolean startProcess() {
 		// calling 'su -c' from Java doesn't work so we use a helper script
-		app.showProgressMessage(R.string.startingolsrd);
+		log(false, "Aquiring wifi lock");
 		wifiLock.acquire();
+		app.showProgressMessage(R.string.startingolsrd);
 		String cmd = NativeHelper.SU_C;
 		try {
 			WifiProcess = new MeshTetherProcess(cmd, buildEnvFromPrefs(), NativeHelper.app_bin);
@@ -694,7 +718,9 @@ public class MeshService extends android.app.Service {
 				}
 				WifiProcess = null;
 			}
+			log(false, "Disconnecting from " + activeSSID);
 			wifiManager.disconnect();
+			log(false, "Releasing wifi lock");
 			wifiLock.release();
 			clients.clear();
 			app.clientsActivity.update();

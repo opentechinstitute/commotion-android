@@ -69,6 +69,7 @@ public class MeshTetherApp extends android.app.Application {
 	final static int NOTIFY_ERROR = 2;
 
 	JsonInfo mJsonInfo = null;
+	String activeProfile;
 
 	public MeshService service = null;
 	public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
@@ -108,6 +109,8 @@ public class MeshTetherApp extends android.app.Application {
 				getString(R.string.notify_error),
 				PendingIntent.getActivity(this, 0, new Intent(this, StatusActivity.class), 0));
 		notificationError.flags = Notification.FLAG_AUTO_CANCEL;
+
+		activeProfile = getString(R.string.defaultprofile);
 
 		mJsonInfo = new JsonInfo();
 
