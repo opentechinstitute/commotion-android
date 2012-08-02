@@ -316,6 +316,16 @@ public class MeshTetherApp extends android.app.Application {
 	void showProgressMessage(String messageText) {
 		Log.i(TAG, "MSG_PROGRESSDIALOG");
 		if (messageText == null) messageText = "(null)";
+		// TODO remove these null check and fix the actual bug! these should
+		// always exist when this is called
+		if (statusActivity == null) {
+			Log.e(TAG, "statusActivity is null!");
+			return;
+		}
+		if (statusActivity.mProgressDialog == null) {
+			Log.e(TAG, "statusActivity.mProgressDialog is null!");
+			return;
+		}
 		statusActivity.mProgressDialog.setMessage(messageText);
 		if ( !statusActivity.mProgressDialog.isShowing())
 			statusActivity.mProgressDialog.show();
