@@ -72,6 +72,7 @@
             android:summary="Associate every 5 seconds until a client connects"
             android:title="Auto Associate" />
     </PreferenceCategory>
+<!--
     <PreferenceCategory android:title="Clients" >
         <PreferenceScreen
             android:summary="What to do when a client connects"
@@ -104,6 +105,7 @@
             android:summary="Don&apos;t wait for data connection"
             android:title="Local Mode" />
     </PreferenceCategory>
+-->
     <PreferenceCategory android:title="Interfaces" >
         <EditTextPreference
             android:defaultValue=""
