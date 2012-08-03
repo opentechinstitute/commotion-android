@@ -293,13 +293,12 @@ public class StatusActivity extends android.app.TabActivity {
 		if (id == DLG_ABOUT) {
 			return (new AlertDialog.Builder(this))
 			.setIcon(android.R.drawable.ic_dialog_info)
-			.setTitle("Help")
-			.setMessage("Press the 'Associate' button to re-announce the ad-hoc network. "
-					+"See Website for help and more info.")
-					.setPositiveButton("Donate", new DialogInterface.OnClickListener() {
+			.setTitle(R.string.help_title)
+			.setMessage(R.string.help_message)
+					.setPositiveButton("Live Chat", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							Uri uri = Uri.parse(getString(R.string.paypalUrl));
+							Uri uri = Uri.parse(getString(R.string.ircUrl));
 							startActivity(new Intent(Intent.ACTION_VIEW, uri));
 						}})
 						.setNeutralButton("Website", new DialogInterface.OnClickListener() {

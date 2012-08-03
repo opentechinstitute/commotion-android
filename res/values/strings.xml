@@ -75,6 +75,7 @@
     <string name="mesh_netmask">Mesh Node Netmask</string>
     <string name="mesh_nameserver">DNS Server</string>
     <string name="adhoc_settings">Adhoc Wifi Setup</string>
+    <string name="invalidmeship">Invalid Mesh Prefix or IP.</string>
 
     <!-- messages for the ProgressDialog -->
     <string name="servicestarting">Mesh service starting…</string>
@@ -86,6 +87,10 @@
     <string name="writingfile">Writing info to file…</string>
     <string name="zippingfile">Zipping up file…</string>
     <string name="olsrdnotrunning">olsrd is not running, no status information available!</string>
+
+    <!-- Share OLSR Status -->
+    <string name="help_title">Help</string>
+    <string name="help_message">Mesh on the phone is experimental! Please check our wiki, email our mailing list, or find us on IRC.</string>
 
     <!-- DO NOT TRANSLATE -->
     <string name="if_wan">if_wan</string>
@@ -144,11 +149,10 @@
         <item>Aria/Liberty (see blog)</item>
     </string-array>
 
-    <string name="websiteUrl">https://commotionwireless.net/</string>
-    <string name="fixUrl">http://szym.net/barnacle/fix/</string>
+    <string name="websiteUrl">http://commotionwireless.net/</string>
+    <string name="ircUrl">http://webchat.freenode.net/?randomnick=1&amp;channels=oti&amp;uio=d4</string>
+    <string name="fixUrl">https://code.commotionwireless.net/projects/commotion/wiki/Android_Troubleshooting</string>
     <string name="rootUrl">http://szym.net/barnacle/faq/#root</string>
-    <string name="wikiUrl">http://github.com/szym/barnacle/wiki</string>
-    <string name="paypalUrl">https://www.paypal.com/</string>
-    <string name="invalidmeship">Invalid Mesh Prefix or IP.</string>
+    <string name="wikiUrl">https://code.commotionwireless.net/projects/commotion/wiki</string>
 
 </resources>
