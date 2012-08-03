@@ -689,6 +689,11 @@ public class MeshService extends android.app.Service {
 		return true;
 	}
 
+	String[] getActiveMeshProfile() {
+		 String[] ret = { activeSSID, activeBSSID, activeIP, activeNetmask, activeDNS, activeOlsrdConf };
+		 return ret;
+	}
+
 	private boolean startProcess() {
 		// calling 'su -c' from Java doesn't work so we use a helper script
 		log(false, "Aquiring wifi lock");

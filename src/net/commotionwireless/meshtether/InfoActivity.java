@@ -126,7 +126,19 @@ public class InfoActivity extends android.app.ListActivity {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		List<String> stringList = new ArrayList<String>();
 
-		// add wifi info first
+		// add active profile info first
+		if (app.service != null) {
+			String[] active = app.service.getActiveMeshProfile();
+			String profileString = "";
+			for (int i=0; i < active.length; i++) {
+				profileString += "\n";
+				profileString += "" + active[i];
+			}
+			stringList.add("active profile"); // key
+			stringList.add(profileString); // value
+		}
+		
+		// then add wifi info
 		WifiInfo wi = app.wifiManager.getConnectionInfo();
 		String wifiInfoString = "\n";
 		wifiInfoString += "SSID: " + wi.getSSID() + "\n";
