@@ -210,7 +210,7 @@ public class InfoActivity extends android.app.ListActivity {
 		while (iter.hasNext()) {
 			String key = iter.next();
 			stringList.add(key);
-			stringList.add((String) data.get(key).toString());
+			stringList.add(data.get(key).toString());
 		}
 
 		Collection<Plugin> plugins = app.mJsonInfo.plugins();

@@ -648,7 +648,7 @@ public class MeshService extends android.app.Service {
 		envlist.add("brncl_path=" + NativeHelper.app_bin.getAbsolutePath());
 		envlist.add("olsrd_conf_path=" + activeOlsrdConf);
 		
-		String[] ret = (String[]) envlist.toArray(new String[0]);
+		String[] ret = envlist.toArray(new String[0]);
 		for (String s : ret) {
 			Log.i(TAG, "env var: " + s);
 		}
