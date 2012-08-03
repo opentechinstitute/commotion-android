@@ -343,8 +343,6 @@ public class MeshService extends android.app.Service {
 			Log.i(TAG, "handle MSG_NETSCHANGE");
 			int wifiState = wifiManager.getWifiState();
 			String wifiStateString = getWifiStateString(wifiState);
-			Log.e(TAG, String.format("NETSCHANGE: wifiState: %s state: %d WifiProcess: %s",
-					wifiStateString, state, WifiProcess == null ? "null" : "proc"));
 			if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
 				// wifi is good (or lost), we can start now...
 				if ((state == STATE_STARTING) && (WifiProcess == null)) {
@@ -724,12 +722,15 @@ public class MeshService extends android.app.Service {
 		log(false, "Aquiring wifi lock");
 		wifiLock.acquire();
 		app.showProgressMessage(R.string.startingolsrd);
-		String cmd = NativeHelper.SU_C;
 		try {
-			WifiProcess = new MeshTetherProcess(cmd, buildEnvFromPrefs(), NativeHelper.app_bin);
+			String[] env = buildEnvFromPrefs();
+			MeshTetherProcess DelRouteProcess;
+			DelRouteProcess = new MeshTetherProcess(NativeHelper.DEL_ROUTE, env, NativeHelper.app_bin);
+			DelRouteProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
+			WifiProcess = new MeshTetherProcess(NativeHelper.SU_C, env, NativeHelper.app_bin);
 			WifiProcess.run(mHandler, MSG_OUTPUT, MSG_ERROR);
 		} catch (Exception e) {
-			log(true, String.format(getString(R.string.execerr), cmd));
+			log(true, String.format(getString(R.string.execerr), NativeHelper.SU_C));
 			Log.e(TAG, "start failed " + e.toString());
 			return false;
 		}

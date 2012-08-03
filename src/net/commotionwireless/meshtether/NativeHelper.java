@@ -30,6 +30,7 @@ public class NativeHelper {
 	static String RUN;
 	static String STOP_OLSRD;
 	static String DO_STOP_OLSRD;
+	static String DEL_ROUTE;
 	static String OLSRD;
 	static String WIFI;
 	static String BUSYBOX;
@@ -46,6 +47,7 @@ public class NativeHelper {
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
+		DEL_ROUTE = new File(app_bin, "del-fake-default-route").getAbsolutePath();
 		RUN = new File(app_bin, "run").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		WIFI = new File(app_bin, "wifi").getAbsolutePath();
@@ -96,6 +98,7 @@ public class NativeHelper {
 		chmod("0750", new File(RUN));
 		chmod("0750", new File(STOP_OLSRD));
 		chmod("0750", new File(DO_STOP_OLSRD));
+		chmod("0750", new File(DEL_ROUTE));
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(WIFI));
 		chmod("0750", new File(BUSYBOX));
