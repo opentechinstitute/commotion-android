@@ -107,14 +107,16 @@ public class MeshService extends android.app.Service {
 		final float neighborLinkQuality;
 		final int linkCost;
 		final int validityTime;
-		boolean hasHna;
+		boolean hasRouteToOther;
+		boolean hasDefaultRoute;
 		ClientData(String ip, float lq, float nlq, int lc, int vt) {
 			remoteIP = ip;
 			linkQuality = lq;
 			neighborLinkQuality = nlq;
 			linkCost = lc;
 			validityTime = vt;
-			hasHna = false;
+			hasRouteToOther = false;
+			hasDefaultRoute = false;
 		}
 		public String toString() { return remoteIP + " " + linkQuality + " " + neighborLinkQuality; }
 		public String toNiceString() { return remoteIP; }

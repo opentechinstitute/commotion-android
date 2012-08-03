@@ -29,8 +29,9 @@ import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 public class ClientsActivity extends android.app.ListActivity {
@@ -46,7 +47,9 @@ public class ClientsActivity extends android.app.ListActivity {
 		TextView remoteIP;
 		ProgressBar lqBar;
 		ProgressBar nlqBar;
-		RadioButton hnaIndicator;
+		LinearLayout idrow;
+		ImageView defaultRouteIcon;
+		ImageView otherRouteIcon;
 	}
 
 	/** Called when the activity is first created. */
@@ -73,7 +76,13 @@ public class ClientsActivity extends android.app.ListActivity {
 					holder.remoteIP = (TextView) view.findViewById(R.id.remoteip);
 					holder.lqBar = (ProgressBar) view.findViewById(R.id.linkquality);
 					holder.nlqBar = (ProgressBar) view.findViewById(R.id.neighborlinkquality);
-					holder.hnaIndicator = (RadioButton) view.findViewById(R.id.hna);
+					holder.idrow = (LinearLayout) view.findViewById(R.id.idrow);
+					holder.defaultRouteIcon = new ImageView(getBaseContext());
+					holder.defaultRouteIcon.setId(R.drawable.default_route);
+					holder.defaultRouteIcon.setImageResource(R.drawable.default_route);
+					holder.otherRouteIcon = new ImageView(getBaseContext());
+					holder.otherRouteIcon.setId(R.drawable.other_route);
+					holder.otherRouteIcon.setImageResource(R.drawable.other_route);
 					view.setTag(holder);
 					view.setClickable(false);
 					convertView = view;
@@ -84,7 +93,19 @@ public class ClientsActivity extends android.app.ListActivity {
 				holder.remoteIP.setText(client.remoteIP);
 				holder.lqBar.setProgress((int)(client.linkQuality * 100));
 				holder.nlqBar.setProgress((int)(client.neighborLinkQuality * 100));
-				holder.hnaIndicator.setChecked(client.hasHna);
+
+				if (client.hasDefaultRoute) {
+					if(holder.idrow.findViewById(R.drawable.default_route) == null)
+						holder.idrow.addView(holder.defaultRouteIcon);
+				} else {
+					holder.idrow.removeView(holder.defaultRouteIcon);
+				}
+				if (client.hasRouteToOther) {
+					if(holder.idrow.findViewById(R.drawable.other_route) == null)
+						holder.idrow.addView(holder.otherRouteIcon);
+				} else {
+					holder.idrow.removeView(holder.otherRouteIcon);
+				}
 				return convertView;
 			}
 		};
@@ -137,8 +158,11 @@ public class ClientsActivity extends android.app.ListActivity {
 						MeshService.ClientData c = new MeshService.ClientData(l.remoteIP, l.linkQuality,
 								l.neighborLinkQuality, l.linkCost, l.validityTime);
 						for (HNA h : dump.hna) {
-							if (l.remoteIP.contentEquals(h.gateway))
-								c.hasHna = true;
+							if (l.remoteIP.equals(h.gateway))
+								if (h.genmask == 0)
+									c.hasDefaultRoute = true;
+								else
+									c.hasRouteToOther = true;
 						}
 						clientsToAdd.add(c);
 					}
@@ -165,12 +189,14 @@ public class ClientsActivity extends android.app.ListActivity {
 		for (int i = 0; i < clients.size(); ++i) {
 			ClientData c = clients.get(i);
 			if (c.remoteIP.equals(cd.remoteIP)) {
-				if (c.hasHna == cd.hasHna
+				if (c.hasRouteToOther == cd.hasRouteToOther
+						&& c.hasDefaultRoute == cd.hasDefaultRoute
 						&& c.linkQuality == cd.linkQuality
 						&& c.neighborLinkQuality == cd.neighborLinkQuality) {
 					return; // no change
 				}
-				cd.hasHna = c.hasHna;
+				cd.hasRouteToOther = c.hasRouteToOther;
+				cd.hasDefaultRoute = c.hasDefaultRoute;
 				clients.remove(i); // we'll add it at the end
 				break;
 			}
