@@ -138,7 +138,7 @@ public class StatusActivity extends android.app.TabActivity {
 		tabs = getTabHost();
 		tabs.addTab(tabs.newTabSpec(LINKS)
 				.setIndicator(LINKS, getResources().getDrawable(R.drawable.ic_tab_contacts))
-				.setContent(new Intent(this, ClientsActivity.class)));
+				.setContent(new Intent(this, LinksActivity.class)));
 		tabs.addTab(tabs.newTabSpec(INFO)
 				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_recent))
 				.setContent(new Intent(this, InfoActivity.class)));
@@ -151,11 +151,11 @@ public class StatusActivity extends android.app.TabActivity {
 					app.service.statsRequest(0);
 				if (INFO.equals(tabId))
 					app.infoActivity.update();
-				if (app.clientsActivity != null)
+				if (app.linksActivity != null)
 					if (LINKS.equals(tabId))
-						app.clientsActivity.mPauseOlsrInfoThread = false;
+						app.linksActivity.mPauseOlsrInfoThread = false;
 					else
-						app.clientsActivity.mPauseOlsrInfoThread = true;
+						app.linksActivity.mPauseOlsrInfoThread = true;
 			}
 		});
 
@@ -221,7 +221,7 @@ public class StatusActivity extends android.app.TabActivity {
 
 	private void getOlsrdStatusAndShare() {
 		if (app.getState() == MeshService.STATE_RUNNING) {
-			app.clientsActivity.mPauseOlsrInfoThread = true;
+			app.linksActivity.mPauseOlsrInfoThread = true;
 			mProgressDialog.setMessage("Generating...");
 			mProgressDialog.show();
 			new Thread() {
@@ -256,7 +256,7 @@ public class StatusActivity extends android.app.TabActivity {
 						e.printStackTrace();
 					}
 					mProgressDialog.dismiss();
-					app.clientsActivity.mPauseOlsrInfoThread = false;
+					app.linksActivity.mPauseOlsrInfoThread = false;
 				}
 			}.start();
 		} else {

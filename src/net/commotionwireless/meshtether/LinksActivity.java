@@ -34,7 +34,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class ClientsActivity extends android.app.ListActivity {
+public class LinksActivity extends android.app.ListActivity {
 	private MeshTetherApp app;
 	private BaseAdapter adapter;
 	private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
@@ -57,7 +57,7 @@ public class ClientsActivity extends android.app.ListActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		app = (MeshTetherApp)getApplication();
-		app.setClientsActivity(this);
+		app.setLinksActivity(this);
 
 		adapter = new BaseAdapter(){
 			@Override
@@ -124,7 +124,7 @@ public class ClientsActivity extends android.app.ListActivity {
 		super.onDestroy();
 		mOlsrInfoThread.interrupt();
 		mOlsrInfoThread = null;
-		app.setClientsActivity(null);
+		app.setLinksActivity(null);
 	}
 
 	@Override

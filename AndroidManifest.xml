@@ -63,7 +63,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="ClientsActivity"
+            android:name=".LinksActivity"
             android:launchMode="singleTop" />
         <activity
             android:name="InfoActivity"

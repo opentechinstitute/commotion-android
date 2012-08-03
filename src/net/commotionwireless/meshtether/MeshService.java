@@ -784,7 +784,7 @@ public class MeshService extends android.app.Service {
 			log(false, "Releasing wifi lock");
 			wifiLock.release();
 			clients.clear();
-			app.clientsActivity.update();
+			app.linksActivity.update();
 			app.hideProgressDialog();
 		}
 	}

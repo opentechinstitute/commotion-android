@@ -57,7 +57,7 @@ public class MeshTetherApp extends android.app.Application {
 
 	SharedPreferences prefs;
 	StatusActivity  statusActivity = null;
-	ClientsActivity clientsActivity = null;
+	LinksActivity linksActivity = null;
 	InfoActivity infoActivity = null;
 	private Toast toast;
 
@@ -169,8 +169,8 @@ public class MeshTetherApp extends android.app.Application {
 		statusActivity = a;
 	}
 
-	void setClientsActivity(ClientsActivity a) { // for updates
-		clientsActivity = a;
+	void setLinksActivity(LinksActivity a) { // for updates
+		linksActivity = a;
 	}
 
 	void setInfoActivity(InfoActivity a) { // for updates
@@ -182,8 +182,8 @@ public class MeshTetherApp extends android.app.Application {
 		service = s;
 		log = service.log;
 		service.startRequest();
-		if (clientsActivity != null)
-			clientsActivity.update();
+		if (linksActivity != null)
+			linksActivity.update();
 		if (infoActivity != null)
 			infoActivity.update();
 	}
@@ -234,8 +234,8 @@ public class MeshTetherApp extends android.app.Application {
 			notificationManager.notify(NOTIFY_CLIENT, notificationClientAdded);
 		}
 
-		if (clientsActivity != null)
-			clientsActivity.update();
+		if (linksActivity != null)
+			linksActivity.update();
 	}
 
 	void cancelClientNotify() {
