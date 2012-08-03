@@ -61,14 +61,17 @@ public class InfoActivity extends android.app.ListActivity {
 		app.setInfoActivity(this);
 		adapter = new BaseAdapter() {
 
+			@Override
 			public int getCount() {
 				return info.length / 2;
 			}
 
+			@Override
 			public long getItemId(int position) {
 				return position;
 			}
 
+			@Override
 			public Object getItem(int position) {
 				String[] ret = new String[2];
 				int i = position * 2;
@@ -77,6 +80,7 @@ public class InfoActivity extends android.app.ListActivity {
 				return ret;
 			}
 
+			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				ViewHolder holder;
 

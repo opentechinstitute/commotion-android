@@ -60,8 +60,11 @@ public class ClientsActivity extends android.app.ListActivity {
 		app.setClientsActivity(this);
 
 		adapter = new BaseAdapter(){
+			@Override
 			public int getCount() { return clients.size(); }
+			@Override
 			public Object getItem(int position) { return clients.get(position); }
+			@Override
 			public long getItemId(int position) { return position; }
 
 			@Override
@@ -149,6 +152,7 @@ public class ClientsActivity extends android.app.ListActivity {
 
 	class OlsrInfoThread extends Thread {
 
+		@Override
 		public void run() {
 			ArrayList<MeshService.ClientData> clientsToAdd = new ArrayList<MeshService.ClientData>();
 			try {
@@ -168,6 +172,7 @@ public class ClientsActivity extends android.app.ListActivity {
 					}
 					final ArrayList<MeshService.ClientData> updateList = new ArrayList<MeshService.ClientData>(clientsToAdd);
 					mHandler.post(new Runnable() {
+						@Override
 						public void run() {
 							for (MeshService.ClientData cd : updateList) {
 								clientAdded(cd);

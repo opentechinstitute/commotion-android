@@ -118,6 +118,7 @@ public class MeshService extends android.app.Service {
 			hasRouteToOther = false;
 			hasDefaultRoute = false;
 		}
+		@Override
 		public String toString() { return remoteIP + " " + linkQuality + " " + neighborLinkQuality; }
 		public String toNiceString() { return remoteIP; }
 	}
@@ -472,6 +473,7 @@ public class MeshService extends android.app.Service {
 			br = Util.toReader(is);
 			msg = t;
 		}
+		@Override
 		public void run() {
 			try{
 				String line;

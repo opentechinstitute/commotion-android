@@ -79,6 +79,7 @@ public class StatusActivity extends android.app.TabActivity {
 
     ProgressDialog mProgressDialog;
     final Handler mHandler = new Handler() {
+        @Override
         public void handleMessage(Message msg) {
             mProgressDialog.setMessage(msg.getData().getString("message"));
         }
@@ -234,6 +235,7 @@ public class StatusActivity extends android.app.TabActivity {
 					mHandler.sendMessage(msg);
 				}
 
+				@Override
 				public void run() {
 					try {
 						showMessage(R.string.gettingolsrinfo);
