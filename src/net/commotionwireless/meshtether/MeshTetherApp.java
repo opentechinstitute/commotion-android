@@ -93,9 +93,9 @@ public class MeshTetherApp extends android.app.Application {
 		// if IP address isn't set, generate one
 		if (prefs.getString(getString(R.string.adhoc_ip), "").equals("")) {
 			SharedPreferences.Editor e = prefs.edit();
-			String myIP = "10." + String.valueOf((int)(Math.random() * 255))
-			+ "." + String.valueOf((int)(Math.random() * 255))
-			+ "." + String.valueOf((int)(Math.random() * 255));
+			String myIP = "10." + String.valueOf((int)(Math.random() * 254))
+			+ "." + String.valueOf((int)(Math.random() * 254))
+			+ "." + String.valueOf((int)(Math.random() * 254));
 			e.putString(getString(R.string.adhoc_ip), myIP);
 			e.commit();
 			Log.i(TAG, "Generated IP: " + myIP);
