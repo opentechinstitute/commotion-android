@@ -6,3 +6,5 @@
 export brncl_path
 
 kill -15 `cat $brncl_path/../app_log/olsrd.pid`
+
+$brncl_path/killall olsrd

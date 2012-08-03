@@ -44,7 +44,7 @@ sleep 1
 
 # run olsrd
 (./olsrd -f "${olsrd_conf_path}" -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
-echo `ps | grep olsrd | awk '{print $2;}'` > $brncl_path/../app_log/olsrd.pid
+echo `ps | ./grep '[o]lsrd' | ./awk '{print $2;}'` > $brncl_path/../app_log/olsrd.pid
 
 # the association loop
 ./wifi assoc
