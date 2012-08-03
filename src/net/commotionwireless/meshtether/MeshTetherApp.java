@@ -280,6 +280,7 @@ public class MeshTetherApp extends android.app.Application {
 
 	/** find default route interface */
 	protected boolean findIfWan() {
+		// TODO move to Util.java and actually detect if there is a GSM/CDMA net connection
 		String if_wan = prefs.getString(getString(R.string.if_wan), "");
 		if (if_wan.length() != 0) return true;
 
