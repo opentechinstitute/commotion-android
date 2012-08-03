@@ -82,6 +82,7 @@ public class MeshService extends android.app.Service {
 	private String activeBSSID = "";
 	private String activeIP = "";
 	private String activeNetmask = "";
+	private String activeIpGeneration = "";
 	private String activeDNS = "";
 	private String activeOlsrdConf = "";
 
@@ -658,6 +659,22 @@ public class MeshService extends android.app.Service {
 		return "\"".concat(ssid).concat("\"");
 	}
 
+	private String generateIP(String base, String netmask) {
+		String[] netmaskBytes = netmask.split("[.]+");
+		String[] baseBytes = base.split("[.]+");
+		// start at byte 1 since a completely random IP would be stupid
+		String ret = baseBytes[0];
+		for (int i=1; i<baseBytes.length; i++) {
+			// if the netmask byte doesn't exist or is zero, generate that byte
+			ret += ".";
+			if (baseBytes[i].equals("0") && (i >= netmaskBytes.length || netmaskBytes[i].equals("0")))
+				ret += String.valueOf((int)(Math.random() * 254));
+			else
+				ret += Byte.parseByte(baseBytes[i]);
+		}
+		return ret;
+	}
+
 	private boolean setMeshProfile() {
 		activeOlsrdConf = new File(NativeHelper.app_bin, "olsrd.conf").getAbsolutePath();
 		if (app.activeProfile.equals(getString(R.string.defaultprofile))) {
@@ -682,15 +699,23 @@ public class MeshService extends android.app.Service {
 			}
 			activeSSID = formatSSID(prop.getProperty("ssid"));
 			activeBSSID = prop.getProperty("bssid");
-			activeIP = prop.getProperty("ip");
 			activeNetmask = prop.getProperty("netmask");
+			activeIpGeneration = prop.getProperty("ipgenerate");
+			if (activeIpGeneration != null && 
+					(activeIpGeneration.equals("true") || activeIpGeneration.equals("1"))) {
+				activeIP = generateIP(prop.getProperty("ip"), activeNetmask);
+				activeIpGeneration = "true";
+			} else {
+				activeIP = prop.getProperty("ip");
+				activeIpGeneration = "false";
+			}
 			activeDNS = prop.getProperty("dns");
 		}
 		return true;
 	}
 
 	String[] getActiveMeshProfile() {
-		 String[] ret = { activeSSID, activeBSSID, activeIP, activeNetmask, activeDNS, activeOlsrdConf };
+		 String[] ret = { activeSSID, activeBSSID, activeIP, activeNetmask, activeIpGeneration, activeDNS, activeOlsrdConf };
 		 return ret;
 	}
 
