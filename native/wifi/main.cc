@@ -103,7 +103,7 @@ int assoc_loop () {
       }
       ic.commit();
 
-      uint8_t eth[6];
+      uint8_t eth[6] = {0, 0, 0, 0, 0, 0};
       ic.getHwAddress(eth);
       LOG("OK %s %02x:%02x:%02x:%02x:%02x:%02x\n", iflan,
           eth[0], eth[1], eth[2], eth[3], eth[4], eth[5]);
@@ -140,7 +140,7 @@ int assoc_loop () {
       if (!Wifi::setup(netid, essid, bssid, wep, chan2freq(channel)))
         return -1;
 
-      uint8_t eth[6];
+      uint8_t eth[6] = {0, 0, 0, 0, 0, 0};
       ic.getHwAddress(eth);
       LOG("OK %s %02x:%02x:%02x:%02x:%02x:%02x\n", iflan,
           eth[0], eth[1], eth[2], eth[3], eth[4], eth[5]);
