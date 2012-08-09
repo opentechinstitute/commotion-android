@@ -60,14 +60,26 @@ public class NativeHelper {
 			AssetManager am = context.getAssets();
 			final String[] assetList = am.list("");
 
+			// ignore folder added to the assets on various devices
 			for (String asset : assetList) {
-				if (asset.equals("images") || asset.equals("sounds")
-						|| asset.equals("webkit") || asset.equals("databases"))
+				if (asset.equals("images")
+						|| asset.equals("sounds")
+						|| asset.equals("webkit")
+						|| asset.equals("databases")  // Motorola
+						|| asset.equals("kioskmode")) // Samsung
 					continue;
 
 				int BUFFER = 2048;
 				final File file = new File(NativeHelper.app_bin, asset);
-				final InputStream assetIS = am.open(asset);
+				InputStream tmp;
+				try {
+					tmp = am.open(asset);
+				} catch (FileNotFoundException e) {
+					// if asset is a directory, we'll get this exception
+					e.printStackTrace();
+					continue;
+				}
+				final InputStream assetIS = tmp;
 
 				if (file.exists()) {
 					file.delete();
