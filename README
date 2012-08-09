@@ -15,7 +15,7 @@ How to build
 Prerequisites:
 1) Android NDK r4 or above
 2) Eclipse and ADT plugin
-3) sudo apt-get install bison flex make
+3) sudo apt-get install bison flex make sed
  
 To build native components, run these commands in the root directory of this
 project (i.e. /path/to/commotion-android):
@@ -23,9 +23,6 @@ project (i.e. /path/to/commotion-android):
  git submodule init
  git submodule update
  ndk-build
-
-Then, open external/busybox_config and set CONFIG_SYSROOT to "/path/to/your/android-ndk". Then, run:
- make NDK_BASE=[/path/to/your/android-ndk] -C external
  
 To build the Android app, import the existing project into Eclipse and export 
 an .apk file.  If you ran the NDK build after already having the project in
