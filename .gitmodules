@@ -7,3 +7,6 @@
 [submodule "external/busybox"]
 	path = external/busybox
 	url = git://busybox.net/busybox.git
+[submodule "external/shell-fork"]
+	path = external/shell-fork
+	url = https://github.com/opentechinstitute/shell-fork
