@@ -184,6 +184,8 @@ public class NativeHelper {
 		int count;
 		while ((count = origin.read(data, 0, BUFFER)) != -1)
 			out.write(data, 0, count);
+		out.closeEntry();
+		origin.close();
 		out.close();
 	}
 }
