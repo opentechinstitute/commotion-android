@@ -271,6 +271,10 @@ public class StatusActivity extends android.app.TabActivity {
 			app.updateToast("Cannot find SD card, needed for saving the zip file.", true);
 			return;
 		}
+		if (! f.exists()) {
+			app.updateToast(f.getAbsolutePath() + " does not exist!", true);
+			return;
+		}
 		final File zipFile = new File(NativeHelper.publicFiles, f.getName() + ".zip");
 		try {
 			NativeHelper.zip(f, zipFile);
