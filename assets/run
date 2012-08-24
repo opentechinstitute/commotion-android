@@ -1,23 +1,6 @@
 #!/system/bin/sh
 # main runner (process manager) for barnacle, root required
 
-# set defaults
-: ${brncl_adhoc_ip:="172.29.5.1"}
-: ${brncl_adhoc_netmask:="255.255.0.0"}
-: ${brncl_if_lan:="`getprop wifi.interface`"}
-: ${brncl_path:=.}
-: ${olsrd_conf_path:=olsrd.conf}
-
-# for init.rc parsing
-: ${brncl_hardware:="`getprop ro.hardware`"}
-
-export brncl_adhoc_ip
-export brncl_adhoc_netmask
-export brncl_if_lan
-export brncl_path
-export olsrd_conf_path
-export brncl_hardware
-
 # log environment for debugging
 set > $brncl_path/../app_log/environment.log 2>&1
 
