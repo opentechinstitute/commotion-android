@@ -27,6 +27,7 @@ public class NativeHelper {
 	public static File app_log;
 
 	static String SU_C;
+	static String SU_C_FORK;
 	static String RUN;
 	static String STOP_OLSRD;
 	static String DO_STOP_OLSRD;
@@ -45,6 +46,7 @@ public class NativeHelper {
 		profileDir = new File(Environment.getExternalStorageDirectory(), "MeshTether");
 		profileDir.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
+		SU_C_FORK = new File(app_bin, "su_c_fork").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
 		DEL_ROUTE = new File(app_bin, "del-fake-default-route").getAbsolutePath();
@@ -107,6 +109,7 @@ public class NativeHelper {
 			Log.e(MeshTetherApp.TAG, "Can't unzip", e);
 		}
 		chmod("0750", new File(SU_C));
+		chmod("0750", new File(SU_C_FORK));
 		chmod("0750", new File(RUN));
 		chmod("0750", new File(STOP_OLSRD));
 		chmod("0750", new File(DO_STOP_OLSRD));
@@ -117,6 +120,8 @@ public class NativeHelper {
 		chmod("0750", new File(app_bin, "script_aria"));
 		chmod("0750", new File(app_bin, "script_hero"));
 		chmod("0750", new File(app_bin, "script_samsung"));
+		chmod("0750", new File(app_bin, "fork"));
+
 		return result;
 	}
 

@@ -48,6 +48,8 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
+import net.commotionwireless.shell.*;
+
 /**
  * Manages the running process, client list, and log
  */
@@ -76,7 +78,6 @@ public class MeshService extends android.app.Service {
 	// private state
 	private int state = STATE_STOPPED;
 	private WifiManager.WifiLock wifiLock;
-	private MeshTetherProcess WifiProcess = null;
 
 	private String activeSSID = "";
 	private String activeBSSID = "";
@@ -85,6 +86,9 @@ public class MeshService extends android.app.Service {
 	private String activeIpGeneration = "";
 	private String activeDNS = "";
 	private String activeOlsrdConf = "";
+	
+	private Shell mShell;
+	private ShellProcess WifiShellProcess;
 
 	private PowerManager.WakeLock wakeLock;
 	private BroadcastReceiver connectivityReceiver = new BroadcastReceiver() {
@@ -168,6 +172,8 @@ public class MeshService extends android.app.Service {
 	public void onCreate() {
 		super.onCreate();
 		singleton = this;
+		
+		mShell = Shell.getInstance();
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -196,6 +202,7 @@ public class MeshService extends android.app.Service {
 		filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
 		filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		registerReceiver(connectivityReceiver, filter);
+
 	}
 
 	@Override
@@ -208,6 +215,8 @@ public class MeshService extends android.app.Service {
 		app.processStopped();
 		wakeLock.release();
 
+		mShell.stopShell();
+		
 		try {
 			unregisterReceiver(connectivityReceiver);
 		} catch (Exception e) {
@@ -258,12 +267,13 @@ public class MeshService extends android.app.Service {
 			log(true, getString(R.string.exception) + " " + thr.getMessage());
 			Log.e(TAG, "Exception " + thr.getMessage() + " " + Log.getStackTraceString(thr));
 			stopProcess();
+			mShell.stopShell();
 			state = STATE_STOPPED;
 			break;
 		case MSG_ERROR:
 			Log.i(TAG, "handle MSG_ERROR");
 			if (state == STATE_STOPPED) return;
-			if (WifiProcess == null) return; // don't kill it again...
+			if (WifiShellProcess == null) return; // don't kill it again...
 			if (msg.obj != null) {
 				String line = (String)msg.obj;
 				log(true, line); // just dump it and ignore it
@@ -271,6 +281,7 @@ public class MeshService extends android.app.Service {
 				// no message, means process died
 				log(true, getString(R.string.unexpected));
 				stopProcess();
+				mShell.stopShell();
 
 				if ((state == STATE_STARTING)) {
 					String err = log.toString();
@@ -290,7 +301,7 @@ public class MeshService extends android.app.Service {
 		case MSG_OUTPUT:
 			Log.i(TAG, "handle MSG_OUTPUT");
 			if (state == STATE_STOPPED) return;
-			if (WifiProcess == null) return; // cut the gibberish
+			if (WifiShellProcess == null) return; // cut the gibberish
 			String line = (String)msg.obj;
 			if (line == null) {
 				// ignore it, wait for MSG_ERROR(null)
@@ -340,6 +351,10 @@ public class MeshService extends android.app.Service {
 			if (wifiManager.getConnectionInfo().getIpAddress() != 0) // if connected, disconnect
 				wifiManager.disconnect(); // this will send MSG_NETSCHANGE
 
+			mShell.setForkCommand(NativeHelper.SU_C_FORK, buildEnvFromPrefs());
+			mShell.startShell();
+			Shell.waitForShellToStart(mShell);
+			
 			state = STATE_STARTING;
 			// FALL THROUGH!
 		case MSG_NETSCHANGE:
@@ -348,7 +363,7 @@ public class MeshService extends android.app.Service {
 			String wifiStateString = getWifiStateString(wifiState);
 			if (wifiState == WifiManager.WIFI_STATE_ENABLED) {
 				// wifi is good (or lost), we can start now...
-				if ((state == STATE_STARTING) && (WifiProcess == null)) {
+				if ((state == STATE_STARTING) && (WifiShellProcess == null)) {
 					if (app.findIfWan()) {
 						// TODO if WAN found with checkUplink(), then setup Hna4 routing
 						log(false, "Found active WAN interface");
@@ -402,6 +417,7 @@ public class MeshService extends android.app.Service {
 				case STATE_RUNNING:
 					app.updateToast("STATE_RUNNING", true); log(false, "STATE_RUNNING");
 					stopProcess(); // this tears down everything
+					mShell.stopShell();
 					state = STATE_STARTING;
 					break;
 				case STATE_STARTING:
@@ -419,6 +435,7 @@ public class MeshService extends android.app.Service {
 			Log.i(TAG, "handle MSG_STOP");
 			if (state == STATE_STOPPED) return;
 			stopProcess();
+			mShell.stopShell();
 			wifiManager.disableNetwork(currentNetId);
 			wifiManager.removeNetwork(currentNetId);
 			final ContentResolver cr = getContentResolver();
@@ -486,83 +503,7 @@ public class MeshService extends android.app.Service {
 			}
 		}
 	}
-
-	private class MeshTetherProcess {
-		private final static int INPUT_THREAD = 0;
-		private final static int ERROR_THREAD = 1;
-
-		private boolean mRunning;
-		private Thread mIoThreads[] = new Thread[2];
-		private Process mProcess = null;
-		private String mProg;
-		private String[] mEnvp;
-		private File mDirectory;
-		private int mExitValue;
-
-		public MeshTetherProcess(String prog, String[] envp, File directory) {
-			mProg = prog;
-			mEnvp = envp;
-			mDirectory = directory;
-			mRunning = false;
-			mExitValue = 0;
-		}
-
-		public void stop() throws IOException, InterruptedException {
-			if (mProcess != null) {
-				mProcess.getOutputStream().close();
-				mProcess.getErrorStream().close();
-
-				mIoThreads[INPUT_THREAD].interrupt();
-				mIoThreads[ERROR_THREAD].interrupt();
-
-				mIoThreads[INPUT_THREAD] = null;
-				mIoThreads[ERROR_THREAD] = null;
-
-				mProcess.destroy();
-				mProcess.waitFor();
-				mExitValue = mProcess.exitValue();
-				mProcess = null;
-				mRunning = false;
-			}
-		}
-
-		public void run(Handler handler, int outputTag, int errorTag) throws IOException {
-			mProcess = Runtime.getRuntime().exec(mProg, mEnvp, mDirectory);
-			mIoThreads[INPUT_THREAD] = new Thread(new OutputMonitor(outputTag, mProcess.getInputStream()));
-			mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(errorTag, mProcess.getErrorStream()));
-			mIoThreads[INPUT_THREAD].start();
-			mIoThreads[ERROR_THREAD].start();
-			mRunning = true;
-		}
-
-		public void tell(byte[] msg) throws IOException {
-			if (mRunning)
-				mProcess.getOutputStream().write(msg);
-		}
-		public void runUntilExit(Handler handler, int outputTag, int errorTag) throws IOException, InterruptedException {
-			run(handler,outputTag,errorTag);
-			mProcess.waitFor();
-
-			mIoThreads[INPUT_THREAD].interrupt();
-			mIoThreads[ERROR_THREAD].interrupt();
-
-			mIoThreads[INPUT_THREAD] = null;
-			mIoThreads[ERROR_THREAD] = null;
-
-			mProcess.destroy();
-			mExitValue = mProcess.exitValue();
-
-			mProcess = null;
-			mRunning = false;
-		}
-		public int exitValue() {
-			if (!mRunning)
-				return mExitValue;
-			else
-				return 0;
-		}
-	}
-
+	
 	private boolean checkUplink() {
 		if (app.prefs.getBoolean("wan_nowait", false)) {
 			return true;
@@ -723,16 +664,30 @@ public class MeshService extends android.app.Service {
 
 	private boolean startProcess() {
 		// calling 'su -c' from Java doesn't work so we use a helper script
+
 		log(false, "Aquiring wifi lock");
 		wifiLock.acquire();
 		app.showProgressMessage(R.string.startingolsrd);
 		try {
 			String[] env = buildEnvFromPrefs();
-			MeshTetherProcess DelRouteProcess;
-			DelRouteProcess = new MeshTetherProcess(NativeHelper.DEL_ROUTE, env, NativeHelper.app_bin);
-			DelRouteProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
-			WifiProcess = new MeshTetherProcess(NativeHelper.SU_C, env, NativeHelper.app_bin);
-			WifiProcess.run(mHandler, MSG_OUTPUT, MSG_ERROR);
+			//MeshTetherProcess DelRouteProcess;
+			ShellProcess DelRouteProcess;
+			
+			DelRouteProcess = new ShellProcess("MSG_STOP_OLSRD_OUTPUT", NativeHelper.DEL_ROUTE, mShell);
+			DelRouteProcess.setHandler(mHandler, MSG_STOP_OLSRD_OUTPUT);
+			if (!DelRouteProcess.runSynchronous()) {
+				Log.w(TAG, "Could not DelRouteProcess");
+			}
+			
+			//DelRouteProcess = new MeshTetherProcess(NativeHelper.DEL_ROUTE, env, NativeHelper.app_bin);
+			//DelRouteProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
+			
+			WifiShellProcess = new ShellProcess("MSG_OUTPUT", NativeHelper.SU_C, mShell);
+			WifiShellProcess.setHandler(mHandler, MSG_OUTPUT);
+			WifiShellProcess.runAsynchronous();
+			
+			//WifiProcess = new MeshTetherProcess(NativeHelper.SU_C, env, NativeHelper.app_bin);
+			//WifiProcess.run(mHandler, MSG_OUTPUT, MSG_ERROR);
 		} catch (Exception e) {
 			log(true, String.format(getString(R.string.execerr), NativeHelper.SU_C));
 			Log.e(TAG, "start failed " + e.toString());
@@ -747,37 +702,23 @@ public class MeshService extends android.app.Service {
 		 */
 		if (state != STATE_STOPPED) {
 			app.showProgressMessage(R.string.servicestopping);
-			try {	
-				MeshTetherProcess StopOlsrProcess = new MeshTetherProcess(NativeHelper.STOP_OLSRD,
-						null, NativeHelper.app_bin);
-				StopOlsrProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
-
-			} catch (IOException e) {
-				log(false, "Error occurred while stopping Olsrd: " + e.getMessage());
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				log(false, "Error occurred while stopping Olsrd: " + e.getMessage());
-				e.printStackTrace();
+			ShellProcess StopOlsrProcess = null;
+			
+			StopOlsrProcess = new ShellProcess("MSG_STOP_OLSRD_OUTPUT", NativeHelper.STOP_OLSRD, mShell);
+			StopOlsrProcess.setHandler(mHandler, MSG_STOP_OLSRD_OUTPUT);
+			if (!StopOlsrProcess.runSynchronous()) {
+				Log.w(TAG, "Could not StopOlsrProcess");
 			}
-
-			if (WifiProcess != null) {
+			if (WifiShellProcess != null) {
 				// first, just close the stream
 				if (state != STATE_STOPPED) {
 					try {
-						WifiProcess.stop();
+						WifiShellProcess.stop();
 					} catch (Exception e) {
-						Log.w(TAG, "Exception while closing process");
+						Log.w(TAG, "Exception while closing WifiShellProcess: " + e.toString());
 					}
 				}
-
-				try {
-					int exit_status = WifiProcess.exitValue();
-					Log.i(TAG, "Wifi Process exited with status: " + exit_status);
-				} catch (IllegalThreadStateException e) {
-					// this is not good
-					log(true, getString(R.string.dirtystop));
-				}
-				WifiProcess = null;
+				WifiShellProcess = null;
 			}
 			log(false, "Disconnecting from " + activeSSID);
 			wifiManager.disconnect();
@@ -791,11 +732,13 @@ public class MeshService extends android.app.Service {
 
 
 	private boolean tellProcess(String msg) {
-		if (WifiProcess != null) {
+		if (WifiShellProcess != null) {
 			try {
-				WifiProcess.tell((msg+"\n").getBytes());
+				WifiShellProcess.sendInput(msg);
 				return true;
-			} catch (Exception e) {} // just ignore it
+			} catch (Exception e) {
+				Log.w(TAG, "tellProcess(): " + e.toString());
+			}
 		}
 		return false;
 	}
