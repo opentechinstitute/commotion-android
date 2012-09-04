@@ -200,8 +200,6 @@ public class LinksActivity extends android.app.ListActivity {
 						&& c.neighborLinkQuality == cd.neighborLinkQuality) {
 					return; // no change
 				}
-				cd.hasRouteToOther = c.hasRouteToOther;
-				cd.hasDefaultRoute = c.hasDefaultRoute;
 				clients.remove(i); // we'll add it at the end
 				break;
 			}
