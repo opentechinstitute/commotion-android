@@ -7,7 +7,7 @@ ASSETS = $(PROJECT_ROOT)/assets
 # Android NDK setup
 SDK_BASE ?= /opt/android-sdk
 NDK_BASE ?=  /opt/android-ndk
-NDK_PLATFORM_LEVEL ?= 8
+NDK_PLATFORM_LEVEL ?= 9
 SDK_PLATFORM_LEVEL ?= 8
 NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_LEVEL)/arch-arm
 SDK_PLATFORM=$(SDK_BASE)/platforms/android-$(SDK_PLATFORM_LEVEL)/
