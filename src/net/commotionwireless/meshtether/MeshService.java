@@ -249,6 +249,7 @@ public class MeshService extends android.app.Service {
 		@Override
 		public void handleMessage(Message msg) { handle(msg); }
 	};
+	private ShellProcess mDelRouteProcess;
 
 	private void handle(Message msg) {
 		switch (msg.what) {
@@ -669,15 +670,9 @@ public class MeshService extends android.app.Service {
 		wifiLock.acquire();
 		app.showProgressMessage(R.string.startingolsrd);
 		try {
-			String[] env = buildEnvFromPrefs();
-			//MeshTetherProcess DelRouteProcess;
-			ShellProcess DelRouteProcess;
-			
-			DelRouteProcess = new ShellProcess("MSG_STOP_OLSRD_OUTPUT", NativeHelper.DEL_ROUTE, mShell);
-			DelRouteProcess.setHandler(mHandler, MSG_STOP_OLSRD_OUTPUT);
-			if (!DelRouteProcess.runSynchronous()) {
-				Log.w(TAG, "Could not DelRouteProcess");
-			}
+			mDelRouteProcess = new ShellProcess("MSG_STOP_OLSRD_OUTPUT", NativeHelper.DEL_ROUTE, mShell);
+			mDelRouteProcess.setHandler(mHandler, MSG_STOP_OLSRD_OUTPUT);
+			mDelRouteProcess.runAsynchronous();
 			
 			//DelRouteProcess = new MeshTetherProcess(NativeHelper.DEL_ROUTE, env, NativeHelper.app_bin);
 			//DelRouteProcess.runUntilExit(mHandler, MSG_STOP_OLSRD_OUTPUT, MSG_STOP_OLSRD_OUTPUT);
