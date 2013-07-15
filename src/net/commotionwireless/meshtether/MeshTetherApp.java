@@ -31,6 +31,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
@@ -83,6 +84,9 @@ public class MeshTetherApp extends android.app.Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Intent selfStartIntent = null;
+		ConnectivityManager cm = null;
+
 		Log.d(TAG, "onCreate");
 		NativeHelper.setup(this);
 
@@ -124,6 +128,17 @@ public class MeshTetherApp extends android.app.Application {
 		profileProperties = new HashMap<String, String>();
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+		/*
+		 * We need to poke the service to get it going. 
+		 * We do our best to mimic a android.net.wifi.STATE_CHANGE
+		 * intent so that we can reuse code. This means that
+		 * we need to putExtra() an instance of NetworkInfo.
+		 */
+		selfStartIntent = new Intent("com.example.wifihandler.SELF_START_INTENT");
+		cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		selfStartIntent.putExtra(WifiManager.EXTRA_NETWORK_INFO, cm.getActiveNetworkInfo());
+		sendBroadcast(selfStartIntent);
 	}
 
 	@Override
