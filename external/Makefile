@@ -54,6 +54,24 @@ RANLIB := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-ranlib
 STRIP := $(NDK_TOOLCHAIN_BASE)/bin/arm-linux-androideabi-strip \
 	--strip-unneeded -R .note -R .comment
 
+
+# the meaning of NDK_TOOLCHAIN has changed, since it was added as an official
+# env var to the Android NDK build system.  the olsrd still has the old version,
+# which we are not calling NDK_TOOLCHAIN_BASE
+ALL_NDK_FLAGS = 	NDK_BASE="$(NDK_BASE)" \
+					NDK_ABI="$(NDK_ABI)" \
+					NDK_PLATFORM_LEVEL="$(NDK_PLATFORM_LEVEL)" \
+					NDK_COMPILER_VERSION="$(NDK_COMPILER_VERSION)" \
+					NDK_TOOLCHAIN="$(NDK_TOOLCHAIN_BASE)" \
+					NDK_SYSROOT="$(NDK_SYSROOT)" \
+					NDK_UNAME="$(NDK_UNAME)" \
+					HOST="$(HOST)" \
+					CC="$(CC)" \
+					LD="$(LD)" \
+					AR="$(AR)" \
+					STRIP="$(STRIP)"
+
+
 ALL_CFLAGS = -DANDROID -I$(LOCAL)/include
 ALL_LDFLAGS = -L$(LOCAL)/lib -Wl,--rpath,$(LOCAL)/lib
 
@@ -73,38 +91,22 @@ clean: olsrd-clean olsrinfo-clean busybox-clean shell-fork-clean
 OLSRD_SOURCE := $(wildcard olsrd/[*/*.[ch]) \
 		$(wildcard olsrd/*/*/*.[ch])
 
-# the meaning of NDK_TOOLCHAIN has changed, since it was added as an official
-# env var to the Android NDK build system.  the olsrd still has the old version,
-# which we are not calling NDK_TOOLCHAIN_BASE
-OLSRD_NDK_FLAGS = 	NDK_BASE="$(NDK_BASE)" \
-					NDK_ABI="$(NDK_ABI)" \
-					NDK_PLATFORM_LEVEL="$(NDK_PLATFORM_LEVEL)" \
-					NDK_COMPILER_VERSION="$(NDK_COMPILER_VERSION)" \
-					NDK_TOOLCHAIN="$(NDK_TOOLCHAIN_BASE)" \
-					NDK_SYSROOT="$(NDK_SYSROOT)" \
-					NDK_UNAME="$(NDK_UNAME)" \
-					HOST="$(HOST)" \
-					CC="$(CC)" \
-					LD="$(LD)" \
-					AR="$(AR)" \
-					STRIP="$(STRIP)"
-
 olsrd: olsrd-build-stamp
 
 olsrd-build-stamp: $(OLSRD_SOURCE)
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 VERBOSE=1 all
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 VERBOSE=1 all
 # build only the plugins we are likely to use to keep the build stable
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 arprefresh
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 bmf
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 dot_draw
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 dyn_gw_plain
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 httpinfo
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 jsoninfo
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 nameservice
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 pgraph
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 secure
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 txtinfo
-	make -C olsrd OS=android $(OLSRD_NDK_FLAGS) DEBUG=0 watchdog
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 arprefresh
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 bmf
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 dot_draw
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 dyn_gw_plain
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 httpinfo
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 jsoninfo
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 nameservice
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 pgraph
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 secure
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 txtinfo
+	make -C olsrd OS=android $(ALL_NDK_FLAGS) DEBUG=0 watchdog
 	touch olsrd-build-stamp
 
 olsrd-clean:
@@ -158,7 +160,7 @@ SHELL_JAVA_SOURCE := $(wildcard shell-fork/src/net/net.commotionwireless.shell/*
 shell-fork: fork-timestamp shell-jar-timestamp
 
 fork-timestamp: $(FORK_SOURCE)
-	make -C shell-fork/ OS=android fork
+	make -C shell-fork/ $(ALL_NDK_FLAGS) OS=android fork
 
 shell-jar-timestamp: $(SHELL_JAVA_SOURCE)
 	ant -Dbasedir=$(EXTERNAL_ROOT)/shell-fork -f $(EXTERNAL_ROOT)/shell-fork/build.xml \
