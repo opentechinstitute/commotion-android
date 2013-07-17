@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
-# Busybox version: 1.21.0.git
-# Fri Jul 20 18:31:14 2012
+# Busybox version: 1.22.0.git
+# Tue Jul 16 21:57:24 2013
 #
 CONFIG_HAVE_DOT_CONFIG=y
 
@@ -42,6 +42,7 @@ CONFIG_LONG_OPTS=y
 # CONFIG_FEATURE_UTMP is not set
 # CONFIG_FEATURE_WTMP is not set
 # CONFIG_FEATURE_PIDFILE is not set
+CONFIG_PID_FILE_PATH="/data/data/net.commotionwireless.meshtether/app_log"
 CONFIG_FEATURE_SUID=y
 # CONFIG_FEATURE_SUID_CONFIG is not set
 # CONFIG_FEATURE_SUID_CONFIG_QUIET is not set
@@ -62,7 +63,7 @@ CONFIG_BUSYBOX_EXEC_PATH="/proc/self/exe"
 # CONFIG_FEATURE_SHARED_BUSYBOX is not set
 # CONFIG_LFS is not set
 CONFIG_CROSS_COMPILER_PREFIX="arm-linux-androideabi-"
-CONFIG_SYSROOT=
+CONFIG_SYSROOT="/opt/android-ndk/platforms/android-9/arch-arm"
 CONFIG_EXTRA_CFLAGS="-DANDROID -D__ANDROID__ -DSK_RELEASE -nostdlib -march=armv5te -mtune=xscale -msoft-float -mthumb -mthumb-interwork -Os -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -fpic -fno-short-enums -fgcse-after-reload -frename-registers"
 CONFIG_EXTRA_LDFLAGS="-Xlinker -z -Xlinker muldefs -nostdlib -Bdynamic -Xlinker -dynamic-linker -Xlinker /system/bin/linker -Xlinker -z -Xlinker nocopyreloc -Xlinker --no-undefined ${SYSROOT}/usr/lib/crtbegin_dynamic.o ${SYSROOT}/usr/lib/crtend_android.o"
 CONFIG_EXTRA_LDLIBS="dl m c gcc"
@@ -96,6 +97,7 @@ CONFIG_PREFIX="./_install"
 # CONFIG_FEATURE_RTMINMAX is not set
 CONFIG_PASSWORD_MINLEN=6
 CONFIG_MD5_SMALL=1
+CONFIG_SHA3_SMALL=1
 # CONFIG_FEATURE_FAST_TOP is not set
 # CONFIG_FEATURE_ETC_NETWORKS is not set
 # CONFIG_FEATURE_USE_TERMIOS is not set
@@ -263,6 +265,7 @@ CONFIG_FEATURE_RMDIR_LONG_OPTIONS=y
 # CONFIG_SHA1SUM is not set
 # CONFIG_SHA256SUM is not set
 # CONFIG_SHA512SUM is not set
+# CONFIG_SHA3SUM is not set
 # CONFIG_SLEEP is not set
 # CONFIG_FEATURE_FANCY_SLEEP is not set
 # CONFIG_FEATURE_FLOAT_SLEEP is not set
@@ -599,9 +602,11 @@ CONFIG_DEFAULT_DEPMOD_FILE=""
 # CONFIG_FEATURE_VOLUMEID_BTRFS is not set
 # CONFIG_FEATURE_VOLUMEID_REISERFS is not set
 # CONFIG_FEATURE_VOLUMEID_FAT is not set
+# CONFIG_FEATURE_VOLUMEID_EXFAT is not set
 # CONFIG_FEATURE_VOLUMEID_HFS is not set
 # CONFIG_FEATURE_VOLUMEID_JFS is not set
 # CONFIG_FEATURE_VOLUMEID_XFS is not set
+# CONFIG_FEATURE_VOLUMEID_NILFS is not set
 # CONFIG_FEATURE_VOLUMEID_NTFS is not set
 # CONFIG_FEATURE_VOLUMEID_ISO9660 is not set
 # CONFIG_FEATURE_VOLUMEID_UDF is not set
@@ -609,6 +614,7 @@ CONFIG_DEFAULT_DEPMOD_FILE=""
 # CONFIG_FEATURE_VOLUMEID_LINUXSWAP is not set
 # CONFIG_FEATURE_VOLUMEID_CRAMFS is not set
 # CONFIG_FEATURE_VOLUMEID_ROMFS is not set
+# CONFIG_FEATURE_VOLUMEID_SQUASHFS is not set
 # CONFIG_FEATURE_VOLUMEID_SYSV is not set
 # CONFIG_FEATURE_VOLUMEID_OCFS2 is not set
 # CONFIG_FEATURE_VOLUMEID_LINUXRAID is not set
@@ -877,6 +883,13 @@ CONFIG_LSOF=y
 # CONFIG_PSTREE is not set
 # CONFIG_PWDX is not set
 # CONFIG_SMEMCAP is not set
+# CONFIG_TOP is not set
+# CONFIG_FEATURE_TOP_CPU_USAGE_PERCENTAGE is not set
+# CONFIG_FEATURE_TOP_CPU_GLOBAL_PERCENTS is not set
+# CONFIG_FEATURE_TOP_SMP_CPU is not set
+# CONFIG_FEATURE_TOP_DECIMALS is not set
+# CONFIG_FEATURE_TOP_SMP_PROCESS is not set
+# CONFIG_FEATURE_TOPMEM is not set
 # CONFIG_UPTIME is not set
 # CONFIG_FEATURE_UPTIME_UTMP_SUPPORT is not set
 # CONFIG_FREE is not set
@@ -897,13 +910,6 @@ CONFIG_FEATURE_PIDOF_OMIT=y
 # CONFIG_FEATURE_PS_UNUSUAL_SYSTEMS is not set
 # CONFIG_RENICE is not set
 # CONFIG_BB_SYSCTL is not set
-# CONFIG_TOP is not set
-# CONFIG_FEATURE_TOP_CPU_USAGE_PERCENTAGE is not set
-# CONFIG_FEATURE_TOP_CPU_GLOBAL_PERCENTS is not set
-# CONFIG_FEATURE_TOP_SMP_CPU is not set
-# CONFIG_FEATURE_TOP_DECIMALS is not set
-# CONFIG_FEATURE_TOP_SMP_PROCESS is not set
-# CONFIG_FEATURE_TOPMEM is not set
 # CONFIG_FEATURE_SHOW_THREADS is not set
 # CONFIG_WATCH is not set
 
@@ -998,6 +1004,7 @@ CONFIG_FEATURE_SYSLOGD_READ_BUFFER_SIZE=0
 CONFIG_FEATURE_IPC_SYSLOG_BUFFER_SIZE=0
 # CONFIG_LOGREAD is not set
 # CONFIG_FEATURE_LOGREAD_REDUCED_LOCKING is not set
+# CONFIG_FEATURE_KMSG_SYSLOG is not set
 # CONFIG_KLOGD is not set
 # CONFIG_FEATURE_KLOGD_KLOGCTL is not set
 # CONFIG_LOGGER is not set
