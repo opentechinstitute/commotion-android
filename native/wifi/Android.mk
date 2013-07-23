@@ -17,7 +17,7 @@ LOCAL_MODULE := wifi
 
 LOCAL_SRC_FILES := main.cc
 LOCAL_CPP_EXTENSION := .cc
-LOCAL_CFLAGS := -Wall -Wextra -Werror -O3
+LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-delete-non-virtual-dtor -O3
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include
 
 LOCAL_SHARED_LIBRARIES := libhardware_legacy 
