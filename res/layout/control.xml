@@ -23,7 +23,7 @@
     android:orientation="horizontal"
     android:padding="5sp" >
 
-    <Button
+    <Spinner
         android:id="@+id/choose_profile"
         android:layout_width="0dip"
         android:layout_height="fill_parent"

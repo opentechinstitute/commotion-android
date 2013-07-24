@@ -21,6 +21,12 @@
     <PreferenceCategory android:title="@string/mesh_profile" >
         <EditTextPreference
             android:defaultValue="commotionwireless.net"
+            android:key="@string/profile_name"
+            android:singleLine="true"
+            android:title="@string/profile_name_title" />
+        
+        <EditTextPreference
+            android:defaultValue="commotionwireless.net"
             android:key="@string/lan_essid"
             android:singleLine="true"
             android:title="@string/ssid" />
@@ -38,7 +44,6 @@
             android:entryValues="@array/channel_values"
             android:key="@string/lan_channel"
             android:title="@string/channel" />
-
         <net.commotionwireless.meshtether.MeshIPPreference
             android:key="@string/adhoc_ip"
             android:singleLine="true"
@@ -72,40 +77,7 @@
             android:summary="Associate every 5 seconds until a client connects"
             android:title="Auto Associate" />
     </PreferenceCategory>
-<!--
-    <PreferenceCategory android:title="Clients" >
-        <PreferenceScreen
-            android:summary="What to do when a client connects"
-            android:title="New Client Actions" >
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:disableDependentsState="false"
-                android:key="client_notify"
-                android:summary="Show notification in status bar"
-                android:title="Notify" />
 
-            <RingtonePreference
-                android:dependency="client_notify"
-                android:key="client_sound"
-                android:ringtoneType="notification"
-                android:showDefault="false"
-                android:summary="Play a ringtone"
-                android:title="Sound" />
-
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="client_notify"
-                android:key="client_light"
-                android:summary="Blink status light"
-                android:title="Light" />
-        </PreferenceScreen>
-
-        <CheckBoxPreference
-            android:key="wan_nowait"
-            android:summary="Don&apos;t wait for data connection"
-            android:title="Local Mode" />
-    </PreferenceCategory>
--->
     <PreferenceCategory android:title="Interfaces" >
         <EditTextPreference
             android:defaultValue=""

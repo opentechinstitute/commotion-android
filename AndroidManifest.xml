@@ -22,8 +22,8 @@
     android:versionName="0.0" >
 
     <uses-sdk
-        android:minSdkVersion="7"
-        android:targetSdkVersion="8" />
+        android:minSdkVersion="16"
+        android:targetSdkVersion="16" />
 
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -68,10 +68,10 @@
         <activity
             android:name="InfoActivity"
             android:launchMode="singleTop" />
-        <activity
-            android:name="net.commotionwireless.meshtether.SettingsActivity"
-            android:launchMode="singleTop" />
-
+		<activity
+            android:name="net.commotionwireless.meshtether.ProfileEditorActivity"
+            android:label="ProfileEditorActivity" >
+        </activity>
         <service
             android:name=".MeshService"
             android:icon="@drawable/comlogo_sm_on"

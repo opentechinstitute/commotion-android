@@ -43,8 +43,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
@@ -54,8 +55,9 @@ public class StatusActivity extends android.app.TabActivity {
 
 	private TabHost tabs;
 	private ImageButton onoff;
-	private Button chooseProfile;
+	private Spinner chooseProfile;
 	private AlertDialog.Builder profileDialogBuilder;
+	private String mSelectedProfileName;
 
 	private boolean paused;
 
@@ -84,12 +86,13 @@ public class StatusActivity extends android.app.TabActivity {
             mProgressDialog.setMessage(msg.getData().getString("message"));
         }
     };
-
-	/** Called when the activity is first created. */
+    /*
+     * Lifecycle methods. 
+     */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		app = (MeshTetherApp)getApplication();
 
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -117,24 +120,7 @@ public class StatusActivity extends android.app.TabActivity {
 
 		profileDialogBuilder = new AlertDialog.Builder(this);
 		profileDialogBuilder.setTitle(R.string.choose_profile);
-
-		chooseProfile = (Button) findViewById(R.id.choose_profile);
-		chooseProfile.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				findProfilesOnDisk();
-				final String[] profilesArray = app.profiles.toArray(new String[0]);
-				profileDialogBuilder.setItems(profilesArray, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						app.activeProfile = profilesArray[which];
-						chooseProfile.setText(app.activeProfile);
-					}
-				});
-				profileDialogBuilder.create().show();
-			}
-		});
-
+		
 		tabs = getTabHost();
 		tabs.addTab(tabs.newTabSpec(LINKS)
 				.setIndicator(LINKS, getResources().getDrawable(R.drawable.ic_tab_contacts))
@@ -174,15 +160,70 @@ public class StatusActivity extends android.app.TabActivity {
 		app.setStatusActivity(null);
 	}
 	@Override
+	protected void onPause() {
+		super.onPause();
+		Profiles.unInstantiateSharedProfiles();
+		paused = true;
+	}
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		Profiles.instantiateSharedProfiles(this);
+		Profiles profiles = Profiles.getSharedProfiles();
+		chooseProfile = (Spinner)findViewById(R.id.choose_profile);
+		chooseProfile.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, profiles.getProfileList()));
+		/*
+		 * mSelectedProfileName set in onActivityResult()
+		 * to indicate the profile that was selected when 
+		 * we went to edit it. So, we will select it here
+		 * to be consistent for the user.
+		 */
+		if (mSelectedProfileName != null) {
+			chooseProfile.setSelection(profiles.getProfileIndex(mSelectedProfileName));
+			mSelectedProfileName = null;
+		}
+		
+		paused = false;
+		update();
+		app.cleanUpNotifications();
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		mSelectedProfileName = data.getStringExtra("profile_name");
+	}
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	public String getSelectedProfileName() {
+		Spinner spinner = (Spinner)findViewById(R.id.choose_profile);
+		String selectedString = (String)spinner.getSelectedItem();
+		
+		return selectedString;
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		String profileName = null;
+		
 		switch (item.getItemId()) {
+		case R.id.menu_new_profile:
+			Profiles profiles = Profiles.getSharedProfiles();
+			profileName = profiles.getNewProfileName();
+			profiles.newProfile(profileName);
+			/* fall through */
 		case R.id.menu_prefs:
-			startActivity(new Intent(this, SettingsActivity.class));
+			Intent intent = new Intent(this, ProfileEditorActivity.class);
+			/*
+			 * Put the profile_name that is either 
+			 * a) newly generated (when we are making a new profile) or
+			 * b) the selected profile (when are editing an existing profile).
+			 */
+			intent.putExtra("profile_name", (profileName != null) ? profileName : getSelectedProfileName());
+			this.startActivityForResult(intent, 0);
 			return true;
 		case R.id.menu_about:
 			showDialog(DLG_ABOUT);
@@ -195,28 +236,6 @@ public class StatusActivity extends android.app.TabActivity {
 			return true;
 		}
 		return(super.onOptionsItemSelected(item));
-	}
-
-	private void findProfilesOnDisk() {
-		FileFilter filter = new FileFilter() {
-			
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.getAbsolutePath().endsWith(".properties"))
-					return true;
-				return false;
-			}
-		};
-		Collection<File> all = new ArrayList<File>();
-		Collections.addAll(all, NativeHelper.app_bin.listFiles(filter));
-		Collections.addAll(all, NativeHelper.profileDir.listFiles(filter));
-		for (File f : all) {
-			Log.i(MeshTetherApp.TAG, "Searching for profile: " + f.getAbsolutePath());
-			String path = f.getAbsolutePath();
-			String profileName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf(".properties"));
-			app.profiles.add(profileName);
-			app.profileProperties.put(profileName, path);
-		}
 	}
 
 	private void getOlsrdStatusAndShare() {
@@ -373,18 +392,6 @@ public class StatusActivity extends android.app.TabActivity {
 		return null;
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		paused = true;
-	}
-	@Override
-	protected void onResume() {
-		super.onResume();
-		paused = false;
-		update();
-		app.cleanUpNotifications();
-	}
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);

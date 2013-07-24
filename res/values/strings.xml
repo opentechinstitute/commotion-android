@@ -66,6 +66,7 @@
     <string name="defaultprofile">(default)</string>
 
     <!-- messages for the Settings/Preferences -->
+    <string name="profile_name_title">Profile Name</string>
     <string name="mesh_profile">Default Mesh Profile</string>
     <string name="ssid">SSID (Network Name)</string>
     <string name="bssid">BSSID (Network ID)</string>
@@ -93,6 +94,7 @@
     <string name="help_message">Mesh on the phone is experimental! Please check our wiki, email our mailing list, or find us on IRC.</string>
 
     <!-- DO NOT TRANSLATE -->
+    <string name="profile_name">profile_name</string>
     <string name="if_wan">if_wan</string>
     <string name="if_lan">if_lan</string>
     <string name="adhoc_netmask">adhoc_netmask</string>
