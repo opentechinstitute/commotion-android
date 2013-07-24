@@ -135,7 +135,7 @@ public class MeshTetherApp extends android.app.Application {
 		 * intent so that we can reuse code. This means that
 		 * we need to putExtra() an instance of NetworkInfo.
 		 */
-		selfStartIntent = new Intent("com.example.wifihandler.SELF_START_INTENT");
+		selfStartIntent = new Intent("net.commotionwireless.meshtether.SELF_START_INTENT");
 		cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 		selfStartIntent.putExtra(WifiManager.EXTRA_NETWORK_INFO, cm.getActiveNetworkInfo());
 		sendBroadcast(selfStartIntent);
