@@ -91,6 +91,13 @@
                 <action android:name="net.commotionwireless.meshtether.CHECK_STATE" />
             </intent-filter>
         </receiver>
+        <receiver android:name="net.commotionwireless.meshtether.NetworkStateChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.wifi.STATE_CHANGE"/>
+                <action android:name="net.commotionwireless.meshtether.SELF_START_INTENT"/>
+            </intent-filter>
+        </receiver>
+        <service android:name="OlsrdService" android:label="Olsrd Service"></service>
     </application>
 
 </manifest>

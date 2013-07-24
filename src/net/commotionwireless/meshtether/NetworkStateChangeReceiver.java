@@ -14,6 +14,9 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
 	
 	WifiConfiguration getActiveWifiConfiguration(WifiManager wifiManager) {
 		List<WifiConfiguration> configs = wifiManager.getConfiguredNetworks();
+		if (configs == null)
+			return null;
+		
 		for (WifiConfiguration i : configs) {
 			if (i.status == WifiConfiguration.Status.CURRENT) {
 				return i;
