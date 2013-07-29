@@ -1,4 +1,4 @@
-package net.commotionwireless.meshtether;
+package net.commotionwireless.profiles;
 
 public class NoMatchingProfileException extends Exception {
 

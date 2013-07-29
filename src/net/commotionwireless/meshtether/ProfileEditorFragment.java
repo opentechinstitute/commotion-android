@@ -1,5 +1,7 @@
 package net.commotionwireless.meshtether;
 
+import net.commotionwireless.profiles.Profile;
+import net.commotionwireless.profiles.Profiles;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;

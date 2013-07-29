@@ -1,4 +1,4 @@
-package net.commotionwireless.meshtether;
+package net.commotionwireless.profiles;
 
 import java.io.File;
 import java.util.Map;

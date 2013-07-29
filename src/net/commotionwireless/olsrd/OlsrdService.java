@@ -1,6 +1,6 @@
 package net.commotionwireless.olsrd;
-import net.commotionwireless.meshtether.NoMatchingProfileException;
-import net.commotionwireless.meshtether.Profile;
+import net.commotionwireless.profiles.NoMatchingProfileException;
+import net.commotionwireless.profiles.Profile;
 import junit.framework.Assert;
 import android.app.Service;
 import android.content.Intent;
