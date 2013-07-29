@@ -31,7 +31,16 @@ public class Profile {
 		}
 		editor.commit();
 		editor.apply();
+	}	
+	
+	public String toString() {
+		String returnString = new String("");
+		for (Map.Entry<String, ?> entry : mSharedPreferences.getAll().entrySet()) {
+			returnString = returnString + entry.getKey() + ": " + entry.getValue() + "\n";
+		}
+		return returnString;
 	}
+	
 	public String getProfileName() {
 		return mName;
 	}
