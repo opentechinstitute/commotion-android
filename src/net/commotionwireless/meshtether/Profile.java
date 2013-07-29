@@ -10,15 +10,31 @@ public class Profile {
 	private String mName;
 	private SharedPreferences mSharedPreferences;
 	
+	public Profile(String profileName, Context context, boolean noCreate) throws NoMatchingProfileException {
+		if (noCreate && !profileFileExists(profileName, context)) {
+			throw new NoMatchingProfileException();
+		}
+		/*
+		 * I do NOT like this copy/paste.
+		 */
+		mName = profileName;
+		mSharedPreferences = context.getSharedPreferences(mName, Context.MODE_PRIVATE);
+	}
+	
 	public Profile(String profileName, Context context) {
 		mName = profileName;
 		mSharedPreferences = context.getSharedPreferences(mName, Context.MODE_PRIVATE);
 	}
 	
+	private boolean profileFileExists(String profileName, Context context) {
+		File file = new File(context.getFilesDir().getParent() + "/shared_prefs" + "/" + profileName + ".xml");
+		return file.exists();
+	}
+	
 	protected SharedPreferences getSharedPreferences() {
 		return mSharedPreferences;
 	}
-	
+
 	public void deepCopy(Profile p) {
 		SharedPreferences.Editor editor = mSharedPreferences.edit();
 		Map<String, ?> existingProfile = p.getSharedPreferences().getAll();
