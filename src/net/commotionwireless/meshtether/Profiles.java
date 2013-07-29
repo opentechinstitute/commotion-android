@@ -7,6 +7,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
@@ -14,22 +15,22 @@ import android.util.Log;
 public class Profiles {
 	
 	private static Profiles mProfiles;
-	private Activity mActivity;
+	private Context mContext;
 	private SharedPreferences mPreferences;
-	
+	private static final String DefaultProfileName = "DefaultProfile";
 	/*
 	 * Constructor: Use the activity's name as the name of the Preference file.
 	 */
-	public static synchronized void instantiateSharedProfiles(Activity activity) {
+	public static synchronized void instantiateSharedProfiles(Context context) {
 		Assert.assertNull("instantiateSharedProfiles() already called.", mProfiles);
-		mProfiles = new Profiles(activity);
+		mProfiles = new Profiles(context);
 	}
 	/*
 	 * Constructor: Use a non-default name as the name of the Preference file.
 	 */
-	public static synchronized void instantiateSharedProfiles(Activity activity, String nonDefaultName) {
+	public static synchronized void instantiateSharedProfiles(Context context, String nonDefaultName) {
 		Assert.assertNull("instantiateSharedProfiles() already called.", mProfiles);
-		mProfiles = new Profiles(activity, nonDefaultName);
+		mProfiles = new Profiles(context, nonDefaultName);
 	}
 	/*
 	 * Deconstructor.
@@ -46,14 +47,13 @@ public class Profiles {
 		return mProfiles;
 	}
 	
-	private Profiles(Activity activity) {
-		mActivity = activity;
-		mPreferences = mActivity.getPreferences(Activity.MODE_PRIVATE);
+	private Profiles(Context context) {
+		this(context, DefaultProfileName);
 	}
 	
-	private Profiles(Activity activity, String nonDefaultName) {
-		mActivity = activity;
-		mPreferences = mActivity.getSharedPreferences(nonDefaultName, Activity.MODE_PRIVATE);
+	private Profiles(Context context, String nonDefaultName) {
+		mContext = context;
+		mPreferences = mContext.getSharedPreferences(nonDefaultName, Activity.MODE_PRIVATE);
 	}
 
 	/*
@@ -77,11 +77,8 @@ public class Profiles {
 		return 0;
 	}
 	
-	/*
-	 * TODO Integrate!
-	 */
 	public String getNewProfileName() {
-		String newProfileName = "New Profile #" + mPreferences.getInt("profile_count", 1);
+		String newProfileName = "New Profile #" + mPreferences.getInt("profiles_count", 1);
 		newProfileName = newProfileName.replace(' ', '_');
 		return newProfileName;
 	}
@@ -103,7 +100,7 @@ public class Profiles {
 	}
 	
 	synchronized public void deleteProfile(String profileToDelete) {
-		File profileToDeleteFile = new File(mActivity.getFilesDir().getParent() + "/shared_prefs/" + profileToDelete + ".xml");
+		File profileToDeleteFile = new File(mContext.getFilesDir().getParent() + "/shared_prefs/" + profileToDelete + ".xml");
 		Set<String> existingProfiles = getExistingProfiles();
 		SharedPreferences.Editor editor = null;
 		
