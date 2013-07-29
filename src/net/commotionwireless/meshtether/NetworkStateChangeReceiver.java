@@ -1,6 +1,8 @@
 package net.commotionwireless.meshtether;
 import java.util.List;
 
+import net.commotionwireless.olsrd.OlsrdService;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
