@@ -76,6 +76,7 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			
 			profiles.deleteProfile(existingProfile.getProfileName());
 			profiles.newProfile(newProfile.getProfileName());
+			profiles.setActiveProfileName(newProfile.getProfileName());
 			
 			mgr.setSharedPreferencesName(mProfileName);
 			updateProfileName(mgr, mProfileName);
