@@ -42,7 +42,7 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onResume() {
 		super.onResume();
-		Profiles.instantiateSharedProfiles(this.getActivity(), getCallingActivityXmlName());
+		Profiles.instantiateSharedProfiles(this.getActivity());
 	}
 	@Override
 	public void onPause() {
@@ -58,7 +58,6 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			 * The user wants to change the name of the profile!
 			 */
 			Profile existingProfile, newProfile;
-			Intent resultIntent = new Intent();
 			Profiles profiles = Profiles.getSharedProfiles();
 			String newProfileName = sharedPreferences.getString(key, "");
 			PreferenceManager mgr = this.getPreferenceManager();
@@ -80,8 +79,6 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			
 			mgr.setSharedPreferencesName(mProfileName);
 			updateProfileName(mgr, mProfileName);
-			resultIntent.putExtra("profile_name", mProfileName);
-			this.getActivity().setResult(0, resultIntent);
 		}
 	}
 	
