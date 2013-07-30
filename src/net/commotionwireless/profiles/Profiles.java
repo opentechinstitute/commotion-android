@@ -14,45 +14,17 @@ import android.util.Log;
 
 public class Profiles {
 	
-	private static Profiles mProfiles;
 	private Context mContext;
 	private SharedPreferences mPreferences;
 	private static final String DefaultProfileName = "DefaultProfile";
 	private String mActiveProfileName = null;
-	/*
-	 * Constructor: Use the activity's name as the name of the Preference file.
-	 */
-	public static synchronized void instantiateSharedProfiles(Context context) {
-		Assert.assertNull("instantiateSharedProfiles() already called.", mProfiles);
-		mProfiles = new Profiles(context);
-	}
-	/*
-	 * Constructor: Use a non-default name as the name of the Preference file.
-	 */
-	public static synchronized void instantiateSharedProfiles(Context context, String nonDefaultName) {
-		Assert.assertNull("instantiateSharedProfiles() already called.", mProfiles);
-		mProfiles = new Profiles(context, nonDefaultName);
-	}
-	/*
-	 * Deconstructor.
-	 */
-	public static synchronized void unInstantiateSharedProfiles() {
-		Assert.assertNotNull("instantiateSharedProfiles not called prior to unInstantiateSharedProfiles", mProfiles);
-		mProfiles = null;
-	}
-	/*
-	 * Singleton: Get the singleton.
-	 */
-	public static synchronized Profiles getSharedProfiles() {
-		Assert.assertNotNull("instantiateSharedProfiles not called prior to getSharedProfiles()", mProfiles);
-		return mProfiles;
-	}
 	
-	private Profiles(Context context) {
+	
+	public Profiles(Context context) {
 		this(context, DefaultProfileName);
 	}
 	
-	private Profiles(Context context, String nonDefaultName) {
+	public Profiles(Context context, String nonDefaultName) {
 		mContext = context;
 		mPreferences = mContext.getSharedPreferences(nonDefaultName, Activity.MODE_PRIVATE);
 		mActiveProfileName = mPreferences.getString("active_profile", "");

@@ -161,15 +161,13 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Profiles.unInstantiateSharedProfiles();
 		paused = true;
 	}
 	@Override
 	protected void onResume() {
 		super.onResume();
 		
-		Profiles.instantiateSharedProfiles(this);
-		mProfiles = Profiles.getSharedProfiles();
+		mProfiles = new Profiles(this);
 		chooseProfile = (Spinner)findViewById(R.id.choose_profile);
 		chooseProfile.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mProfiles.getProfileList()));
 		chooseProfile.setSelection(mProfiles.getProfileIndex(mProfiles.getActiveProfileName()));
@@ -208,10 +206,9 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		
 		switch (item.getItemId()) {
 		case R.id.menu_new_profile:
-			Profiles profiles = Profiles.getSharedProfiles();
-			profileName = profiles.getNewProfileName();
-			profiles.newProfile(profileName);
-			profiles.setActiveProfileName(profileName);
+			profileName = mProfiles.getNewProfileName();
+			mProfiles.newProfile(profileName);
+			mProfiles.setActiveProfileName(profileName);
 			/* fall through */
 		case R.id.menu_prefs:
 			Intent intent = new Intent(this, ProfileEditorActivity.class);

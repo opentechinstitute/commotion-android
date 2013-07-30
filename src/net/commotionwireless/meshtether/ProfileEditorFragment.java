@@ -14,6 +14,7 @@ import android.util.Log;
 
 public class ProfileEditorFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
 	private String mProfileName = null;
+	private Profiles mProfiles = null;
 	
 	private void updateProfileName(PreferenceManager mgr, String newName) {
 		SharedPreferences.Editor editor = mgr.getSharedPreferences().edit();
@@ -42,12 +43,11 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onResume() {
 		super.onResume();
-		Profiles.instantiateSharedProfiles(this.getActivity());
+		mProfiles = new Profiles(this.getActivity());
 	}
 	@Override
 	public void onPause() {
 		super.onPause();
-		Profiles.unInstantiateSharedProfiles();
 	}
 
 	@Override
@@ -58,7 +58,6 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			 * The user wants to change the name of the profile!
 			 */
 			Profile existingProfile, newProfile;
-			Profiles profiles = Profiles.getSharedProfiles();
 			String newProfileName = sharedPreferences.getString(key, "");
 			PreferenceManager mgr = this.getPreferenceManager();
 
@@ -74,9 +73,9 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			
 			mProfileName = newProfileName.substring(0);
 			
-			profiles.deleteProfile(existingProfile.getProfileName());
-			profiles.newProfile(newProfile.getProfileName());
-			profiles.setActiveProfileName(newProfile.getProfileName());
+			mProfiles.deleteProfile(existingProfile.getProfileName());
+			mProfiles.newProfile(newProfile.getProfileName());
+			mProfiles.setActiveProfileName(newProfile.getProfileName());
 			
 			mgr.setSharedPreferencesName(mProfileName);
 			updateProfileName(mgr, mProfileName);
