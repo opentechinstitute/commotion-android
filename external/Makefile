@@ -8,7 +8,7 @@ ASSETS = $(PROJECT_ROOT)/assets
 SDK_BASE ?= /opt/android-sdk
 NDK_BASE ?=  /opt/android-ndk
 NDK_PLATFORM_LEVEL ?= 9
-SDK_PLATFORM_LEVEL ?= 8
+SDK_PLATFORM_LEVEL ?= 4.2.2
 NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_LEVEL)/arch-arm
 SDK_PLATFORM=$(SDK_BASE)/platforms/android-$(SDK_PLATFORM_LEVEL)/
 NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
@@ -42,7 +42,7 @@ ALL_LDFLAGS = -L$(LOCAL)/lib -Wl,--rpath,$(LOCAL)/lib
 ALL_CFLAGS += -fdata-sections -ffunction-sections -Os
 ALL_LDFLAGS += -Wl,--gc-sections
 
-all: olsrd busybox shell-fork
+all: olsrd busybox
 
 clean: olsrd-clean olsrinfo-clean busybox-clean shell-fork-clean
 
@@ -117,20 +117,3 @@ busybox-clean:
 	rm -f -- $(EXTERNAL_ROOT)/busybox/.config
 	rm -f -- $(EXTERNAL_ROOT)/busybox/busybox
 	make -C $(EXTERNAL_ROOT)/busybox/ clean
-
-FORK_SOURCE := $(wildcard shell-fork/*.[ch])
-SHELL_JAVA_SOURCE := $(wildcard shell-fork/src/net/net.commotionwireless.shell/*.java)
-shell-fork: fork-timestamp shell-jar-timestamp
-
-fork-timestamp: $(FORK_SOURCE)
-	make -C shell-fork/ OS=android fork
-
-shell-jar-timestamp: $(SHELL_JAVA_SOURCE)
-	ant -Dbasedir=$(EXTERNAL_ROOT)/shell-fork -f $(EXTERNAL_ROOT)/shell-fork/build.xml \
-		-DandroidJarFilePath="$(SDK_PLATFORM)" -DjunitJarFile=/usr/share/java/junit4.jar \
-		jar
-
-shell-fork-clean:
-	make -C shell-fork/ clean
-	ant -Dbasedir=$(EXTERNAL_ROOT)/shell-fork -f $(EXTERNAL_ROOT)/shell-fork/build.xml clean
-
