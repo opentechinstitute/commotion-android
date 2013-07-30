@@ -28,13 +28,7 @@ public class NativeHelper {
 
 	static String SU_C;
 	static String SU_C_FORK;
-	static String RUN;
-	static String STOP_OLSRD;
-	static String DO_STOP_OLSRD;
-	static String DEL_ROUTE;
-	static String OLSRD;
-	static String WIFI;
-	static String BUSYBOX;
+	static String RUN_OLSRD;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -47,13 +41,7 @@ public class NativeHelper {
 		profileDir.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		SU_C_FORK = new File(app_bin, "su_c_fork").getAbsolutePath();
-		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
-		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
-		DEL_ROUTE = new File(app_bin, "del-fake-default-route").getAbsolutePath();
-		RUN = new File(app_bin, "run").getAbsolutePath();
-		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
-		WIFI = new File(app_bin, "wifi").getAbsolutePath();
-		BUSYBOX = new File(app_bin, "busybox").getAbsolutePath();
+		RUN_OLSRD = new File(app_bin, "run_olsrd").getAbsolutePath();
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -110,39 +98,8 @@ public class NativeHelper {
 		}
 		chmod("0750", new File(SU_C));
 		chmod("0750", new File(SU_C_FORK));
-		chmod("0750", new File(RUN));
-		chmod("0750", new File(STOP_OLSRD));
-		chmod("0750", new File(DO_STOP_OLSRD));
-		chmod("0750", new File(DEL_ROUTE));
-		chmod("0750", new File(OLSRD));
-		chmod("0750", new File(WIFI));
-		chmod("0750", new File(BUSYBOX));
-		chmod("0750", new File(app_bin, "script_aria"));
-		chmod("0750", new File(app_bin, "script_hero"));
-		chmod("0750", new File(app_bin, "script_samsung"));
-		chmod("0750", new File(app_bin, "fork"));
-
+		chmod("0750", new File(RUN_OLSRD));
 		return result;
-	}
-
-	public static boolean installBusyboxSymlinks() {
-		File testFile = new File(NativeHelper.app_bin, "awk");
-		if (testFile.exists()) {
-			Log.v(TAG, "busybox test file exists: " + testFile);
-		} else {
-			// setup busybox so we have the utils we need, guaranteed
-			String command = new File(NativeHelper.app_bin, "busybox").getAbsolutePath()
-					+ " --install -s " + NativeHelper.app_bin.getAbsolutePath();
-			Log.i(TAG, "Running " + command);
-			try {
-				Process sh = Runtime.getRuntime().exec(command);
-				sh.waitFor();
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			}
-		}
-		return true;
 	}
 
 	public static void chmod(String modestr, File path) {

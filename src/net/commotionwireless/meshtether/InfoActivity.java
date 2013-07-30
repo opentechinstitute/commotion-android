@@ -131,6 +131,10 @@ public class InfoActivity extends android.app.ListActivity {
 		List<String> stringList = new ArrayList<String>();
 
 		// add active profile info first
+		/*
+		 * FIXME
+		 */
+		/*
 		if (app.service != null) {
 			String[] active = app.service.getActiveMeshProfile();
 			String profileString = "";
@@ -141,6 +145,7 @@ public class InfoActivity extends android.app.ListActivity {
 			stringList.add("active profile"); // key
 			stringList.add(profileString); // value
 		}
+		*/
 		
 		// then add wifi info
 		WifiInfo wi = app.wifiManager.getConnectionInfo();

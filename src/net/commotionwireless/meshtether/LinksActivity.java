@@ -20,7 +20,7 @@ package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
 
-import net.commotionwireless.meshtether.MeshService.ClientData;
+import net.commotionwireless.olsrd.ClientData;
 import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.Link;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
@@ -37,7 +37,7 @@ import android.widget.TextView;
 public class LinksActivity extends android.app.ListActivity {
 	private MeshTetherApp app;
 	private BaseAdapter adapter;
-	private ArrayList<MeshService.ClientData> clients = new ArrayList<MeshService.ClientData>();
+	private ArrayList<ClientData> clients = new ArrayList<ClientData>();
 
 	private OlsrInfoThread mOlsrInfoThread;
 	boolean mPauseOlsrInfoThread = false;
@@ -69,7 +69,7 @@ public class LinksActivity extends android.app.ListActivity {
 
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				final MeshService.ClientData client = clients.get(position);
+				final ClientData client = clients.get(position);
 
 				ViewHolder holder;
 
@@ -145,21 +145,30 @@ public class LinksActivity extends android.app.ListActivity {
 	}
 
 	public void update() {
+		/*
+		 * FIXME
+		 */
+		/*
 		if (app.service != null)
 			clients = app.service.clients;
 		adapter.notifyDataSetChanged();
+		*/
 	}
 
 	class OlsrInfoThread extends Thread {
 
 		@Override
 		public void run() {
-			ArrayList<MeshService.ClientData> clientsToAdd = new ArrayList<MeshService.ClientData>();
+			ArrayList<ClientData> clientsToAdd = new ArrayList<ClientData>();
 			try {
 				while(true) {
+					/*
+					 * FIXME
+					 */
+					/*
 					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
 					for (Link l : dump.links) {
-						MeshService.ClientData c = new MeshService.ClientData(l.remoteIP, l.linkQuality,
+						ClientData c = new ClientData(l.remoteIP, l.linkQuality,
 								l.neighborLinkQuality, l.linkCost, l.validityTime);
 						for (HNA h : dump.hna) {
 							if (l.remoteIP.equals(h.gateway))
@@ -170,11 +179,12 @@ public class LinksActivity extends android.app.ListActivity {
 						}
 						clientsToAdd.add(c);
 					}
-					final ArrayList<MeshService.ClientData> updateList = new ArrayList<MeshService.ClientData>(clientsToAdd);
+					*/
+					final ArrayList<ClientData> updateList = new ArrayList<ClientData>(clientsToAdd);
 					mHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							for (MeshService.ClientData cd : updateList) {
+							for (ClientData cd : updateList) {
 								clientAdded(cd);
 							}
 						}

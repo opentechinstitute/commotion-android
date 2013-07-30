@@ -78,7 +78,6 @@ public class MeshTetherApp extends android.app.Application {
 	Map<String, String> profileProperties;
 	String activeProfile;
 
-	public MeshService service = null;
 	public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
 
 	@Override
@@ -141,45 +140,6 @@ public class MeshTetherApp extends android.app.Application {
 		sendBroadcast(selfStartIntent);
 	}
 
-	@Override
-	public void onTerminate() {
-		if (service != null) {
-			Log.e(TAG, "The app is terminated while the service is running!");
-			service.stopRequest();
-		}
-		super.onTerminate();
-	}
-
-	public void startService() {
-		if (service == null) {
-			showProgressMessage(R.string.servicestarting);
-			startService(new Intent(this, MeshService.class));
-		}
-	}
-
-	public void stopService() {
-		if (service != null)
-			service.stopRequest();
-	}
-
-	public int getState() {
-		if (service != null)
-			return service.getState();
-		return MeshService.STATE_STOPPED;
-	}
-
-	public boolean isChanging() {
-		return getState() == MeshService.STATE_STARTING;
-	}
-
-	public boolean isRunning() {
-		return getState() == MeshService.STATE_RUNNING;
-	}
-
-	public boolean isStopped() {
-		return getState() == MeshService.STATE_STOPPED;
-	}
-
 	void setStatusActivity(StatusActivity a) { // for updates
 		statusActivity = a;
 	}
@@ -192,17 +152,6 @@ public class MeshTetherApp extends android.app.Application {
 		infoActivity = a;
 	}
 
-	void serviceStarted(MeshService s) {
-		Log.w(TAG, "serviceStarted");
-		service = s;
-		log = service.log;
-		service.startRequest();
-		if (linksActivity != null)
-			linksActivity.update();
-		if (infoActivity != null)
-			infoActivity.update();
-	}
-
 	static void broadcastState(Context ctx, int state) {
 		Intent intent = new Intent(ACTION_CHANGED);
 		intent.putExtra("state", state);
@@ -213,7 +162,10 @@ public class MeshTetherApp extends android.app.Application {
 		if (statusActivity != null)
 			statusActivity.update();
 		// TODO: only broadcast state if changed or stale, using a sticky intent broadcast
-		broadcastState(this, getState());
+		/*
+		 * TODO FIXME
+		 */
+		broadcastState(this, 0);
 	}
 
 	void updateToast(String msg, boolean islong) {
@@ -222,7 +174,8 @@ public class MeshTetherApp extends android.app.Application {
 		toast.show();
 	}
 
-	void clientAdded(MeshService.ClientData cd) {
+	/* void clientAdded(MeshService.ClientData cd) { */
+	void clientAdded(Object cd) {
 		if (prefs.getBoolean("client_notify", false)) {
 			notificationClientAdded.defaults = 0;
 			if (prefs.getBoolean("client_light", false)) {
@@ -245,7 +198,7 @@ public class MeshTetherApp extends android.app.Application {
 			notificationIntent.setAction(ACTION_CLIENTS);
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 			notificationClientAdded.setLatestEventInfo(this, getString(R.string.app_name),
-					getString(R.string.notify_client) + " " + cd.toNiceString(), contentIntent);
+					getString(R.string.notify_client) + " " + cd.toString(), contentIntent);
 			notificationManager.notify(NOTIFY_CLIENT, notificationClientAdded);
 		}
 
@@ -255,25 +208,6 @@ public class MeshTetherApp extends android.app.Application {
 
 	void cancelClientNotify() {
 		notificationManager.cancel(NOTIFY_CLIENT);
-	}
-
-	void processStarted() {
-		Log.w(TAG, "processStarted");
-		Intent notificationIntent = new Intent(this, StatusActivity.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(this, getString(R.string.app_name),
-				getString(R.string.notify_running), contentIntent);
-		notificationManager.notify(NOTIFY_RUNNING, notification);
-		service.startForegroundCompat(NOTIFY_RUNNING, notification);
-	}
-
-	void processStopped() {
-		Log.w(TAG, "processStopped");
-		notificationManager.cancel(NOTIFY_RUNNING);
-		notificationManager.cancel(NOTIFY_CLIENT);
-		if (service != null) service.stopSelf();
-		service = null;
-		updateStatus();
 	}
 
 	void failed(int err) {
@@ -327,11 +261,6 @@ public class MeshTetherApp extends android.app.Application {
 		// NOTE: always use the name found by the process
 		if_lan = found_if_lan;
 		prefs.edit().putString(getString(R.string.if_lan), if_lan).commit();
-	}
-
-	void cleanUpNotifications() {
-		if ((service != null) && (service.getState() == MeshService.STATE_STOPPED))
-			processStopped(); // clean up notifications
 	}
 
 	void showProgressMessage(int resId) {
