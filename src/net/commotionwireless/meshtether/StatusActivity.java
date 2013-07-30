@@ -19,15 +19,12 @@
 package net.commotionwireless.meshtether;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
+import net.commotionwireless.profiles.Profiles;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -37,12 +34,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -50,15 +48,16 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TextView;
 
-public class StatusActivity extends android.app.TabActivity {
+public class StatusActivity extends android.app.TabActivity implements OnItemSelectedListener {
 	private MeshTetherApp app;
 
 	private TabHost tabs;
 	private ImageButton onoff;
 	private Spinner chooseProfile;
 	private AlertDialog.Builder profileDialogBuilder;
-	private String mSelectedProfileName;
-
+	
+	
+	private Profiles mProfiles;
 	private boolean paused;
 
 	private TextView textDownloadRate;
@@ -108,9 +107,9 @@ public class StatusActivity extends android.app.TabActivity {
 				if (state == MeshService.STATE_STOPPED) {
 					chooseProfile.setEnabled(false);
 					onoff.setImageResource(R.drawable.comlogo_sm_on);
-					app.startService();
+					//app.startService();
 				} else {
-					app.stopService();
+					//app.stopService();
 					onoff.setImageResource(R.drawable.comlogo_sm_off);
 					chooseProfile.setEnabled(true);
 					update();
@@ -170,27 +169,15 @@ public class StatusActivity extends android.app.TabActivity {
 		super.onResume();
 		
 		Profiles.instantiateSharedProfiles(this);
-		Profiles profiles = Profiles.getSharedProfiles();
+		mProfiles = Profiles.getSharedProfiles();
 		chooseProfile = (Spinner)findViewById(R.id.choose_profile);
-		chooseProfile.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, profiles.getProfileList()));
-		/*
-		 * mSelectedProfileName set in onActivityResult()
-		 * to indicate the profile that was selected when 
-		 * we went to edit it. So, we will select it here
-		 * to be consistent for the user.
-		 */
-		if (mSelectedProfileName != null) {
-			chooseProfile.setSelection(profiles.getProfileIndex(mSelectedProfileName));
-			mSelectedProfileName = null;
-		}
+		chooseProfile.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, mProfiles.getProfileList()));
+		chooseProfile.setSelection(mProfiles.getProfileIndex(mProfiles.getActiveProfileName()));
+		chooseProfile.setOnItemSelectedListener(this);
 		
 		paused = false;
 		update();
 		app.cleanUpNotifications();
-	}
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		mSelectedProfileName = data.getStringExtra("profile_name");
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -204,6 +191,16 @@ public class StatusActivity extends android.app.TabActivity {
 		
 		return selectedString;
 	}
+	@Override
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,
+			long id) {
+		String newActiveProfile = (String)parent.getItemAtPosition(pos);
+		mProfiles.setActiveProfileName(newActiveProfile);
+	}
+	@Override
+	public void onNothingSelected(AdapterView<?> parent) {
+		// TODO FIXME
+	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -214,6 +211,7 @@ public class StatusActivity extends android.app.TabActivity {
 			Profiles profiles = Profiles.getSharedProfiles();
 			profileName = profiles.getNewProfileName();
 			profiles.newProfile(profileName);
+			profiles.setActiveProfileName(profileName);
 			/* fall through */
 		case R.id.menu_prefs:
 			Intent intent = new Intent(this, ProfileEditorActivity.class);
@@ -222,8 +220,8 @@ public class StatusActivity extends android.app.TabActivity {
 			 * a) newly generated (when we are making a new profile) or
 			 * b) the selected profile (when are editing an existing profile).
 			 */
-			intent.putExtra("profile_name", (profileName != null) ? profileName : getSelectedProfileName());
-			this.startActivityForResult(intent, 0);
+			intent.putExtra("profile_name", (profileName != null) ? profileName : mProfiles.getActiveProfileName());
+			this.startActivity(intent);
 			return true;
 		case R.id.menu_about:
 			showDialog(DLG_ABOUT);
