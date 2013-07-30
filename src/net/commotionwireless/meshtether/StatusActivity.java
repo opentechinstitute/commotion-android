@@ -218,7 +218,7 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 			 * b) the selected profile (when are editing an existing profile).
 			 */
 			intent.putExtra("profile_name", (profileName != null) ? profileName : mProfiles.getActiveProfileName());
-			this.startActivity(intent);
+			this.startActivityForResult(intent, 0);
 			return true;
 		case R.id.menu_about:
 			showDialog(DLG_ABOUT);
