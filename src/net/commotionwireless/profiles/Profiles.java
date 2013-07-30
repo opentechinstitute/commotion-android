@@ -18,6 +18,7 @@ public class Profiles {
 	private Context mContext;
 	private SharedPreferences mPreferences;
 	private static final String DefaultProfileName = "DefaultProfile";
+	private String mActiveProfileName = null;
 	/*
 	 * Constructor: Use the activity's name as the name of the Preference file.
 	 */
@@ -54,6 +55,7 @@ public class Profiles {
 	private Profiles(Context context, String nonDefaultName) {
 		mContext = context;
 		mPreferences = mContext.getSharedPreferences(nonDefaultName, Activity.MODE_PRIVATE);
+		mActiveProfileName = mPreferences.getString("active_profile", "");
 	}
 
 	/*
@@ -83,6 +85,10 @@ public class Profiles {
 		return newProfileName;
 	}
 	
+	public String getActiveProfileName() {
+		return mActiveProfileName;
+	}
+	
 	/*
 	 * Setters.
 	 */
@@ -97,6 +103,15 @@ public class Profiles {
 		editor.putStringSet("profile_names", existingProfiles);
 		updateProfileCount(editor);
 		editor.commit();
+	}
+	
+	public void setActiveProfileName(String activeProfile) {
+		SharedPreferences.Editor editor = null;
+		
+		mActiveProfileName = activeProfile;
+		editor = mPreferences.edit();
+		editor.putString("active_profile", mActiveProfileName);
+		editor.apply();
 	}
 	
 	synchronized public void deleteProfile(String profileToDelete) {
