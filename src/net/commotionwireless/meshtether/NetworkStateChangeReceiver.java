@@ -2,6 +2,7 @@ package net.commotionwireless.meshtether;
 import java.util.List;
 
 import net.commotionwireless.olsrd.OlsrdService;
+import net.commotionwireless.profiles.Profiles;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,10 +28,16 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
 		return null;
 	}
 	
+	
 	private void messageOlsrdService(Context context, int message) {
+		messageOlsrdService(context, message, null);
+	}
+	private void messageOlsrdService(Context context, int message, String profileName) {
 		Intent startOlsrdServiceIntent = new Intent(context, OlsrdService.class);
 		if (message != 0)
 			startOlsrdServiceIntent.addFlags(message);
+		if (profileName != null) 
+			startOlsrdServiceIntent.putExtra("profile_name", profileName);
 		context.startService(startOlsrdServiceIntent);
 	}
 	
@@ -39,6 +46,7 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
 		
 		WifiManager mgr = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
 		NetworkInfo ni = (NetworkInfo)intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+		Profiles profiles = new Profiles(context);
 		
 		Log.i("NetworkStateChangeReceiver", "This is the intent: " + intent.getAction());
 		/*
@@ -54,7 +62,7 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
 				Log.d("onReceive", "This is the active configuration: " + activeConfiguration.toString());
 				if (activeConfiguration.isIBSS) {
 					Log.d("onReceive", "Connect (an ad hoc network)");
-					messageOlsrdService(context, OlsrdService.CONNECTED_MESSAGE);
+					messageOlsrdService(context, OlsrdService.CONNECTED_MESSAGE, profiles.getActiveProfileName());
 				}
 				else {
 					Log.d("onReceive", "Disconnect (no ad hoc network).");
