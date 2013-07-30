@@ -97,7 +97,7 @@
                 <action android:name="net.commotionwireless.meshtether.SELF_START_INTENT"/>
             </intent-filter>
         </receiver>
-        <service android:name="OlsrdService" android:label="Olsrd Service"></service>
+        <service android:name="net.commotionwireless.olsrd.OlsrdService" android:label="Olsrd Service"></service>
     </application>
 
 </manifest>
