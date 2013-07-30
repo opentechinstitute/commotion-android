@@ -1,6 +1,0 @@
-#!/system/bin/sh
-#
-# horrible hack to work around the hack of telling Android that our gateway is our own IP
-# calling 'su -c' from Java doesn't work so we use a helper script
-
-exec "${brncl_path}/do_del-fake-default-route"

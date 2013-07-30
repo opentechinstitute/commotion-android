@@ -26,9 +26,10 @@ public class NativeHelper {
 	public static File app_bin;
 	public static File app_log;
 
-	static String SU_C;
-	static String SU_C_FORK;
-	static String RUN_OLSRD;
+	public static String SU_C;
+	public static String RUN_OLSRD;
+	public static String OLSRD_CONF;
+	public static String OLSRD;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -40,8 +41,11 @@ public class NativeHelper {
 		profileDir = new File(Environment.getExternalStorageDirectory(), "MeshTether");
 		profileDir.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
-		SU_C_FORK = new File(app_bin, "su_c_fork").getAbsolutePath();
 		RUN_OLSRD = new File(app_bin, "run_olsrd").getAbsolutePath();
+		OLSRD_CONF = new File(app_bin, "olsrd.conf").getAbsolutePath();
+		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
+
+
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -97,8 +101,8 @@ public class NativeHelper {
 			Log.e(MeshTetherApp.TAG, "Can't unzip", e);
 		}
 		chmod("0750", new File(SU_C));
-		chmod("0750", new File(SU_C_FORK));
 		chmod("0750", new File(RUN_OLSRD));
+		chmod("0750", new File(OLSRD));
 		return result;
 	}
 

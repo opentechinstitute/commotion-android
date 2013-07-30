@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import android.os.Handler;
 import android.util.Log;
 
-class MeshTetherProcess {
+public class MeshTetherProcess {
 	private final static int INPUT_THREAD = 0;
 	private final static int ERROR_THREAD = 1;
 

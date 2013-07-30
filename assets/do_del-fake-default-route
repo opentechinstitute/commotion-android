@@ -1,8 +1,0 @@
-#!/system/bin/sh
-#
-# horrible hack to work around the hack of telling Android that our gateway is our own IP
-
-: ${brncl_if_lan:="`getprop wifi.interface`"}
-
-sleep 15
-${brncl_path}/ip route del default via ${brncl_adhoc_ip} dev $brncl_if_lan

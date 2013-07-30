@@ -19,6 +19,7 @@
 package net.commotionwireless.meshtether;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.util.Log;
 
@@ -143,5 +144,13 @@ public class Util {
 
 	public static java.io.BufferedReader toReader(java.io.InputStream is) {
 		return new java.io.BufferedReader(new java.io.InputStreamReader(is), 8192);
+	}
+	
+	public static ArrayList<String> getSystemEnvironment() {
+		ArrayList<String> environment = new ArrayList<String>();
+		Map<String, String> env = System.getenv();
+		for (Map.Entry<String,String> entry : env.entrySet())
+			environment.add(entry.getKey() + "=" + entry.getValue());
+		return environment;
 	}
 }

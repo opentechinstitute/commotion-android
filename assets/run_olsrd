@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# main runner (process manager) for barnacle, root required
+# main runner (process manager) for olsrd, root required
 
 # log environment for debugging
 set > $brncl_path/../app_log/environment.log 2>&1
@@ -10,27 +10,7 @@ echo "" > $brncl_path/../app_log/olsrd.log 2>&1
 
 cd $brncl_path
 
-# load the driver
-# NOTE: Android's shell is ash and there is no "test" or "["
-: ${brncl_lan_script:=wifi}
-
-./$brncl_lan_script load
-
-# necessary hack for HTC phones
-type ip >/dev/null 2>&1 && ip route del table gprs default >/dev/null 2>&1
-
-# ifconfig $brncl_if_lan $brncl_adhoc_ip netmask $brncl_adhoc_netmask up
-./wifi config
-
-# Xperia X10 running Gingerbread needs extra time for wifi config to finish
-sleep 1
-
 # run olsrd
-(./olsrd -f "${olsrd_conf_path}" -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1) &
-echo `ps | ./grep '[o]lsrd' | ./awk '{print $2;}'` > $brncl_path/../app_log/olsrd.pid
-
-# the association loop
-./wifi assoc
-
-# cleanup
-./wifi unload
+echo pwd: `pwd`
+./olsrd -f "${olsrd_conf_path}" -i $brncl_if_lan > $brncl_path/../app_log/olsrd.log 2>&1
+# echo `ps | ./grep '[o]lsrd' | ./awk '{print $2;}'` > $brncl_path/../app_log/olsrd.pid

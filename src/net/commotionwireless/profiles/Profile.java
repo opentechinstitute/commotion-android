@@ -1,6 +1,7 @@
 package net.commotionwireless.profiles;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Map;
 
 import android.content.Context;
@@ -47,7 +48,24 @@ public class Profile {
 		}
 		editor.commit();
 		editor.apply();
-	}	
+	}
+	
+	public ArrayList<String> toEnvironment(String keyPrefix) {
+		ArrayList<String> environment = new ArrayList<String>();
+		Map<String, ?> profileMap = mSharedPreferences.getAll();
+		for (Map.Entry<String, ?> entry : profileMap.entrySet()) {
+			String value = null;
+			if (entry.getValue().getClass() == Boolean.class)
+				if ((Boolean)entry.getValue())
+					value = "1";
+				else
+					value = "0";
+			else 
+				value = (String)entry.getValue();
+			environment.add(keyPrefix + entry.getKey() + "=" + value);
+		}
+		return environment;
+	}
 	
 	public String toString() {
 		String returnString = new String("");
