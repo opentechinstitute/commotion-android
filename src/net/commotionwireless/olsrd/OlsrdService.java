@@ -1,17 +1,27 @@
 package net.commotionwireless.olsrd;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import junit.framework.Assert;
 import net.commotionwireless.meshtether.MeshTetherProcess;
 import net.commotionwireless.meshtether.NativeHelper;
+import net.commotionwireless.meshtether.NetworkStateChangeReceiver;
 import net.commotionwireless.meshtether.Util;
 import net.commotionwireless.profiles.NoMatchingProfileException;
 import net.commotionwireless.profiles.Profile;
+import net.commotionwireless.route.EWifiConfiguration;
+import net.commotionwireless.route.EWifiManager;
+import net.commotionwireless.route.RLinkProperties;
+import net.commotionwireless.route.RRouteInfo;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
 
 
@@ -23,7 +33,7 @@ public class OlsrdService extends Service {
 	public static final int DISCONNECTED_MESSAGE = 2;
 	public static final int NEWPROFILE_MESSAGE = 3;
 	public static final int OLSRDSERVICE_MESSAGE_MAX = 3;
-
+	
 	public static final int TO_NOTHING = 0;
 	public static final int TO_RUNNING = 1;
 	public static final int TO_STOPPED = 2;
@@ -31,6 +41,48 @@ public class OlsrdService extends Service {
 
 	private boolean mRunning = false;
 	private OlsrdControl mOlsrdControl = null;
+	private WifiManager mMgr;
+	private EWifiManager mEmgr;
+	private WifiConfiguration mWifiConfig;
+	private EWifiConfiguration mEwifiConfig;
+
+	private final Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			Log.i("OlsrdService", "Got a message: " + msg.obj.toString());
+			String cmd = null;
+			String cmdParts[] = null;
+			cmd = msg.obj.toString();
+			cmdParts = cmd.split(" ");
+			if (cmdParts.length == 4) {
+				RRouteInfo route;
+				RLinkProperties linkProperties;
+
+				try {
+					route = RRouteInfo.parseFromCommand(cmd);
+				} catch (UnknownHostException unknown) {
+					Log.e("OlsrdService", "Could not parse a route command from olsrd: " + cmd);
+					return;
+				}
+				
+				if (mWifiConfig == null || mEmgr == null || mEwifiConfig == null) {
+					Log.e("OlsrdService", "It appears that things are bad!");
+					return;
+				}
+				linkProperties = new RLinkProperties(mEwifiConfig.getLinkProperties());
+				if ("ADD".equalsIgnoreCase(cmdParts[0])) {
+					Log.i("OlsrdService", "Would add a route (" + cmdParts[1] + "/" + cmdParts[2] + "->" + cmdParts[3] + ")");
+					linkProperties.addRoute(route);
+					
+				} else if ("DEL".equalsIgnoreCase(cmdParts[0])) {
+					Log.i("OlsrdService", "Would delete a route (" + cmdParts[1] + "/" + cmdParts[2] + "->" + cmdParts[3] + ")");
+					linkProperties.removeRoute(route);
+				}
+				mEwifiConfig.setLinkProperties(linkProperties);
+				mEmgr.save(mWifiConfig);
+			}
+		}
+	};
 	
 	private enum OlsrdState { STOPPED, RUNNING;
 		int mTransitions[][] = {
@@ -54,7 +106,7 @@ public class OlsrdService extends Service {
 			}
 		}
 	}
-
+	
 	class OlsrdControl {
 		OlsrdState mState;
 		String mProfileName;
@@ -95,17 +147,22 @@ public class OlsrdService extends Service {
 			Log.i("OlsrdControl", "Profile environment: " + profileEnvironment.toString());
 			Log.i("OlsrdControl", "Combined environment: " + combinedEnvironment.toString());
 			
+			mWifiConfig = NetworkStateChangeReceiver.getActiveWifiConfiguration(mMgr);
+			mEwifiConfig = new EWifiConfiguration(mWifiConfig);
+			
 			mProcess = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStartPath, 
 					combinedEnvironment.toArray(new String[0]), 
 					NativeHelper.app_bin);
 			
 			try {
-				mProcess.run(1, 1);
+				mProcess.run(mHandler, 1, 1);
 			} catch (IOException e) {
 				Log.e("OlsrdService", "Could not start process: " + e.toString());
 			}
 		}
-		
+		/*
+		 * TODO: Should be able to make this much simpler now!
+		 */
 		public void stop() {
 			ArrayList<String> systemEnvironment = null;
 			systemEnvironment = Util.getSystemEnvironment();
@@ -122,7 +179,7 @@ public class OlsrdService extends Service {
 			Log.i("OlsrdControl", "Trying to stop with: " + mOlsrdStopPath);
 			
 			try {
-				olsrdStopper.run(1,1);
+				olsrdStopper.run(mHandler, 1,1);
 				mProcess.stop();
 				mProcess = null;
 			} catch (InterruptedException e) {
@@ -130,6 +187,8 @@ public class OlsrdService extends Service {
 			} catch (IOException e) {
 				Log.e("OlsrdService", "Could not stop process: " + e.toString());
 			}
+			mWifiConfig = null;
+			mEwifiConfig = null;
 		}
 		
 		public void setProfileName(String profileName) {
@@ -141,6 +200,7 @@ public class OlsrdService extends Service {
 		}
 		
 		public void transition(int message) {
+			
 			if (!(message>=OLSRDSERVICE_MESSAGE_MIN && message<=OLSRDSERVICE_MESSAGE_MAX)) {
 				Log.e("OlsrdControl", "Transition message not appropriate");
 				return;
@@ -148,7 +208,6 @@ public class OlsrdService extends Service {
 			
 			OlsrdState oldState = mState;
 			mState = mState.transition(message, this);
-			
 			Log.i("OlsrdControl", "Transitioned from " + oldState + " to " + mState + " on message " + message);
 		}
 	}
@@ -160,6 +219,8 @@ public class OlsrdService extends Service {
 		mOlsrdControl = new OlsrdControl(this.getApplicationContext());
 		NativeHelper.setup(this.getApplicationContext());
 		NativeHelper.unzipAssets(this.getApplicationContext());
+		mMgr = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+		mEmgr = new EWifiManager(mMgr);
 	}
 	
     @Override
