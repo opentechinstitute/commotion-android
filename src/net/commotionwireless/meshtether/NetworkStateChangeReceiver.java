@@ -15,7 +15,7 @@ import android.util.Log;
 
 public class NetworkStateChangeReceiver extends BroadcastReceiver {
 	
-	WifiConfiguration getActiveWifiConfiguration(WifiManager wifiManager) {
+	public static WifiConfiguration getActiveWifiConfiguration(WifiManager wifiManager) {
 		List<WifiConfiguration> configs = wifiManager.getConfiguredNetworks();
 		if (configs == null)
 			return null;
