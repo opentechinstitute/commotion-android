@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class MeshTetherProcess {
@@ -53,10 +54,10 @@ public class MeshTetherProcess {
 		}
 	}
 
-	public void run(int outputTag, int errorTag) throws IOException {
+	public void run(Handler handler, int outputTag, int errorTag) throws IOException {
 		mProcess = Runtime.getRuntime().exec(mProg, mEnvp, mDirectory);
-		mIoThreads[INPUT_THREAD] = new Thread(new OutputMonitor(outputTag, mProcess.getInputStream()));
-		mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(errorTag, mProcess.getErrorStream()));
+		mIoThreads[INPUT_THREAD] = new Thread(new OutputMonitor(handler, outputTag, mProcess.getInputStream()));
+		mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(handler, errorTag, mProcess.getErrorStream()));
 		mIoThreads[INPUT_THREAD].start();
 		mIoThreads[ERROR_THREAD].start();
 		mRunning = true;
@@ -67,8 +68,8 @@ public class MeshTetherProcess {
 			mProcess.getOutputStream().write(msg);
 	}
 	
-	public void runUntilExit(int outputTag, int errorTag) throws IOException, InterruptedException {
-		run(outputTag,errorTag);
+	public void runUntilExit(Handler handler, int outputTag, int errorTag) throws IOException, InterruptedException {
+		run(handler, outputTag,errorTag);
 		mProcess.waitFor();
 		mProcess.destroy();
 		
@@ -89,16 +90,22 @@ public class MeshTetherProcess {
 	/** Worker Threads */
 	private class OutputMonitor implements Runnable {
 		private final BufferedReader mBr;
-		public OutputMonitor(int t, InputStream is) {
+		private Handler mHandler;
+		public OutputMonitor(Handler handler, int t, InputStream is) {
 			mBr = new BufferedReader(new InputStreamReader(is), 8192);
+			mHandler = handler;
 		}
 		@Override
 		public void run() {
 			try{
 				String line;
+				Message msg;
 				do {
 					line = mBr.readLine();
-					Log.i("MeshTetherProcess", "Line: " + line);
+					if (mHandler != null) {
+						msg = mHandler.obtainMessage(0, new String(line));
+						mHandler.dispatchMessage(msg);
+					}
 				} while(line != null);
 			} catch (Exception e) {
 				/*
