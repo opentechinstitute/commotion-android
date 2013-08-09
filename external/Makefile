@@ -44,9 +44,9 @@ ALL_LDFLAGS += -Wl,--gc-sections
 
 all: olsrd busybox
 
-clean: olsrd-clean olsrinfo-clean busybox-clean shell-fork-clean
+clean: olsrd-clean olsrinfo-clean busybox-clean
 
-.PHONY: shell-fork olsrd olsrd-clean olsrinfo olsrinfo-clean busybox busybox-clean shell-fork-clean
+.PHONY: olsrd olsrd-clean olsrinfo olsrinfo-clean busybox busybox-clean
 .SUFFIXES: .java .class
 
 #--olsrd-----------------------------------------------------------------------#
