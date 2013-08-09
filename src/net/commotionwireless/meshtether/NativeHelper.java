@@ -27,9 +27,10 @@ public class NativeHelper {
 	public static File app_log;
 
 	public static String SU_C;
-	public static String RUN_OLSRD;
-	public static String OLSRD_CONF;
-	public static String OLSRD;
+	private static String RUN_OLSRD;
+	private static String OLSRD;
+	private static String STOP_OLSRD;
+	private static String DO_STOP_OLSRD;
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -42,10 +43,9 @@ public class NativeHelper {
 		profileDir.mkdirs();
 		SU_C = new File(app_bin, "su_c").getAbsolutePath();
 		RUN_OLSRD = new File(app_bin, "run_olsrd").getAbsolutePath();
-		OLSRD_CONF = new File(app_bin, "olsrd.conf").getAbsolutePath();
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
-
-
+		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
+		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -103,6 +103,9 @@ public class NativeHelper {
 		chmod("0750", new File(SU_C));
 		chmod("0750", new File(RUN_OLSRD));
 		chmod("0750", new File(OLSRD));
+		chmod("0750", new File(STOP_OLSRD));
+		chmod("0750", new File(DO_STOP_OLSRD));
+
 		return result;
 	}
 

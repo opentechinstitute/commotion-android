@@ -53,7 +53,7 @@ public class MeshTetherProcess {
 		}
 	}
 
-	public void run(Handler handler, int outputTag, int errorTag) throws IOException {
+	public void run(int outputTag, int errorTag) throws IOException {
 		mProcess = Runtime.getRuntime().exec(mProg, mEnvp, mDirectory);
 		mIoThreads[INPUT_THREAD] = new Thread(new OutputMonitor(outputTag, mProcess.getInputStream()));
 		mIoThreads[ERROR_THREAD] = new Thread(new OutputMonitor(errorTag, mProcess.getErrorStream()));
@@ -67,8 +67,8 @@ public class MeshTetherProcess {
 			mProcess.getOutputStream().write(msg);
 	}
 	
-	public void runUntilExit(Handler handler, int outputTag, int errorTag) throws IOException, InterruptedException {
-		run(handler,outputTag,errorTag);
+	public void runUntilExit(int outputTag, int errorTag) throws IOException, InterruptedException {
+		run(outputTag,errorTag);
 		mProcess.waitFor();
 		mProcess.destroy();
 		

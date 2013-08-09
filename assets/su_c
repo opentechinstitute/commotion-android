@@ -2,6 +2,6 @@
 #
 # calling 'su -c' from Java doesn't work so we use a helper script
 
-# exec su -c ${1:-${brncl_path}/run}
 echo ${brncl_path}
+echo "Attempting to execute: " $1
 exec su -c ${1:-${brncl_path}/run_olsrd}

@@ -57,14 +57,18 @@ public class OlsrdService extends Service {
 
 	class OlsrdControl {
 		OlsrdState mState;
-		int mPid;
 		String mProfileName;
 		Context mContext;
 		MeshTetherProcess mProcess;
 		
+		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
+		final String mOlsrdConfFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
+		final String mOlsrdStopPath = NativeHelper.app_bin.getAbsolutePath() + "/stop_olsrd";
+		final String mOlsrdStartPath = NativeHelper.app_bin.getAbsolutePath() + "/run_olsrd";
+		final String mOlsrdEnvironmentVariablePrefix = "brncl_";
+
 		OlsrdControl(Context context) {
 			mState = OlsrdState.STOPPED;
-			mPid = 0;
 			mContext = context;
 		}
 		
@@ -78,9 +82,10 @@ public class OlsrdService extends Service {
 			ArrayList<String> profileEnvironment, systemEnvironment, combinedEnvironment;
 			Profile p = new Profile(mProfileName, mContext);
 			
-			profileEnvironment = p.toEnvironment("brncl_");
-			profileEnvironment.add("brncl_path=" + NativeHelper.app_bin.getAbsolutePath());
-			profileEnvironment.add("olsrd_conf_path=" + NativeHelper.OLSRD_CONF);
+			profileEnvironment = p.toEnvironment(mOlsrdEnvironmentVariablePrefix);
+			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
+			profileEnvironment.add("olsrd_conf_path=" + mOlsrdConfFilePath);
+			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
 			systemEnvironment = Util.getSystemEnvironment();
 			
 			(combinedEnvironment = (ArrayList<String>)systemEnvironment.clone()).addAll(profileEnvironment);
@@ -90,18 +95,36 @@ public class OlsrdService extends Service {
 			Log.i("OlsrdControl", "Profile environment: " + profileEnvironment.toString());
 			Log.i("OlsrdControl", "Combined environment: " + combinedEnvironment.toString());
 			
-			mProcess = new MeshTetherProcess(NativeHelper.SU_C, combinedEnvironment.toArray(new String[0]), NativeHelper.app_bin);
+			mProcess = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStartPath, 
+					combinedEnvironment.toArray(new String[0]), 
+					NativeHelper.app_bin);
+			
 			try {
-				mProcess.run(null, 1, 1);
+				mProcess.run(1, 1);
 			} catch (IOException e) {
 				Log.e("OlsrdService", "Could not start process: " + e.toString());
 			}
 		}
 		
 		public void stop() {
+			ArrayList<String> systemEnvironment = null;
+			systemEnvironment = Util.getSystemEnvironment();
+			MeshTetherProcess olsrdStopper = null;
+			
+			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
+			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
+			
+			olsrdStopper = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStopPath,
+					systemEnvironment.toArray(new String[0]), 
+					NativeHelper.app_bin);
+			
 			Log.i("OlsrdControl", "OlsrdControl.stop()");
+			Log.i("OlsrdControl", "Trying to stop with: " + mOlsrdStopPath);
+			
 			try {
+				olsrdStopper.run(1,1);
 				mProcess.stop();
+				mProcess = null;
 			} catch (InterruptedException e) {
 				Log.e("OlsrdService", "Could not stop process: " + e.toString());
 			} catch (IOException e) {

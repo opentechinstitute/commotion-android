@@ -57,7 +57,7 @@ OLSRD_SOURCE := $(wildcard olsrd/[*/*.[ch]) \
 olsrd: olsrd-build-stamp
 
 olsrd-build-stamp: $(OLSRD_SOURCE)
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 all
+	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 NDK_BASE=$(NDK_BASE) DEBUG=0 all
 # build only the plugins we are likely to use to keep the build stable
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 arprefresh
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 bmf
@@ -70,6 +70,7 @@ olsrd-build-stamp: $(OLSRD_SOURCE)
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 secure
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 txtinfo
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 watchdog
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 stdout
 	touch olsrd-build-stamp
 
 olsrd-clean:

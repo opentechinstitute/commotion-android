@@ -4,7 +4,5 @@
 : ${brncl_path:=.}
 
 export brncl_path
-
-kill -15 `cat $brncl_path/../app_log/olsrd.pid`
-
-$brncl_path/killall olsrd
+echo "Killing " `cat ${brncl_olsrd_pid_file}`
+kill -15 `cat ${brncl_olsrd_pid_file}`
