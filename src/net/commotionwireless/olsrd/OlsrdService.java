@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import junit.framework.Assert;
+import net.commotionwireless.meshtether.MeshTetherApp;
 import net.commotionwireless.meshtether.MeshTetherProcess;
 import net.commotionwireless.meshtether.NativeHelper;
 import net.commotionwireless.meshtether.NetworkStateChangeReceiver;
@@ -29,15 +30,18 @@ public class OlsrdService extends Service {
 	
 	public static final int START_MESSAGE = 0;
 	public static final int OLSRDSERVICE_MESSAGE_MIN = 1;
-	public static final int CONNECTED_MESSAGE = 1;
-	public static final int DISCONNECTED_MESSAGE = 2;
-	public static final int NEWPROFILE_MESSAGE = 3;
-	public static final int OLSRDSERVICE_MESSAGE_MAX = 3;
+	public static final int CONNECTING_MESSAGE = 1;
+	public static final int CONNECTED_MESSAGE = 2;
+	public static final int DISCONNECTED_MESSAGE = 3;
+	public static final int NEWPROFILE_MESSAGE = 4;
+	public static final int OLSRDSERVICE_MESSAGE_MAX = 4;
 	
 	public static final int TO_NOTHING = 0;
 	public static final int TO_RUNNING = 1;
 	public static final int TO_STOPPED = 2;
 	public static final int TO_RESTART = 3;
+
+	public static final String OLSRD_CHANGE_ACTION = "net.commotionwireless.olsrd.OLSRD_CHANGE";
 
 	private boolean mRunning = false;
 	private OlsrdControl mOlsrdControl = null;
@@ -86,8 +90,8 @@ public class OlsrdService extends Service {
 	
 	private enum OlsrdState { STOPPED, RUNNING;
 		int mTransitions[][] = {
-				/* STOPPED */ {/* CONNECTED */ TO_RUNNING, /* DISCONNECTED */ TO_NOTHING, /* NEWPROFILE */ TO_NOTHING},
-				/* RUNNING */ {/* CONNECTED */ TO_NOTHING, /* DISCONNECTED */ TO_STOPPED, /* NEWPROFILE */ TO_RESTART}
+				/* STOPPED */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_RUNNING, /* DISCONNECTED */ TO_NOTHING, /* NEWPROFILE */ TO_NOTHING},
+				/* RUNNING */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_NOTHING, /* DISCONNECTED */ TO_STOPPED, /* NEWPROFILE */ TO_RESTART}
 		};
 		public OlsrdState transition(int message, OlsrdControl control) {
 			int transitionToDo = mTransitions[this.ordinal()][message-1];
@@ -155,7 +159,10 @@ public class OlsrdService extends Service {
 					NativeHelper.app_bin);
 			
 			try {
+				Intent startIntent = new Intent();
+				startIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
 				mProcess.run(mHandler, 1, 1);
+				mContext.sendBroadcast(startIntent);
 			} catch (IOException e) {
 				Log.e("OlsrdService", "Could not start process: " + e.toString());
 			}
@@ -179,9 +186,12 @@ public class OlsrdService extends Service {
 			Log.i("OlsrdControl", "Trying to stop with: " + mOlsrdStopPath);
 			
 			try {
+				Intent stopIntent = new Intent();
+				stopIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
 				olsrdStopper.run(mHandler, 1,1);
 				mProcess.stop();
 				mProcess = null;
+				mContext.sendBroadcast(stopIntent);
 			} catch (InterruptedException e) {
 				Log.e("OlsrdService", "Could not stop process: " + e.toString());
 			} catch (IOException e) {
@@ -212,6 +222,10 @@ public class OlsrdService extends Service {
 		}
 	}
 	
+	public boolean isOlsrdRunning() {
+		return (mOlsrdControl.mState == OlsrdState.RUNNING);
+	}
+
 	@Override
 	public void onCreate() {
     	Log.i("OlsrdService", "Starting ...");

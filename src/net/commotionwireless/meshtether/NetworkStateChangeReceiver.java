@@ -55,14 +55,19 @@ public class NetworkStateChangeReceiver extends BroadcastReceiver {
 		messageOlsrdService(context, OlsrdService.START_MESSAGE);
 		
 		Log.d("onReceive", "Running onReceive()");
-		if (ni != null && ni.isConnected()) {
+		if (ni != null && (NetworkInfo.State.CONNECTED == ni.getState() || 
+						   NetworkInfo.State.CONNECTING == ni.getState())) {
 			Log.d("onReceive", "Connected? " + ni.toString());
 			WifiConfiguration activeConfiguration = getActiveWifiConfiguration(mgr);
 			if (activeConfiguration != null) {
 				Log.d("onReceive", "This is the active configuration: " + activeConfiguration.toString());
 				if (activeConfiguration.isIBSS) {
 					Log.d("onReceive", "Connect (an ad hoc network)");
-					messageOlsrdService(context, OlsrdService.CONNECTED_MESSAGE, profiles.getActiveProfileName());
+					messageOlsrdService(context,
+							(NetworkInfo.State.CONNECTED == ni.getState()) ? 
+									OlsrdService.CONNECTED_MESSAGE : 
+									OlsrdService.CONNECTING_MESSAGE, 
+							profiles.getActiveProfileName());
 				}
 				else {
 					Log.d("onReceive", "Disconnect (no ad hoc network).");
