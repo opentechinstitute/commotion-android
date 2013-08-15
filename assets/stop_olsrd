@@ -5,4 +5,4 @@
 
 export brncl_path
 
-su -c ${brncl_path}/do_stop_olsrd
+${brncl_path}/do_stop_olsrd
