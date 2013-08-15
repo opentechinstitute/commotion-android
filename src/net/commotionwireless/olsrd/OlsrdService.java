@@ -235,6 +235,8 @@ public class OlsrdService extends Service {
 		NativeHelper.unzipAssets(this.getApplicationContext());
 		mMgr = (WifiManager)getSystemService(Context.WIFI_SERVICE);
 		mEmgr = new EWifiManager(mMgr);
+		MeshTetherApp app = (MeshTetherApp)this.getApplication();
+		app.setOlsrdService(this);
 	}
 	
     @Override

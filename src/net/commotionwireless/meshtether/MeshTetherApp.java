@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import net.commotionwireless.olsrd.OlsrdService;
 import net.commotionwireless.olsrinfo.JsonInfo;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -72,6 +73,8 @@ public class MeshTetherApp extends android.app.Application {
 	final static int NOTIFY_RUNNING = 0;
 	final static int NOTIFY_CLIENT = 1;
 	final static int NOTIFY_ERROR = 2;
+
+	private OlsrdService mOlsrdService;
 
 	JsonInfo mJsonInfo = null;
 	Set<String> profiles;
@@ -140,6 +143,13 @@ public class MeshTetherApp extends android.app.Application {
 		sendBroadcast(selfStartIntent);
 	}
 
+	public void setOlsrdService(OlsrdService s) {
+		mOlsrdService = s;
+	}
+
+	public OlsrdService getOlsrdService() {
+		return mOlsrdService;
+	}
 	void setStatusActivity(StatusActivity a) { // for updates
 		statusActivity = a;
 	}
