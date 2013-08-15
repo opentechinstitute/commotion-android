@@ -12,5 +12,5 @@ cd $brncl_path
 
 # run olsrd
 # -nofork 
-./olsrd -f "${olsrd_conf_path}" -i $brncl_if_lan -pidfile ${brncl_olsrd_pid_file} > $brncl_path/../app_log/olsrd.log 2>&1
+./olsrd -f "${olsrd_conf_path}" -i $brncl_if_lan -pidfile ${brncl_olsrd_pid_file} -nofork -d 0
 echo $? > ${brncl_path}/../app_log/olsrd.pid
