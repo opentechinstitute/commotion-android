@@ -9,7 +9,7 @@ public class ClientData {
 	public final int validityTime;
 	public boolean hasRouteToOther;
 	public boolean hasDefaultRoute;
-	ClientData(String ip, float lq, float nlq, int lc, int vt) {
+	public ClientData(String ip, float lq, float nlq, int lc, int vt) {
 		remoteIP = ip;
 		linkQuality = lq;
 		neighborLinkQuality = nlq;
