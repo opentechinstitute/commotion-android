@@ -21,11 +21,17 @@ package net.commotionwireless.meshtether;
 import java.util.ArrayList;
 
 import net.commotionwireless.olsrd.ClientData;
+import net.commotionwireless.olsrd.OlsrdService;
 import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.Link;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -42,6 +48,7 @@ public class LinksActivity extends android.app.ListActivity {
 	private OlsrInfoThread mOlsrInfoThread;
 	boolean mPauseOlsrInfoThread = false;
 	private final Handler mHandler = new Handler();
+	private BroadcastReceiver mOlsrdStatusReceiver;
 
 	private static class ViewHolder {
 		TextView remoteIP;
@@ -115,8 +122,27 @@ public class LinksActivity extends android.app.ListActivity {
 		setListAdapter(adapter);
 		setTitle(getString(R.string.clientview));
 
-		mOlsrInfoThread = new OlsrInfoThread();
-		mOlsrInfoThread.start();
+		mOlsrdStatusReceiver = new BroadcastReceiver() {
+			public void onReceive(Context context, Intent intent) {
+				if (intent.getAction() == OlsrdService.OLSRD_CHANGE_ACTION) {
+					OlsrdService olsrdService = app.getOlsrdService();
+					if (olsrdService.isOlsrdRunning()) {
+						mOlsrInfoThread = new OlsrInfoThread();
+						mOlsrInfoThread.start();
+					} else {
+						if (mOlsrInfoThread != null) {
+							mOlsrInfoThread.interrupt();
+							mOlsrInfoThread = null;
+						}
+					}
+				}
+			}
+		};
+		OlsrdService olsrdService = app.getOlsrdService();
+		if (olsrdService != null && olsrdService.isOlsrdRunning()) {
+			mOlsrInfoThread = new OlsrInfoThread();
+			mOlsrInfoThread.start();
+		}
 	}
 
 	@Override
@@ -135,25 +161,26 @@ public class LinksActivity extends android.app.ListActivity {
 
 		if (hasWindowFocus() && clients.isEmpty())
 			app.updateToast(getString(R.string.noclients), false);
-		mPauseOlsrInfoThread = false;
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(OlsrdService.OLSRD_CHANGE_ACTION);
+		registerReceiver(mOlsrdStatusReceiver, filter);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mPauseOlsrInfoThread = true;
+		//mPauseOlsrInfoThread = true;
+		unregisterReceiver(mOlsrdStatusReceiver);
 	}
 
 	public void update() {
 		/*
 		 * FIXME
 		 */
-		/*
-		if (app.service != null)
-			clients = app.service.clients;
 		adapter.notifyDataSetChanged();
-		*/
+
 	}
+
 
 	class OlsrInfoThread extends Thread {
 
@@ -161,11 +188,12 @@ public class LinksActivity extends android.app.ListActivity {
 		public void run() {
 			ArrayList<ClientData> clientsToAdd = new ArrayList<ClientData>();
 			try {
-				while(true) {
+				Log.i("LinksActivity", "Starting OlsrdInfoThread()");
+				while(!Thread.interrupted()) {
 					/*
 					 * FIXME
 					 */
-					/*
+
 					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
 					for (Link l : dump.links) {
 						ClientData c = new ClientData(l.remoteIP, l.linkQuality,
@@ -179,7 +207,6 @@ public class LinksActivity extends android.app.ListActivity {
 						}
 						clientsToAdd.add(c);
 					}
-					*/
 					final ArrayList<ClientData> updateList = new ArrayList<ClientData>(clientsToAdd);
 					mHandler.post(new Runnable() {
 						@Override
@@ -196,6 +223,7 @@ public class LinksActivity extends android.app.ListActivity {
 			} catch (InterruptedException e) {
 				// fall through
 			}
+			Log.i("LinksActivity", "Stopping OlsrdInfoThread()");
 		}
 	}
 
