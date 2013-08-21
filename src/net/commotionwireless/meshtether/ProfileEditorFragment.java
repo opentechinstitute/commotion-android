@@ -37,17 +37,20 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 		this.getActivity().setResult(0, resultIntent);
 
 		addPreferencesFromResource(R.xml.preferences);
-		
-		mgr.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
+
 	@Override
 	public void onResume() {
 		super.onResume();
+		PreferenceManager mgr = this.getPreferenceManager();
 		mProfiles = new Profiles(this.getActivity());
+		mgr.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 	}
 	@Override
 	public void onPause() {
 		super.onPause();
+		PreferenceManager mgr = this.getPreferenceManager();
+		mgr.getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	@Override
