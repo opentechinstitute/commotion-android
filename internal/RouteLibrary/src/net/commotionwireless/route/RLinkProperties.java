@@ -26,6 +26,22 @@ public class RLinkProperties extends RClass {
 
 	private Collection<RRouteInfo> mRoutes = null;
 	
+	public RLinkProperties() {
+		try {
+			mNativeClass = Class.forName(NATIVE_CLASS_NAME);
+			mNativeObject = mNativeClass.newInstance();
+
+			initializeRouteSet();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
 	public RLinkProperties(Object linkProperties) {
 		try {
 			Constructor nativeCopyConstructor = null;
@@ -132,6 +148,28 @@ public class RLinkProperties extends RClass {
 		
 	}
 	
+	public void addLinkAddress(RLinkAddress linkAddress) {
+		Class LinkAddressClass;
+		Method addLinkAddress;
+
+		try {
+			LinkAddressClass = Class.forName(RLinkAddress.NATIVE_CLASS_NAME);
+			addLinkAddress = mNativeClass.getMethod(ADD_LINK_ADDRESS_METHOD_NAME, LinkAddressClass);
+			addLinkAddress.invoke(mNativeObject, linkAddress.getNativeObject());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	public void removeRoute(RRouteInfo oldRoute) {
 		mRoutes.remove(oldRoute);
 		clearRoutes();
@@ -146,6 +184,23 @@ public class RLinkProperties extends RClass {
 		printRoutes("After addRoute()");
 	}
 	
+	public void addDns(InetAddress dns) {
+		Method addDns;
+
+		try {
+			addDns = mNativeClass.getMethod(ADD_DNS_METHOD_NAME, InetAddress.class);
+			addDns.invoke(mNativeObject, dns);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void addRouteNative(RRouteInfo newRoute) {
 		Method addRouteMethod = null;
 		try {
