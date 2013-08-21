@@ -19,11 +19,11 @@
 package net.commotionwireless.meshtether;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
 
-import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
+import net.commotionwireless.olsrd.OlsrdService;
+import net.commotionwireless.profiles.Profile;
 import net.commotionwireless.profiles.Profiles;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,13 +31,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -63,6 +65,8 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	private TextView textDownloadRate;
 	private TextView textUploadRate;
 
+	private int NetworkId;
+
 	final static int DLG_ABOUT = 0;
 	final static int DLG_ROOT = 1;
 	final static int DLG_ERROR = 2;
@@ -78,16 +82,47 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		nf.setMinimumIntegerDigits(1);
 	}
 
-    ProgressDialog mProgressDialog;
-    final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            mProgressDialog.setMessage(msg.getData().getString("message"));
-        }
-    };
-    /*
-     * Lifecycle methods. 
-     */
+	ProgressDialog mProgressDialog;
+	final Handler mHandler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			mProgressDialog.setMessage(msg.getData().getString("message"));
+		}
+	};
+
+	public void onOffClick(View v) {
+		OlsrdService olsrdService = app.getOlsrdService();
+		WifiManager wifiManager = (WifiManager)this.getSystemService(WIFI_SERVICE);
+		if (olsrdService != null && olsrdService.isOlsrdRunning()) {
+			/*
+			 * stop!
+			 */
+			Log.w("StatusActivity", "Attempting to stop network ID " + NetworkId);
+
+			wifiManager.disableNetwork(NetworkId);
+			wifiManager.removeNetwork(NetworkId);
+			wifiManager.saveConfiguration();
+		} else {
+			/*
+			 * start!
+			 */
+			WifiConfiguration newWc = new WifiConfiguration();
+			Profile mProfile = new Profile(mProfiles.getActiveProfileName(), this);
+
+			if (!mProfile.getWifiConfiguration(newWc)) {
+				Log.e("StatusActivity", "Failing to start because getWifiConfiguration() failed.");
+				return;
+			}
+
+			Log.w("StatusActivity", "Attempting to start with configuration: " + newWc.toString());
+			NetworkId = wifiManager.addNetwork(newWc);
+			wifiManager.saveConfiguration();
+			wifiManager.enableNetwork(NetworkId, true);
+		}
+	}
+	/*
+	 * Lifecycle methods.
+	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -97,30 +132,6 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setProgressBarIndeterminate(true);
 		setContentView(R.layout.main);
-
-		// control interface
-		onoff = (ImageButton) findViewById(R.id.onoff);
-		onoff.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				/*
-				 * FIXME
-				 */
-				/*
-				int state = app.getState();
-				if (state == MeshService.STATE_STOPPED) {
-					chooseProfile.setEnabled(false);
-					onoff.setImageResource(R.drawable.comlogo_sm_on);
-					//app.startService();
-				} else {
-					//app.stopService();
-					onoff.setImageResource(R.drawable.comlogo_sm_off);
-					chooseProfile.setEnabled(true);
-					update();
-				}
-				*/
-			}
-		});
 
 		profileDialogBuilder = new AlertDialog.Builder(this);
 		profileDialogBuilder.setTitle(R.string.choose_profile);
@@ -369,7 +380,7 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 
 	static String formatRate(long v) {
 		if (v < 1048576)
-			return nf.format(v /    1024.0f) + " KB";
+			return nf.format(v /	1024.0f) + " KB";
 		else
 			return nf.format(v / 1048576.0f) + " MB";
 	}
