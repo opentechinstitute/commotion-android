@@ -120,7 +120,7 @@
         <item>11</item>
         <item>12</item>
         <item>13</item>
-        <!-- <item>14</item> -->
+        <item>14</item>
     </string-array>
     <string-array name="channel_names">
         <item>1 – 2412 MHz</item>
@@ -136,7 +136,7 @@
         <item>11 – 2462 MHz</item>
         <item>12 – 2467 MHz</item>
         <item>13 – 2472 MHz</item>
-        <!-- <item>14 - 2484 MHz</item> -->
+        <item>14 - 2484 MHz</item>
     </string-array>
     <string-array name="script_values">
         <item></item>
