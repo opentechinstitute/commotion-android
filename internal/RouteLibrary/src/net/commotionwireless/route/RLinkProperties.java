@@ -205,6 +205,25 @@ public class RLinkProperties extends RClass {
 		}
 	}
 
+	public Collection<InetAddress> getDnses() {
+		Method getDnses;
+
+		try {
+			getDnses = mNativeClass.getMethod(GET_DNSES_METHOD_NAME, null);
+			return (Collection<InetAddress>)getDnses.invoke(mNativeObject, null);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
 	private void addRouteNative(RRouteInfo newRoute) {
 		Method addRouteMethod = null;
 		try {
