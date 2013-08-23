@@ -66,12 +66,33 @@ public class LinkPropertiesTest extends TestBase {
 		linkAddress = new RLinkAddress(sevens, 8);
 		route = new RRouteInfo(linkAddress, fives);
 		
-		
 		modifiedLinkProperties.addRoute(route);
 		modifiedLinkProperties.removeRoute(route);
 		
 		assertEquals("Adding/removing the same route does not work as expected.", modifiedLinkProperties, linkProperties);
 	}
 	
+	public void testAddDns() {
+		InetAddress dnsServer= null;
+		RLinkProperties linkProperties;
+		Collection<InetAddress> getDnsServers = null;
 
+		/*
+		 * we add 8.8.4.4 not 8.8.8.8 because
+		 * 8.8.8.8 is added by default with an
+		 * AdHoc configuration on Android.
+		 */
+		try {
+			dnsServer = InetAddress.getByName("8.8.4.4");
+		} catch (UnknownHostException e) {
+			assertFalse("getByName() failed", true);
+		}
+
+		linkProperties = new RLinkProperties(extendedWifiConfiguration.getLinkProperties());
+		linkProperties.addDns(dnsServer);
+
+		getDnsServers = linkProperties.getDnses();
+
+		assertTrue("Adding Dns server does not work.", getDnsServers.contains(dnsServer));
+	}
 }
