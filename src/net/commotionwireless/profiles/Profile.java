@@ -64,6 +64,39 @@ public class Profile {
 		deepCopy(p, true);
 	}
 
+	public boolean deepEquals(Profile p) {
+		boolean isEqual = true;
+		Map<String, ?> comparisonProfile, thisProfile;
+
+		comparisonProfile = p.getSharedPreferences().getAll();
+		thisProfile = getSharedPreferences().getAll();
+
+		/*
+		 * first and foremost, the number of preferences
+		 * must match.
+		 */
+		if (comparisonProfile.size() != thisProfile.size())
+			return false;
+
+		/*
+		 * Now, check the values!
+		 */
+		for (Map.Entry<String, ?> comparisonEntry : comparisonProfile.entrySet()) {
+			if (comparisonEntry.getValue().getClass() == Boolean.class) {
+				if (getBooleanValue(comparisonEntry.getKey()) != (Boolean)comparisonEntry.getValue()) {
+					isEqual = false;
+					break;
+				}
+			} else if (comparisonEntry.getValue().getClass() == String.class) {
+				if (!getStringValue(comparisonEntry.getKey()).equals(comparisonEntry.getValue())) {
+					isEqual = false;
+					break;
+				}
+			}
+		}
+		return isEqual;
+	}
+
 	public void deepCopy(Profile p, boolean overwrite) {
 		SharedPreferences.Editor editor = mSharedPreferences.edit();
 		Map<String, ?> existingProfile = p.getSharedPreferences().getAll();
