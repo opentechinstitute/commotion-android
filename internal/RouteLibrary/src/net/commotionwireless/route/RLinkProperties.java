@@ -107,6 +107,8 @@ public class RLinkProperties extends RClass {
 		Method getInterfaceName, setInterfaceName, getLinkAddresses, addLinkAddress, 
 			addDns, getDnses, setHttpProxy, getHttpProxy;
 		Class LinkAddressClass, ProxyPropertiesClass;
+		Object existingProxyPropertiesNative;
+		RProxyProperties existingProxyProperties;
 		
 		try {
 			LinkAddressClass = Class.forName(RLinkAddress.NATIVE_CLASS_NAME);
@@ -126,7 +128,9 @@ public class RLinkProperties extends RClass {
 			for (Object l : (Collection<Object>)getLinkAddresses.invoke(mNativeObject, null)) addLinkAddress.invoke(newNativeObject, l);
 			for (InetAddress i : (Collection<InetAddress>)getDnses.invoke(mNativeObject,null)) addDns.invoke(newNativeObject, i);
 
-			setHttpProxy.invoke(newNativeObject, (new RProxyProperties((Object)getHttpProxy.invoke(mNativeObject, null))).getNativeObject());
+			existingProxyPropertiesNative = (Object)getHttpProxy.invoke(mNativeObject, null);
+			if (existingProxyPropertiesNative != null)
+				setHttpProxy.invoke(newNativeObject, existingProxyPropertiesNative);
 
 			Log.i("LinkPropertiesR", "mNativeObject: " + mNativeObject.toString());
 			Log.i("LinkPropertiesR", "newNativeObject: " + newNativeObject.toString());
