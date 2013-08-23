@@ -8,7 +8,7 @@
 
     <instrumentation
         android:name="android.test.InstrumentationTestRunner"
-        android:targetPackage="net.commotionwireless.route" />
+        android:targetPackage="net.commotionwireless.meshtether" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
