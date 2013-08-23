@@ -19,6 +19,7 @@ public class Profiles {
 	private static final String DefaultProfileName = "DefaultProfile";
 	private String mActiveProfileName = null;
 	
+	public static final int PROFILE_NOT_FOUND = -1;
 	
 	public Profiles(Context context) {
 		this(context, DefaultProfileName);
@@ -48,7 +49,7 @@ public class Profiles {
 			}
 			counter++;
 		}
-		return 0;
+		return PROFILE_NOT_FOUND;
 	}
 	
 	public String getNewProfileName() {
