@@ -215,14 +215,18 @@ public class Profile {
 		return Integer.bitCount(addressInt);
 	}
 
-	public String getValue(String key) {
+	public String getStringValue(String key) {
 		return mSharedPreferences.getString(key, "");
 	}
-	
+
+	public boolean getBooleanValue(String key) {
+		return mSharedPreferences.getBoolean(key, false);
+	}
+
 	public String[] getKeys() {
 		return (String[])mSharedPreferences.getAll().keySet().toArray();
 	}
-	
+
 	public void setValue(String key, String value) {
 		SharedPreferences.Editor editor = mSharedPreferences.edit();
 		
