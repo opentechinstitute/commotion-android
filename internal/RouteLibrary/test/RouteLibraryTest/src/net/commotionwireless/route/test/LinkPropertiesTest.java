@@ -2,12 +2,22 @@ package net.commotionwireless.route.test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import net.commotionwireless.route.RLinkAddress;
 import net.commotionwireless.route.RLinkProperties;
 import net.commotionwireless.route.RRouteInfo;
+import android.util.Log;
 
 
+/*
+ * There are some ways that the phone must be
+ * set up in order for these tests to work.
+ *
+ * 0) The phone must have the wireless enabled.
+ * 1) The phone must be associated with an AdHoc network.
+ */
 public class LinkPropertiesTest extends TestBase {
 
 	public LinkPropertiesTest() {
