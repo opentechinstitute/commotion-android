@@ -71,6 +71,7 @@ olsrd-build-stamp: $(OLSRD_SOURCE)
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 txtinfo
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 watchdog
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 stdout
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) CFLAGS="-DHAVE_BZERO -DHAVE_BCMP -DHAVE_BCOPY" SERVALD_ROOT=$(EXTERNAL_ROOT)/serval-dna/ SERVALD_LIB_ROOT=$(PROJECT_ROOT)/native/libs/armeabi/ DEBUG=0 mdp
 	touch olsrd-build-stamp
 
 olsrd-clean:
