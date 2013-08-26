@@ -4,9 +4,6 @@
 [submodule "external/busybox"]
 	path = external/busybox
 	url = git://busybox.net/busybox.git
-[submodule "external/olsrd"]
-	path = external/olsrd
-	url = https://github.com/hawkinswnaf/olsrd.git
 [submodule "external/serval-dna"]
 	path = external/serval-dna
 	url = https://github.com/servalproject/serval-dna.git
