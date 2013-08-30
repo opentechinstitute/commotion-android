@@ -1,5 +1,5 @@
 diff --git a/Android.mk b/Android.mk
-index d3fe4a4..0a0c23b 100644
+index d3fe4a4..16afc22 100644
 --- a/Android.mk
 +++ b/Android.mk
 @@ -1,7 +1,7 @@
@@ -22,7 +22,7 @@ index d3fe4a4..0a0c23b 100644
  NACL_INC=$(LOCAL_PATH)/$(NACL_BASE)/../include
  # Find sources
  include $(LOCAL_PATH)/$(NACL_BASE)/nacl.mk
-@@ -39,9 +39,9 @@ include $(BUILD_STATIC_LIBRARY)
+@@ -39,13 +39,14 @@ include $(BUILD_STATIC_LIBRARY)
  # Build libservald.so
  include $(CLEAR_VARS)
  # Find SQLITE3 headers
@@ -34,3 +34,8 @@ index d3fe4a4..0a0c23b 100644
  LOCAL_SRC_FILES:= $(SERVALD_SRC_FILES) $(SERVAL_BASE)version_servald.c
  LOCAL_CFLAGS += $(SERVALD_LOCAL_CFLAGS) -Iserval-dna/nacl/include
  LOCAL_LDLIBS := $(SERVALD_LOCAL_LDLIBS)
+ LOCAL_STATIC_LIBRARIES := $(SERVALD_LOCAL_STATIC_LIBRARIES)
++LOCAL_MODULE_FILENAME:=libservald
+ LOCAL_MODULE:= serval
+ include $(BUILD_SHARED_LIBRARY)
+ 
