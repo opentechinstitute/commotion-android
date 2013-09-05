@@ -72,6 +72,20 @@
             android:name="net.commotionwireless.meshtether.ProfileEditorActivity"
             android:label="ProfileEditorActivity" >
         </activity>
+        <activity
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:icon="@drawable/ic_chooser"
+            android:label="Choose file" >
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".MeshService"
             android:icon="@drawable/comlogo_sm_on"
