@@ -1,18 +1,29 @@
 package net.commotionwireless.meshtether;
 
+import java.io.File;
+
 import net.commotionwireless.profiles.Profile;
 import net.commotionwireless.profiles.Profiles;
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.ipaulpro.afilechooser.FileChooserActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
+
 
 public class ProfileEditorFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener {
+	protected static final int REQUEST_CHOOSER = 1234;
+
 	private String mProfileName = null;
 	private Profiles mProfiles = null;
 	
@@ -26,19 +37,40 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Preference servalpathPreference = null;
 		PreferenceManager mgr = this.getPreferenceManager();
 		Intent resultIntent = new Intent();
-		Intent intent = this.getActivity().getIntent();
-		
+		final Activity thisActivity = getActivity();
+		Intent intent = thisActivity.getIntent();
+
 		mProfileName = intent.getStringExtra("profile_name");
+
 		mgr.setSharedPreferencesName(mProfileName);
 		updateProfileName(mgr, mProfileName);
 		resultIntent.putExtra("profile_name", mProfileName);
-		this.getActivity().setResult(0, resultIntent);
+		thisActivity.setResult(0, resultIntent);
 
 		addPreferencesFromResource(R.xml.preferences);
-	}
 
+		servalpathPreference = findPreference(getString(R.string.mdp_servalpath));
+		servalpathPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference p) {
+				Intent getFileIntent = new Intent(thisActivity, FileChooserActivity.class);
+			    startActivityForResult(getFileIntent, REQUEST_CHOOSER);
+				return true;
+			}
+		});
+	}
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == REQUEST_CHOOSER && resultCode == Activity.RESULT_OK) {
+			final Uri uri = data.getData();
+			File file = FileUtils.getFile(uri);
+			StringPreference filePreference = (StringPreference) findPreference(getString(R.string.mdp_servalpath));
+			filePreference.setText(file.getAbsolutePath());
+		}
+	}
 	@Override
 	public void onResume() {
 		super.onResume();

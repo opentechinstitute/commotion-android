@@ -93,4 +93,16 @@
             android:title="LAN" />
     </PreferenceCategory>
 
+	<PreferenceCategory android:title="Security" >
+        <net.commotionwireless.meshtether.StringPreference
+            android:defaultValue=""
+            android:key="@string/mdp_servalpath"
+            android:singleLine="true"
+            android:title="MDP Serval Path" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="@string/mdp_sid"
+            android:singleLine="true"
+            android:title="MDP SID" />
+    </PreferenceCategory>
 </PreferenceScreen>
