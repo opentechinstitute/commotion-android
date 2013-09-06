@@ -107,8 +107,9 @@
         </receiver>
         <receiver android:name="net.commotionwireless.meshtether.NetworkStateChangeReceiver" >
             <intent-filter>
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
-                <action android:name="net.commotionwireless.meshtether.SELF_START_INTENT"/>
+                <action android:name="android.net.wifi.STATE_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="net.commotionwireless.meshtether.SELF_START_INTENT" />
             </intent-filter>
         </receiver>
         <service android:name="net.commotionwireless.olsrd.OlsrdService" android:label="Olsrd Service"></service>
