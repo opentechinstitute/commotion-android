@@ -94,15 +94,17 @@
     </PreferenceCategory>
 
 	<PreferenceCategory android:title="Security" >
+	    <CheckBoxPreference
+            android:key="@string/use_mdp"
+            android:title="Use MDP" />
         <net.commotionwireless.meshtether.StringPreference
             android:defaultValue=""
             android:key="@string/mdp_servalpath"
             android:singleLine="true"
             android:title="MDP Serval Path" />
-        <EditTextPreference
+        <ListPreference
             android:defaultValue=""
             android:key="@string/mdp_sid"
-            android:singleLine="true"
             android:title="MDP SID" />
     </PreferenceCategory>
 </PreferenceScreen>

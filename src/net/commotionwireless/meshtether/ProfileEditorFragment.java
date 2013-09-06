@@ -4,6 +4,12 @@ import java.io.File;
 
 import net.commotionwireless.profiles.Profile;
 import net.commotionwireless.profiles.Profiles;
+
+import org.servalproject.servald.ServalD;
+import org.servalproject.servald.ServalD.KeyringListResult;
+import org.servalproject.servald.ServalDFailureException;
+import org.servalproject.servald.ServalDInterfaceError;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -11,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceFragment;
@@ -26,6 +33,7 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 
 	private String mProfileName = null;
 	private Profiles mProfiles = null;
+	private KeyringListResult.Entry mSids[] = null;
 	
 	private void updateProfileName(PreferenceManager mgr, String newName) {
 		SharedPreferences.Editor editor = mgr.getSharedPreferences().edit();
@@ -65,10 +73,27 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CHOOSER && resultCode == Activity.RESULT_OK) {
+			int counter = 0;
+			ListPreference sidPreference = null;
+			String sidVisible[] = null, sidValues[] = null;
 			final Uri uri = data.getData();
 			File file = FileUtils.getFile(uri);
 			StringPreference filePreference = (StringPreference) findPreference(getString(R.string.mdp_servalpath));
 			filePreference.setText(file.getAbsolutePath());
+
+			getMdpPeers();
+
+			sidVisible = new String[mSids.length];
+			sidValues = new String[mSids.length];
+			for (KeyringListResult.Entry e : mSids) {
+				sidVisible[counter] = e.subscriberId.abbreviation();
+				sidValues[counter] = e.subscriberId.toString();
+				counter++;
+			}
+
+			sidPreference = (ListPreference)findPreference(getString(R.string.mdp_sid));
+			sidPreference.setEntries(sidVisible);
+			sidPreference.setEntryValues(sidValues);
 		}
 	}
 	@Override
@@ -135,5 +160,19 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			return callingActivityName.substring(1);
 		}
 		return callingActivityName;
+	}
+
+	private synchronized void getMdpPeers() {
+		ServalD.ServalInstancePath = getPreferenceManager().getSharedPreferences().getString(getString(R.string.mdp_servalpath), null);
+		KeyringListResult keyringResult = null;
+
+		try {
+			keyringResult = ServalD.keyringList();
+		} catch (ServalDFailureException e) {
+			return;
+		} catch (ServalDInterfaceError e){
+			return;
+		}
+		mSids = keyringResult.entries;
 	}
 }

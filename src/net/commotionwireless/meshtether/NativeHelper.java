@@ -31,6 +31,8 @@ public class NativeHelper {
 	private static String OLSRD;
 	private static String STOP_OLSRD;
 	private static String DO_STOP_OLSRD;
+	private static String SERVALD;
+
 
 	public static void setup(Context context) {
 		app_bin = context.getDir("bin", Context.MODE_PRIVATE).getAbsoluteFile();
@@ -46,6 +48,8 @@ public class NativeHelper {
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
+		SERVALD = new File(app_bin, "servald").getAbsolutePath();
+
 	}
 
 	public static boolean unzipAssets(Context context) {
@@ -105,6 +109,7 @@ public class NativeHelper {
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(STOP_OLSRD));
 		chmod("0750", new File(DO_STOP_OLSRD));
+		chmod("0750", new File(SERVALD));
 
 		return result;
 	}

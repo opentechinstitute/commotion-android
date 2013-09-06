@@ -105,6 +105,7 @@
     <string name="lan_wext">lan_wext</string>
     <string name="lan_script">lan_script</string>
     <string name="adhoc_dns_server">adhoc_dns_server</string>
+    <string name="use_mdp">use_mdp</string>
     <string name="mdp_servalpath">mdp_servalpath</string>
     <string name="mdp_sid">mdp_sid</string>
 
