@@ -24,7 +24,9 @@ project (i.e. /path/to/commotion-android):
  git submodule update
  make -C external/
  cd external/serval-dna/
- patch -p1 < ../Android.mk.serval-dna.patch
+ patch -p1 < ../../patches/Android.mk.serval-dna.patch
+ patch -p1 < ../../patches/commandline.c.serval-dna.patch
+ patch -p1 < ../../patches/servalwrap.c.serval-dna.patch
  cd -
  ndk-build
  

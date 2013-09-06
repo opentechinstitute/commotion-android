@@ -1,0 +1,21 @@
+diff --git a/servalwrap.c b/servalwrap.c
+index d780e30..2fe3490 100644
+--- a/servalwrap.c
++++ b/servalwrap.c
+@@ -24,13 +24,13 @@ struct context;
+ 
+ int main(int argc,char **argv)
+ {
+- void *h = dlopen("/data/data/org.servalproject/lib/libserval.so",RTLD_LAZY);
++ void *h = dlopen("/data/data/net.commotionwireless.meshtether/app_bin/libservald.so",RTLD_LAZY);
+  if (!h)
+-   return fprintf(stderr, "Failed to load libserval.so");
++   return fprintf(stderr, "Failed to load libservald.so");
+ 
+  int (*servalmain)(struct context *,const char *, int, const char *const *) = dlsym(h,"parseCommandLine");
+  if (!servalmain) 
+-   return fprintf(stderr,"Could not load libserval.so\n");
++   return fprintf(stderr,"Could not load libservald.so\n");
+ 
+  return (*servalmain)(NULL, argv[0], argc - 1, (const char*const*)&argv[1]);
+ }
