@@ -148,8 +148,10 @@ public class LinksActivity extends android.app.ListActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mOlsrInfoThread.interrupt();
-		mOlsrInfoThread = null;
+		if (mOlsrInfoThread != null) {
+			mOlsrInfoThread.interrupt();
+			mOlsrInfoThread = null;
+		}
 		app.setLinksActivity(null);
 	}
 
