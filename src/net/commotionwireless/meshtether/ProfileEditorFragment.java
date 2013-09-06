@@ -33,7 +33,6 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 
 	private String mProfileName = null;
 	private Profiles mProfiles = null;
-	private KeyringListResult.Entry mSids[] = null;
 	
 	private void updateProfileName(PreferenceManager mgr, String newName) {
 		SharedPreferences.Editor editor = mgr.getSharedPreferences().edit();
@@ -73,27 +72,12 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == REQUEST_CHOOSER && resultCode == Activity.RESULT_OK) {
-			int counter = 0;
-			ListPreference sidPreference = null;
-			String sidVisible[] = null, sidValues[] = null;
 			final Uri uri = data.getData();
 			File file = FileUtils.getFile(uri);
 			StringPreference filePreference = (StringPreference) findPreference(getString(R.string.mdp_servalpath));
 			filePreference.setText(file.getAbsolutePath());
 
 			getMdpPeers();
-
-			sidVisible = new String[mSids.length];
-			sidValues = new String[mSids.length];
-			for (KeyringListResult.Entry e : mSids) {
-				sidVisible[counter] = e.subscriberId.abbreviation();
-				sidValues[counter] = e.subscriberId.toString();
-				counter++;
-			}
-
-			sidPreference = (ListPreference)findPreference(getString(R.string.mdp_sid));
-			sidPreference.setEntries(sidVisible);
-			sidPreference.setEntryValues(sidValues);
 		}
 	}
 	@Override
@@ -102,6 +86,8 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 		PreferenceManager mgr = this.getPreferenceManager();
 		mProfiles = new Profiles(this.getActivity());
 		mgr.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+		getMdpPeers();
+
 	}
 	@Override
 	public void onPause() {
@@ -165,14 +151,37 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 	private synchronized void getMdpPeers() {
 		ServalD.ServalInstancePath = getPreferenceManager().getSharedPreferences().getString(getString(R.string.mdp_servalpath), null);
 		KeyringListResult keyringResult = null;
+		int counter = 0;
+		ListPreference sidPreference = (ListPreference)findPreference(getString(R.string.mdp_sid));
+
+		String sidVisibles[] = null, sidValues[] = null;
+		KeyringListResult.Entry sids[] = null;
 
 		try {
 			keyringResult = ServalD.keyringList();
 		} catch (ServalDFailureException e) {
+			sidPreference.setEnabled(false);
 			return;
 		} catch (ServalDInterfaceError e){
+			sidPreference.setEnabled(false);
 			return;
 		}
-		mSids = keyringResult.entries;
+		sids = keyringResult.entries;
+
+		if (sids == null) {
+			sidPreference.setEnabled(false);
+			return;
+		}
+		sidVisibles = new String[sids.length];
+		sidValues = new String[sids.length];
+		for (KeyringListResult.Entry e : sids) {
+			sidVisibles[counter] = e.subscriberId.abbreviation();
+			sidValues[counter] = e.subscriberId.toString();
+			counter++;
+		}
+
+		sidPreference.setEnabled(true);
+		sidPreference.setEntries(sidVisibles);
+		sidPreference.setEntryValues(sidValues);
 	}
 }
