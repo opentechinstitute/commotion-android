@@ -147,10 +147,18 @@ public class Util {
 	}
 	
 	public static ArrayList<String> getSystemEnvironment() {
+		boolean didSetLdLibraryPath = false;
 		ArrayList<String> environment = new ArrayList<String>();
 		Map<String, String> env = System.getenv();
 		for (Map.Entry<String,String> entry : env.entrySet())
-			environment.add(entry.getKey() + "=" + entry.getValue());
+			if (entry.getKey().equalsIgnoreCase("LD_LIBRARY_PATH")) {
+				didSetLdLibraryPath = true;
+				environment.add(entry.getKey() + "=" + "/data/data/net.commotionwireless.meshtether/app_bin/:" + entry.getValue());
+			} else {
+				environment.add(entry.getKey() + "=" + entry.getValue());
+			}
+		if (!didSetLdLibraryPath)
+			environment.add("LD_LIBRARY_PATH=/data/data/net.commotionwireless.meshtether/app_bin/");
 		return environment;
 	}
 }

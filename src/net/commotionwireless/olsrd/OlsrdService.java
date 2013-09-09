@@ -1,4 +1,7 @@
 package net.commotionwireless.olsrd;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -8,6 +11,7 @@ import net.commotionwireless.meshtether.MeshTetherApp;
 import net.commotionwireless.meshtether.MeshTetherProcess;
 import net.commotionwireless.meshtether.NativeHelper;
 import net.commotionwireless.meshtether.NetworkStateChangeReceiver;
+import net.commotionwireless.meshtether.R;
 import net.commotionwireless.meshtether.Util;
 import net.commotionwireless.profiles.NoMatchingProfileException;
 import net.commotionwireless.profiles.Profile;
@@ -118,7 +122,7 @@ public class OlsrdService extends Service {
 		MeshTetherProcess mProcess;
 		
 		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
-		final String mOlsrdConfFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
+		final String mOlsrdConfBaseFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
 		final String mOlsrdStopPath = NativeHelper.app_bin.getAbsolutePath() + "/stop_olsrd";
 		final String mOlsrdStartPath = NativeHelper.app_bin.getAbsolutePath() + "/run_olsrd";
 		final String mOlsrdEnvironmentVariablePrefix = "brncl_";
@@ -137,10 +141,43 @@ public class OlsrdService extends Service {
 		public void start() {
 			ArrayList<String> profileEnvironment, systemEnvironment, combinedEnvironment;
 			Profile p = new Profile(mProfileName, mContext);
+			String olsrdConfFilePath = null;
+			DotConf dotConf = null;
+			File dotConfFile = null;
+			FileOutputStream dotConfFileStream = null;
+
+			/*
+			 * Generate the conf file!
+			 */
+			try {
+				 dotConf = new DotConf(mOlsrdConfBaseFilePath);
+			} catch (IOException e) {
+				Log.e("OlsrdControl", "Cannot open base olsrd.conf: " + e.toString());
+				return;
+			}
+			if (p.getBooleanValue(mContext.getString(R.string.use_mdp))) {
+				Log.i("OlsrdControl", "Using MDP");
+				DotConf.PluginStanza mdpStanza = new DotConf.PluginStanza("/data/data/net.commotionwireless.meshtether/app_bin/olsrd_mdp.so.0.1");
+				mdpStanza.addKeyValue("sid", p.getStringValue(mContext.getString(R.string.mdp_sid)));
+				mdpStanza.addKeyValue("servalpath", p.getStringValue(mContext.getString(R.string.mdp_servalpath)));
+				dotConf.addStanza(mdpStanza);
+			}
+			try {
+				dotConfFileStream = mContext.openFileOutput("olsrd.conf", 0);
+				dotConfFile = mContext.getFileStreamPath("olsrd.conf");
+				dotConf.write(dotConfFileStream);
+				dotConfFileStream.close();
+			} catch (FileNotFoundException e) {
+				Log.e("OlsrdControl", "Cannot open temp olsrd.conf: " + e.toString());
+				return;
+			} catch (IOException e) {
+				Log.e("OlsrdControl", "Cannot open temp olsrd.conf: " + e.toString());
+				return;
+			}
 			
 			profileEnvironment = p.toEnvironment(mOlsrdEnvironmentVariablePrefix);
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
-			profileEnvironment.add("olsrd_conf_path=" + mOlsrdConfFilePath);
+			profileEnvironment.add("olsrd_conf_path=" + dotConfFile);
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
 			systemEnvironment = Util.getSystemEnvironment();
 			
