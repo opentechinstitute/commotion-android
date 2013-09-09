@@ -86,7 +86,7 @@ public class DotConf {
 		public PluginStanza(String pluginPath) {
 			super();
 			mDirective = "LoadPlugin";
-			mDirectiveParameter = pluginPath;
+			mDirectiveParameter = "\"" + pluginPath + "\"";
 		}
 		@Override
 		public String toString() {
