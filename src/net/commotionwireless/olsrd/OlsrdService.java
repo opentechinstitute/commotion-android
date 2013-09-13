@@ -62,7 +62,7 @@ public class OlsrdService extends Service {
 			String cmdParts[] = null;
 			cmd = msg.obj.toString();
 			cmdParts = cmd.split(" ");
-			if (cmdParts.length == 4) {
+			if (cmdParts.length == 4 && (cmdParts[0].equalsIgnoreCase("ADD") || cmdParts[0].equalsIgnoreCase("DEL"))) {
 				RRouteInfo route;
 				RLinkProperties linkProperties;
 
