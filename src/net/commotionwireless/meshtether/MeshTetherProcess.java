@@ -22,6 +22,93 @@ public class MeshTetherProcess {
 	private File mDirectory;
 	private int mExitValue;
 
+	public static class ProcessReader {
+		private final InputStream mIs;
+		private int mBufferSize = 80;
+		private byte mBuffer[] = null;
+		private int mBufferOffset = 0;
+		private String mHold = new String("");
+		private boolean mErrorCondition;
+
+		public ProcessReader(InputStream is, int bufferLen) {
+			mIs = is;
+			mBufferSize = bufferLen;
+			mBuffer = new byte[mBufferSize];
+			mBufferOffset = 0;
+			bufferLen = 0;
+			mErrorCondition = false;
+		}
+
+		public ProcessReader(InputStream is) {
+			this(is, 80);
+		}
+
+		private String extractToEndOfLine() {
+			int endOfLine = 0;
+			if ((endOfLine = (new String(mBuffer, 0, mBufferOffset)).indexOf('\n')) != -1) {
+				return extractSubstring(0, endOfLine + 1);
+			}
+			return null;
+		}
+
+		private String extractSubstring(int beginning, int length) {
+			String substring;
+			byte tBuffer[] = new byte[mBufferSize];
+
+			System.arraycopy(mBuffer, beginning + length, tBuffer, 0, mBufferSize - (beginning + length));
+			substring = new String(mBuffer, beginning, length);
+			mBuffer = tBuffer;
+			mBufferOffset -= (beginning + length);
+
+			return substring;
+		}
+
+		private String cleanupExcess() {
+			String line = null;
+			/*
+			 * Grab what's left in the buffer.
+			 */
+			line = mHold = mHold + extractSubstring(0, mBufferOffset);
+			if (mHold.length() == 0) return null;
+			mHold = null;
+			return line;
+		}
+
+		public String readLine() {
+			if (mErrorCondition) return null;
+			do {
+				try {
+					int justRead = 0;
+					String lineInBuffer = null;
+
+					/*
+					 * See if there is a line already in the input!
+					 */
+					if ((lineInBuffer = extractToEndOfLine()) != null) {
+						String line = mHold + lineInBuffer;
+						mHold = new String("");
+						return line;
+					}
+
+					if ((justRead = mIs.read(mBuffer, mBufferOffset, mBufferSize - mBufferOffset)) <= 0) {
+						return cleanupExcess();
+					}
+					mBufferOffset += justRead;
+
+					/*
+					 * See if this read fills out our buffer!
+					 */
+					if (mBufferOffset == mBufferSize) {
+						mHold = mHold + extractSubstring(0, mBufferOffset);
+					}
+				} catch (IOException e) {
+					mErrorCondition = true;
+					return cleanupExcess();
+				}
+			} while (true);
+		}
+	}
+
 	public MeshTetherProcess(String prog, String[] envp, File directory) {
 		mProg = prog;
 		mEnvp = envp;
@@ -90,10 +177,14 @@ public class MeshTetherProcess {
 	/** Worker Threads */
 	private class OutputMonitor implements Runnable {
 		private final BufferedReader mBr;
+		private final InputStream mIs;
 		private Handler mHandler;
+		private MeshTetherProcess.ProcessReader mPr;
 		public OutputMonitor(Handler handler, int t, InputStream is) {
-			mBr = new BufferedReader(new InputStreamReader(is), 8192);
+			mIs = is;
+			mBr = new BufferedReader(new InputStreamReader(is), 160);
 			mHandler = handler;
+			mPr = new ProcessReader(is);
 		}
 		@Override
 		public void run() {
@@ -101,12 +192,12 @@ public class MeshTetherProcess {
 				String line;
 				Message msg;
 				do {
-					line = mBr.readLine();
+					line = mPr.readLine();
 					if (mHandler != null) {
 						msg = mHandler.obtainMessage(0, new String(line));
 						mHandler.dispatchMessage(msg);
 					}
-				} while(line != null);
+				} while (line != null);
 			} catch (Exception e) {
 				/*
 				 * don't worry too much.
