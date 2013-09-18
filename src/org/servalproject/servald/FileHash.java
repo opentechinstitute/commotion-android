@@ -21,7 +21,7 @@
 package org.servalproject.servald;
 
 import java.nio.ByteBuffer;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class FileHash extends AbstractId {
 
@@ -46,7 +46,7 @@ public class FileHash extends AbstractId {
 
 	// get a random sid, purely for testing purposes
 	public static FileHash randomFileHash() {
-		Random r = new Random();
+		SecureRandom r = new SecureRandom();
 		byte buff[] = new byte[BINARY_SIZE];
 		r.nextBytes(buff);
 		try {

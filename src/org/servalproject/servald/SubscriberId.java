@@ -21,7 +21,7 @@
 package org.servalproject.servald;
 
 import java.nio.ByteBuffer;
-import java.util.Random;
+import java.security.SecureRandom;
 
 public class SubscriberId extends AbstractId {
 
@@ -51,7 +51,7 @@ public class SubscriberId extends AbstractId {
 
 	// get a random sid, purely for testing purposes
 	public static SubscriberId randomSid() {
-		Random r = new Random();
+		SecureRandom r = new SecureRandom();
 		byte buff[] = new byte[BINARY_SIZE];
 		r.nextBytes(buff);
 		try {
