@@ -74,7 +74,6 @@
         </activity>
         <activity
             android:name="com.ipaulpro.afilechooser.FileChooserActivity"
-            android:icon="@drawable/ic_chooser"
             android:label="Choose file" >
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
