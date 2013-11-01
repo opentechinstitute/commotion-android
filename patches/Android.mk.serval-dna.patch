@@ -8,7 +8,7 @@ index d3fe4a4..b9a3dff 100644
 -SERVAL_BASE=serval-dna/
 -include jni/serval-dna/sourcefiles.mk
 +LOCAL_PATH:= $(call my-dir)
-+SERVAL_BASE=/
++SERVAL_BASE=
 +include external/serval-dna/sourcefiles.mk
  SERVALD_SRC_FILES = $(SERVAL_SOURCES) $(ANDROIDONLY_SOURCES)
  
