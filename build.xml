@@ -67,12 +67,36 @@
             -pre-clean
     -->
     <target name="-pre-build">
+     	<exec executable="./patchup-serval-dna.sh" failonerror="true">
+	      <arg value="clean"/>
+	</exec>
+     	<exec executable="./patchup-serval-dna.sh" failonerror="true"/>
+    	<exec executable="${ndk.dir}/ndk-build" failonerror="true"/>
+    	<exec executable="make" failonerror="true">
+	      <arg value="-C"/>
+	      <arg value="external/"/>
+	      <arg value="SDK_BASE=${sdk.dir}"/>
+	      <arg value="NDK_BASE=${ndk.dir}"/>
+	</exec>
+
     	<copy file="local.properties-afilechooser.xml"
 	      tofile="external/aFileChooser/aFileChooser/local.properties" />
     	<copy file="build-afilechooser.xml"
 	      tofile="external/aFileChooser/aFileChooser/build.xml" />
     </target>
      <target name="-pre-clean">
+     	<exec executable="./patchup-serval-dna.sh" failonerror="true">
+	      <arg value="clean"/>
+	</exec>
+     	<exec executable="./patchup-serval-dna.sh" failonerror="true"/>
+    	<exec executable="${ndk.dir}/ndk-build" failonerror="true">
+	      <arg value="clean"/>
+	</exec>
+    	<exec executable="make" failonerror="true">
+	      <arg value="-C"/>
+	      <arg value="external/"/>
+	      <arg value="clean"/>
+	</exec>
     	<copy file="local.properties-afilechooser.xml"
 	      tofile="external/aFileChooser/aFileChooser/local.properties" />
     	<copy file="build-afilechooser.xml"
