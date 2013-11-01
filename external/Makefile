@@ -7,12 +7,13 @@ ASSETS = $(PROJECT_ROOT)/assets
 # Android NDK setup
 SDK_BASE ?= /opt/android-sdk
 NDK_BASE ?=  /opt/android-ndk
+TOOLCHAIN_ARCHITECTURE ?= x86
 NDK_PLATFORM_LEVEL ?= 9
 SDK_PLATFORM_LEVEL ?= 4.2.2
 NDK_SYSROOT=$(NDK_BASE)/platforms/android-$(NDK_PLATFORM_LEVEL)/arch-arm
 SDK_PLATFORM=$(SDK_BASE)/platforms/android-$(SDK_PLATFORM_LEVEL)/
 NDK_UNAME := $(shell uname -s | tr '[A-Z]' '[a-z]')
-NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-x86
+NDK_TOOLCHAIN=$(NDK_BASE)/toolchains/arm-linux-androideabi-4.4.3/prebuilt/$(NDK_UNAME)-$(TOOLCHAIN_ARCHITECTURE)
 
 # to use the real HOST tag, you need the latest libtool files:
 # http://stackoverflow.com/questions/4594736/configure-does-not-recognize-androideabi
@@ -57,21 +58,21 @@ OLSRD_SOURCE := $(wildcard olsrd/[*/*.[ch]) \
 olsrd: olsrd-build-stamp
 
 olsrd-build-stamp: $(OLSRD_SOURCE)
-	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 NDK_BASE=$(NDK_BASE) DEBUG=0 all
+	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 all
 # build only the plugins we are likely to use to keep the build stable
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 arprefresh
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 bmf
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 dot_draw
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 dyn_gw_plain
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 httpinfo
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 jsoninfo
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 nameservice
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 pgraph
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 secure
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 txtinfo
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 watchdog
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) DEBUG=0 stdout
-	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) CFLAGS="-DHAVE_BZERO -DHAVE_BCMP -DHAVE_BCOPY" SERVALD_ROOT=$(EXTERNAL_ROOT)/serval-dna/ SERVALD_LIB_ROOT=$(PROJECT_ROOT)/native/libs/armeabi/ DEBUG=0 mdp
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 arprefresh
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 bmf
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 dot_draw
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 dyn_gw_plain
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 httpinfo
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 jsoninfo
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 nameservice
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 pgraph
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 secure
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 txtinfo
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 watchdog
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 stdout
+	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) CFLAGS="-DHAVE_BZERO -DHAVE_BCMP -DHAVE_BCOPY" SERVALD_ROOT=$(EXTERNAL_ROOT)/serval-dna/ SERVALD_LIB_ROOT=$(PROJECT_ROOT)/native/libs/armeabi/ DEBUG=0 mdp
 	touch olsrd-build-stamp
 
 olsrd-clean:
