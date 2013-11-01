@@ -10,6 +10,3 @@
 [submodule "external/aFileChooser"]
 	path = external/aFileChooser
 	url = https://github.com/opentechinstitute/aFileChooser.git
-[submodule "external/olsrd"]
-	path = external/olsrd
-	url = https://github.com/hawkinswnaf/olsrd.git
