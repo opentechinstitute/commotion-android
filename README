@@ -23,11 +23,7 @@ project (i.e. /path/to/commotion-android):
  git submodule init
  git submodule update
  make -C external/
- cd external/serval-dna/
- patch -p1 < ../../patches/Android.mk.serval-dna.patch
- patch -p1 < ../../patches/commandline.c.serval-dna.patch
- patch -p1 < ../../patches/servalwrap.c.serval-dna.patch
- cd -
+ ./patchup-serval-dna.sh 
  ndk-build
  
 To build the Android app, import the existing project into Eclipse and export 
