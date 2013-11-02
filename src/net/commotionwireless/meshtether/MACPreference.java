@@ -20,8 +20,10 @@ package net.commotionwireless.meshtether;
 
 import android.content.Context;
 import android.preference.EditTextPreference;
-import android.text.method.DigitsKeyListener;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -34,9 +36,28 @@ public class MACPreference extends EditTextPreference {
 	public MACPreference(Context context, AttributeSet attrs) { super(context, attrs); }
 	public MACPreference(Context context) { super(context); }
 
+	class MACInputFilter implements InputFilter {
+
+		@Override
+		public CharSequence filter(CharSequence source, int start, int end,
+				Spanned dest, int dstart, int dend) {
+			String newSource = new String();
+			/*
+			 * Allow only characters found in a valid MAC address.
+			 */
+			String acceptableCharacters = new String("ABCDEFabcdef1234567890:");
+			int i = 0;
+			for (i = start; i<end; i++) {
+				if ( acceptableCharacters.indexOf(source.charAt(i)) != -1) {
+					newSource = newSource + source.charAt(i);
+				}
+			}
+			return newSource;
+		}
+	}
 	@Override
 	protected void onAddEditTextToDialogView(View dialogView, EditText editText) {
-		editText.setKeyListener(DigitsKeyListener.getInstance("0123456789ABCDEFabcdef:-."));
+		editText.setFilters(new InputFilter[]{new MACInputFilter()});
 		super.onAddEditTextToDialogView(dialogView, editText);
 	}
 

@@ -36,6 +36,7 @@
             android:hint="@string/bssid_hint"
             android:key="@string/lan_bssid"
             android:singleLine="true"
+            android:inputType="text|textNoSuggestions"
             android:title="@string/bssid" />
 
         <ListPreference
