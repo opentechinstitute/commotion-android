@@ -4,7 +4,9 @@ PROJECT_ROOT = $(CWD)/..
 EXTERNAL_ROOT = $(PROJECT_ROOT)/external
 ASSETS = $(PROJECT_ROOT)/assets
 
-# Android NDK setup
+# Read README in base directory for information
+# about each of these variables and how to
+# customize them.
 SDK_BASE ?= /opt/android-sdk
 NDK_BASE ?=  /opt/android-ndk
 TOOLCHAIN_ARCHITECTURE ?= x86

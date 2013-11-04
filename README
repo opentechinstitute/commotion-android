@@ -16,17 +16,63 @@ Prerequisites:
 1) Android NDK r4 or above
 2) Eclipse and ADT plugin
 3) sudo apt-get install bison flex make sed junit4
- 
+
+By hand + Eclipse
+------------
 To build native components, run these commands in the root directory of this
 project (i.e. /path/to/commotion-android):
 
  git submodule init
  git submodule update
- make -C external/
  ./patchup-serval-dna.sh 
  ndk-build
+
+The last command depends upon the location of your Android SDK and NDK.
+There are reasonable defaults in the Makefile, but you will probably
+want to configure it. You can override the defaults  by specifying
+the paths on the command line using the following variables:
+SDK_BASE
+The path to the Android SDK on your system. The default is /opt/android-sdk/.
+NDK_BASE
+The path to the Android NDK on your system. The default is /opt/android-ndk/.
+TOOLCHAIN_ARCHITECTURE
+The architecture of the Android NDK. The default is x86. If you are building
+with a 64-bit version of the NDK, you should specificy x86-64 for this.
+SDK_PLATFORM_LEVEL
+The platform level of the SDK. The default is 4.2.2.
+NDK_PLATFORM_LEVEL
+The platform level of the NDK. The default is 9.
+
+ make -C external/ SDK_BASE=/path/to/sdk NDK_BASE=/path/to/ndk TOOLCHAIN_ARCHITECTURE=x86 SDK_PLATFORM_LEVEL=4.2.2 NDK_PLATFORM_LEVEL=9
  
 To build the Android app, import the existing project into Eclipse and export 
 an .apk file.  If you ran the NDK build after already having the project in
 Eclipse, you'll need to refresh the project for Eclipse to see the new files.
 To do that, right-click on the project, and select "Refresh".
+
+With Ant
+------------
+To build with ant, you will (obviously) need to install ant. When invoking
+ant, you can (and should) specify the following variables:
+
+sdk.dir
+The path to the Android SDK on your system. There is no default for this. If
+you do not specify this on the command line, ant will attempt to derive it
+from the local.properties or ant.properties file. The build will not start
+without this variable.
+ndk.dir
+The path to the Android NDK on your system. There is no default for this. If
+you do not specify this on the command line the build will not start.
+toolchain_architecture
+The architecture of the NDK toolchain. The default is x86. If you are
+building on a 64-bit machine, set this to x86-64.
+
+If you need to specify anything more than that, you will have to use the
+method described above to customize the build.
+
+Once you have set your variable appropriately, simply build for the debug
+target:
+
+ ant debug
+
+The output will be in the bin/ directory.

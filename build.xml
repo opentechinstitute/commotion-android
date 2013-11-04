@@ -36,6 +36,11 @@
     <condition property="sdk.dir" value="${env.ANDROID_HOME}">
         <isset property="env.ANDROID_HOME" />
     </condition>
+    <condition property="toolchain_architecture" value="x86">
+        <not>
+            <isset property="toolchain_architecture" />
+	</not>
+    </condition>
 
     <!-- The project.properties file is created and updated by the 'android'
          tool, as well as ADT.
@@ -52,6 +57,11 @@
     <fail
             message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through the ANDROID_HOME environment variable."
             unless="sdk.dir"
+    />
+    <!-- quick check on ndk.dir -->
+    <fail
+            message="ndk.dir is missing. Please set it on the command line or in local.properties."
+            unless="ndk.dir"
     />
 
     <!--
