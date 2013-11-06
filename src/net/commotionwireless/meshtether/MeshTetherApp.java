@@ -114,7 +114,7 @@ public class MeshTetherApp extends android.app.Application {
 		notificationClientAdded = new Notification(android.R.drawable.stat_sys_warning,
 				getString(R.string.notify_client), 0);
 		notificationClientAdded.flags = Notification.FLAG_AUTO_CANCEL;
-		notificationError = new Notification(R.drawable.barnacle_error,
+		notificationError = new Notification(R.drawable.comlogo_error,
 				getString(R.string.notify_error), 0);
 		notificationError.setLatestEventInfo(this,
 				getString(R.string.app_name),
@@ -209,6 +209,9 @@ public class MeshTetherApp extends android.app.Application {
 			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 			notificationClientAdded.setLatestEventInfo(this, getString(R.string.app_name),
 					getString(R.string.notify_client) + " " + cd.toString(), contentIntent);
+			/*
+			 * Veracode thinks that we need permission to make this call.
+			 */
 			notificationManager.notify(NOTIFY_CLIENT, notificationClientAdded);
 		}
 
@@ -233,6 +236,9 @@ public class MeshTetherApp extends android.app.Application {
 		}
 		if ((statusActivity == null) || !statusActivity.hasWindowFocus()) {
 			Log.d(TAG, "notifying error");
+			/*
+			 * Veracode thinks that we need permission to make this call.
+			 */
 			notificationManager.notify(NOTIFY_ERROR, notificationError);
 		}
 	}
