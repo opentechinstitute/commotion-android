@@ -7,7 +7,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
-import junit.framework.Assert;
 import net.commotionwireless.route.EWifiConfiguration;
 import net.commotionwireless.route.EWifiConfiguration.IpAssignmentType;
 import net.commotionwireless.route.RLinkAddress;
@@ -133,9 +132,13 @@ public class Profile {
 					value = "1";
 				else
 					value = "0";
-			else 
+			else {
 				value = (String)entry.getValue();
-			environment.add(keyPrefix + entry.getKey() + "=" + value);
+				if (value.equalsIgnoreCase("")) {
+					value = null;
+				}
+			}
+			if (value != null) environment.add(keyPrefix + entry.getKey() + "=" + value);
 		}
 		return environment;
 	}
