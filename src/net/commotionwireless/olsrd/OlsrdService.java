@@ -299,10 +299,12 @@ public class OlsrdService extends Service {
         
         if (intent != null) {
         	String optionalProfileName = intent.getStringExtra("profile_name");
+        	String fallbackInterfaceName = intent.getStringExtra("interface_name");
         	if (optionalProfileName != null) {
         		try {
         			Profile p = new Profile(optionalProfileName, this.getApplicationContext(), true);
         			mOlsrdControl.setProfileName(optionalProfileName);
+        			mOlsrdControl.setFallbackInterfaceName(fallbackInterfaceName);
             		Log.i("OlsrdService", "Intent has optional profile: " + p.toString());
         		} catch (NoMatchingProfileException e) {
         			/*
