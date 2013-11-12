@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Map;
 
+import net.commotionwireless.meshtether.Util;
 import net.commotionwireless.route.EWifiConfiguration;
 import net.commotionwireless.route.EWifiConfiguration.IpAssignmentType;
 import net.commotionwireless.route.RLinkAddress;
@@ -165,7 +166,12 @@ public class Profile {
 			/*
 			 * do the stuff that might fail first.
 			 */
-			linkAddressAddress = InetAddress.getByName(mSharedPreferences.getString("adhoc_ip", "5.5.5.5"));
+			String linkAddressFromProfile = mSharedPreferences.getString("adhoc_ip", "");
+			if (linkAddressFromProfile.equalsIgnoreCase("")) {
+				linkAddressFromProfile = Util.generateMeshAddress();
+			}
+
+			linkAddressAddress = InetAddress.getByName(linkAddressFromProfile);
 			linkAddressNetmask = InetAddress.getByName(mSharedPreferences.getString("adhoc_netmask", "255.0.0.0"));
 			dnsAddress = InetAddress.getByName(mSharedPreferences.getString("adhoc_dns_server", "8.8.8.8"));
 

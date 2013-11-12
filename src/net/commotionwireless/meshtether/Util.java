@@ -38,6 +38,15 @@ public class Util {
 		}
 	}
 
+	public static String generateMeshAddress() {
+		String myIP = "10." + String.valueOf((int)(Math.random() * 254))
+				+ "." + String.valueOf((int)(Math.random() * 254))
+				+ "." + String.valueOf((int)(Math.random() * 254));
+
+		Log.i("Util.generateMeshAddress", "Generated IP: " + myIP);
+
+		return myIP;
+	}
 	public static class MACAddress {
 		public final static int LENGTH = 6;
 		public final byte[] value = new byte[LENGTH];
