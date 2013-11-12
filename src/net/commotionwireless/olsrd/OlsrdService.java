@@ -120,6 +120,7 @@ public class OlsrdService extends Service {
 		String mProfileName;
 		Context mContext;
 		MeshTetherProcess mProcess;
+		String mFallbackInterfaceName;
 		
 		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
 		final String mOlsrdConfBaseFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
@@ -174,8 +175,10 @@ public class OlsrdService extends Service {
 				Log.e("OlsrdControl", "Cannot open temp olsrd.conf: " + e.toString());
 				return;
 			}
-			
 			profileEnvironment = p.toEnvironment(mOlsrdEnvironmentVariablePrefix);
+			if (p.getStringValue("if_lan").equalsIgnoreCase("") && mFallbackInterfaceName != null) {
+				profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "if_lan=" + mFallbackInterfaceName);
+			}
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
 			profileEnvironment.add("olsrd_conf_path=" + dotConfFile);
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
@@ -245,7 +248,15 @@ public class OlsrdService extends Service {
 		public String getProfileName() {
 			return mProfileName;
 		}
-		
+
+		public void setFallbackInterfaceName(String fallbackInterfaceName) {
+			mFallbackInterfaceName = fallbackInterfaceName;
+		}
+
+		public String getFallbackInterfaceName() {
+			return mFallbackInterfaceName;
+		}
+
 		public void transition(int message) {
 			
 			if (!(message>=OLSRDSERVICE_MESSAGE_MIN && message<=OLSRDSERVICE_MESSAGE_MAX)) {
