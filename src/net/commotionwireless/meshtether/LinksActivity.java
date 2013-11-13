@@ -176,11 +176,7 @@ public class LinksActivity extends android.app.ListActivity {
 	}
 
 	public void update() {
-		/*
-		 * FIXME
-		 */
 		adapter.notifyDataSetChanged();
-
 	}
 
 
@@ -188,13 +184,10 @@ public class LinksActivity extends android.app.ListActivity {
 
 		@Override
 		public void run() {
-			ArrayList<ClientData> clientsToAdd = new ArrayList<ClientData>();
 			try {
 				Log.i("LinksActivity", "Starting OlsrdInfoThread()");
 				while(!Thread.interrupted()) {
-					/*
-					 * FIXME
-					 */
+					ArrayList<ClientData> clientsToAdd = new ArrayList<ClientData>();
 
 					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
 					for (Link l : dump.links) {
@@ -216,6 +209,7 @@ public class LinksActivity extends android.app.ListActivity {
 							for (ClientData cd : updateList) {
 								clientAdded(cd);
 							}
+							updateList.clear();
 						}
 					});
 					while (mPauseOlsrInfoThread)
@@ -226,23 +220,29 @@ public class LinksActivity extends android.app.ListActivity {
 				// fall through
 			}
 			Log.i("LinksActivity", "Stopping OlsrdInfoThread()");
+			clients.clear();
+			mHandler.post(new Runnable() {
+				public void run() {
+					update();
+				}
+			});
 		}
 	}
 
 	private void clientAdded(ClientData cd) {
 
-		for (int i = 0; i < clients.size(); ++i) {
-			ClientData c = clients.get(i);
-			if (c.remoteIP.equals(cd.remoteIP)) {
-				if (c.hasRouteToOther == cd.hasRouteToOther
-						&& c.hasDefaultRoute == cd.hasDefaultRoute
-						&& c.linkQuality == cd.linkQuality
-						&& c.neighborLinkQuality == cd.neighborLinkQuality) {
-					return; // no change
-				}
-				clients.remove(i); // we'll add it at the end
-				break;
+		if (clients.contains(cd)) {
+			ClientData c = clients.get(clients.indexOf(cd));
+			if (c.hasRouteToOther == cd.hasRouteToOther
+					&& c.hasDefaultRoute == cd.hasDefaultRoute
+					&& c.linkQuality == cd.linkQuality
+					&& c.neighborLinkQuality == cd.neighborLinkQuality) {
+				return; // no change
 			}
+			clients.remove(c);
+			clients.add(cd);
+			update();
+			return;
 		}
 		clients.add(cd);
 		app.clientAdded(cd);
