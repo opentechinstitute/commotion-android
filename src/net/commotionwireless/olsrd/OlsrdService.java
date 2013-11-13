@@ -15,6 +15,7 @@ import net.commotionwireless.meshtether.R;
 import net.commotionwireless.meshtether.Util;
 import net.commotionwireless.profiles.NoMatchingProfileException;
 import net.commotionwireless.profiles.Profile;
+import net.commotionwireless.route.EConnectivityManager;
 import net.commotionwireless.route.EWifiConfiguration;
 import net.commotionwireless.route.EWifiManager;
 import net.commotionwireless.route.RLinkProperties;
@@ -22,6 +23,7 @@ import net.commotionwireless.route.RRouteInfo;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -121,6 +123,7 @@ public class OlsrdService extends Service {
 		Context mContext;
 		MeshTetherProcess mProcess;
 		String mFallbackInterfaceName;
+		String mTetherIface;
 		
 		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
 		final String mOlsrdConfBaseFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
@@ -146,7 +149,8 @@ public class OlsrdService extends Service {
 			DotConf dotConf = null;
 			File dotConfFile = null;
 			FileOutputStream dotConfFileStream = null;
-
+			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
 			/*
 			 * Generate the conf file!
 			 */
@@ -178,7 +182,11 @@ public class OlsrdService extends Service {
 			profileEnvironment = p.toEnvironment(mOlsrdEnvironmentVariablePrefix);
 			if (p.getStringValue("if_lan").equalsIgnoreCase("") && mFallbackInterfaceName != null) {
 				profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "if_lan=" + mFallbackInterfaceName);
+				mTetherIface = mFallbackInterfaceName;
+			} else {
+				mTetherIface = p.getStringValue("if_lan");
 			}
+
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
 			profileEnvironment.add("olsrd_conf_path=" + dotConfFile);
 			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
@@ -203,6 +211,7 @@ public class OlsrdService extends Service {
 				startIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
 				mProcess.run(mHandler, 1, 1);
 				mContext.sendBroadcast(startIntent);
+				ecMgr.tether(mTetherIface);
 			} catch (IOException e) {
 				Log.e("OlsrdService", "Could not start process: " + e.toString());
 			}
@@ -214,6 +223,8 @@ public class OlsrdService extends Service {
 			ArrayList<String> systemEnvironment = null;
 			systemEnvironment = Util.getSystemEnvironment();
 			MeshTetherProcess olsrdStopper = null;
+			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
 			
 			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
 			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
@@ -232,6 +243,7 @@ public class OlsrdService extends Service {
 				mProcess.stop();
 				mProcess = null;
 				mContext.sendBroadcast(stopIntent);
+				ecMgr.untether(mTetherIface);
 			} catch (InterruptedException e) {
 				Log.e("OlsrdService", "Could not stop process: " + e.toString());
 			} catch (IOException e) {
