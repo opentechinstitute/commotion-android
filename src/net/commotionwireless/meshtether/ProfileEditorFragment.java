@@ -157,17 +157,18 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 		String sidVisibles[] = null, sidValues[] = null;
 		KeyringListResult.Entry sids[] = null;
 
-		try {
-			keyringResult = ServalD.keyringList();
-		} catch (ServalDFailureException e) {
-			sidPreference.setEnabled(false);
-			return;
-		} catch (ServalDInterfaceError e){
-			sidPreference.setEnabled(false);
-			return;
+		if (ServalD.ServalInstancePath != null) {
+			try {
+				keyringResult = ServalD.keyringList();
+			} catch (ServalDFailureException e) {
+				sidPreference.setEnabled(false);
+				return;
+			} catch (ServalDInterfaceError e){
+				sidPreference.setEnabled(false);
+				return;
+			}
+			sids = keyringResult.entries;
 		}
-		sids = keyringResult.entries;
-
 		if (sids == null) {
 			sidPreference.setEnabled(false);
 			return;
