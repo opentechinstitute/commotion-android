@@ -4,4 +4,4 @@
 
 echo ${brncl_path}
 echo "Attempting to execute: " $1
-exec su -c ${1:-${brncl_path}/run_olsrd}
+exec ${1:-${brncl_path}/run_olsrd}
