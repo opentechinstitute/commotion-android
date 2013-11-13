@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+<string name="lan_script"></string>
+<string name="adhoc_dns_server">8.8.8.8</string>
+<string name="adhoc_netmask">255.0.0.0</string>
+<string name="mdp_servalpath"></string>
+<string name="mdp_sid"></string>
+<string name="profile_name">commotionwireless.net</string>
+<string name="lan_essid">commotionwireless.net</string>
+<string name="if_wan"></string>
+<string name="lan_bssid">02:CA:FF:EE:BA:BE</string>
+<string name="if_lan"></string>
+<string name="lan_channel">5</string>
+</map>

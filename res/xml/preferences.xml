@@ -20,19 +20,16 @@
 
     <PreferenceCategory android:title="@string/mesh_profile" >
         <EditTextPreference
-            android:defaultValue="commotionwireless.net"
             android:key="@string/profile_name"
             android:singleLine="true"
             android:title="@string/profile_name_title" />
         
         <EditTextPreference
-            android:defaultValue="commotionwireless.net"
             android:key="@string/lan_essid"
             android:singleLine="true"
             android:title="@string/ssid" />
 
         <net.commotionwireless.meshtether.MACPreference
-            android:defaultValue="02:CA:FF:EE:BA:BE"
             android:hint="@string/bssid_hint"
             android:key="@string/lan_bssid"
             android:singleLine="true"
@@ -40,7 +37,6 @@
             android:title="@string/bssid" />
 
         <ListPreference
-            android:defaultValue="5"
             android:entries="@array/channel_names"
             android:entryValues="@array/channel_values"
             android:key="@string/lan_channel"
@@ -51,19 +47,18 @@
             android:title="@string/mesh_ip" />
 
         <net.commotionwireless.meshtether.IPPreference
-            android:defaultValue="255.0.0.0"
             android:key="@string/adhoc_netmask"
             android:singleLine="true"
             android:title="@string/mesh_netmask" />
+
         <net.commotionwireless.meshtether.IPPreference
-            android:defaultValue="8.8.8.8"
             android:key="@string/adhoc_dns_server"
             android:singleLine="true"
             android:title="@string/mesh_nameserver" />
     </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/adhoc_settings" >
         <ListPreference
-            android:defaultValue=""
             android:entries="@array/script_names"
             android:entryValues="@array/script_values"
             android:key="@string/lan_script"
@@ -81,13 +76,12 @@
 
     <PreferenceCategory android:title="Interfaces" >
         <EditTextPreference
-            android:defaultValue=""
             android:hint="leave empty to autodetect"
             android:key="@string/if_wan"
             android:singleLine="true"
             android:title="WAN" />
+
         <EditTextPreference
-            android:defaultValue=""
             android:hint="leave empty to autodetect"
             android:key="@string/if_lan"
             android:singleLine="true"
@@ -98,13 +92,13 @@
 	    <CheckBoxPreference
             android:key="@string/use_mdp"
             android:title="Use MDP" />
+
         <net.commotionwireless.meshtether.StringPreference
-            android:defaultValue=""
             android:key="@string/mdp_servalpath"
             android:singleLine="true"
             android:title="MDP Serval Path" />
+
         <ListPreference
-            android:defaultValue=""
             android:key="@string/mdp_sid"
             android:title="MDP SID" />
     </PreferenceCategory>
