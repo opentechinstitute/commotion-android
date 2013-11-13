@@ -59,7 +59,6 @@ public class OlsrdService extends Service {
 	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			Log.i("OlsrdService", "Got a message: " + msg.obj.toString());
 			String cmd = null;
 			String cmdParts[] = null;
 			cmd = msg.obj.toString();
@@ -67,6 +66,7 @@ public class OlsrdService extends Service {
 			if (cmdParts.length == 4 && (cmdParts[0].equalsIgnoreCase("ADD") || cmdParts[0].equalsIgnoreCase("DEL"))) {
 				RRouteInfo route;
 				RLinkProperties linkProperties;
+				Log.i("OlsrdService", "Got a message: " + msg.obj.toString());
 
 				try {
 					route = RRouteInfo.parseFromCommand(cmd);
