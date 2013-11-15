@@ -4,5 +4,8 @@
 : ${brncl_path:=.}
 
 export brncl_path
-echo "Killing " `cat ${brncl_olsrd_pid_file}`
-kill -15 `cat ${brncl_olsrd_pid_file}`
+pid=`cat ${brncl_olsrd_pid_file}`
+if [ $pid -ne '0' ]; then
+	echo "Killing " $pid
+	kill -15 $pid
+fi

@@ -31,8 +31,13 @@ public class MeshTetherProcess {
 	}
 
 	private void cleanupIoThreads() throws IOException {
-		mProcess.getInputStream().close();
-		mProcess.getErrorStream().close();
+		InputStream inputStream = null, errorStream = null;
+
+		inputStream = mProcess.getInputStream();
+		errorStream = mProcess.getErrorStream();
+
+		if (inputStream != null) inputStream.close();
+		if (errorStream != null) errorStream.close();
 
 		mIoThreads[INPUT_THREAD].interrupt();
 		mIoThreads[ERROR_THREAD].interrupt();
@@ -92,6 +97,9 @@ public class MeshTetherProcess {
 		private final BufferedReader mBr;
 		private Handler mHandler;
 		public OutputMonitor(Handler handler, int t, InputStream is) {
+			/*
+			 * Veracode static analysis does NOT like this.
+			 */
 			mBr = new BufferedReader(new InputStreamReader(is), 8192);
 			mHandler = handler;
 		}
@@ -112,6 +120,13 @@ public class MeshTetherProcess {
 				 * don't worry too much.
 				 */
 				Log.i("MeshTetherProcess", "Exception reading process output: " + e.toString());
+			}
+			try {
+				mBr.close();
+			} catch (IOException e) {
+				/*
+				 * don't really care.
+				 */
 			}
 		}
 	}

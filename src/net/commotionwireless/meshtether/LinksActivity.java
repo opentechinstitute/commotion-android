@@ -78,6 +78,7 @@ public class LinksActivity extends android.app.ListActivity {
 			public View getView(int position, View convertView, ViewGroup parent) {
 				final ClientData client = clients.get(position);
 
+
 				ViewHolder holder;
 
 				if (convertView == null) {
@@ -126,7 +127,7 @@ public class LinksActivity extends android.app.ListActivity {
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equalsIgnoreCase(OlsrdService.OLSRD_CHANGE_ACTION)) {
 					OlsrdService olsrdService = app.getOlsrdService();
-					if (olsrdService.isOlsrdRunning()) {
+					if (olsrdService != null && olsrdService.isOlsrdRunning()) {
 						mOlsrInfoThread = new OlsrInfoThread();
 						mOlsrInfoThread.start();
 					} else {
