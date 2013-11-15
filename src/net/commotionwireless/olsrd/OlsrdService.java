@@ -140,6 +140,7 @@ public class OlsrdService extends Service {
 		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
 		final String mOlsrdConfBaseFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
 		final String mOlsrdStopPath = NativeHelper.app_bin.getAbsolutePath() + "/stop_olsrd";
+		final String mOlsrdStopAllPath = NativeHelper.app_bin.getAbsolutePath() + "/stop_all_olsrd";
 		final String mOlsrdStartPath = NativeHelper.app_bin.getAbsolutePath() + "/run_olsrd";
 		final String mOlsrdEnvironmentVariablePrefix = "brncl_";
 
@@ -164,6 +165,7 @@ public class OlsrdService extends Service {
 			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
 			RLinkProperties linkProperties = null;
+			MeshTetherProcess olsrdAllStopper = null;
 
 			/*
 			 * Generate the conf file!
@@ -216,6 +218,17 @@ public class OlsrdService extends Service {
 			mWifiConfig = NetworkStateChangeReceiver.getActiveWifiConfiguration(mMgr);
 			mEwifiConfig = new EWifiConfiguration(mWifiConfig);
 			
+			olsrdAllStopper = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStopAllPath,
+					systemEnvironment.toArray(new String[0]), 
+					NativeHelper.app_bin);
+			try {
+				olsrdAllStopper.runUntilExit(mHandler, 1,1);
+			} catch (IOException e) {
+				Log.e("OlsrdService", "Tried (and failed) to stop other running olsrd instances: " + e.toString());
+			} catch (InterruptedException e) {
+				Log.e("OlsrdService", "Tried (and failed) to stop other running olsrd instances: " + e.toString());
+			}
+
 			/*
 			 * clear out old routes.
 			 */

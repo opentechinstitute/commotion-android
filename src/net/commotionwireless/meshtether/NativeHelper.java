@@ -34,6 +34,8 @@ public class NativeHelper {
 	private static String OLSRD;
 	private static String STOP_OLSRD;
 	private static String DO_STOP_OLSRD;
+	private static String STOP_ALL_OLSRD;
+	private static String DO_STOP_ALL_OLSRD;
 	private static String SERVALD;
 	private static String DEFAULT_PROFILE;
 
@@ -54,6 +56,8 @@ public class NativeHelper {
 		OLSRD = new File(app_bin, "olsrd").getAbsolutePath();
 		STOP_OLSRD = new File(app_bin, "stop_olsrd").getAbsolutePath();
 		DO_STOP_OLSRD = new File(app_bin, "do_stop_olsrd").getAbsolutePath();
+		STOP_ALL_OLSRD = new File(app_bin, "stop_all_olsrd").getAbsolutePath();
+		DO_STOP_ALL_OLSRD = new File(app_bin, "do_stop_all_olsrd").getAbsolutePath();
 		SERVALD = new File(app_bin, "servald").getAbsolutePath();
 		DEFAULT_PROFILE = new File(shared_prefs, "commotionwireless.net.xml").getAbsolutePath();
 	}
@@ -141,6 +145,8 @@ public class NativeHelper {
 		chmod("0750", new File(OLSRD));
 		chmod("0750", new File(STOP_OLSRD));
 		chmod("0750", new File(DO_STOP_OLSRD));
+		chmod("0750", new File(STOP_ALL_OLSRD));
+		chmod("0750", new File(DO_STOP_ALL_OLSRD));
 		chmod("0750", new File(SERVALD));
 		chmod("0660", new File(DEFAULT_PROFILE));
 
