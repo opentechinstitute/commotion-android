@@ -209,6 +209,15 @@ public class LinksActivity extends android.app.ListActivity {
 				while(!Thread.interrupted()) {
 					ArrayList<ClientData> clientsToAdd = new ArrayList<ClientData>();
 
+					/*
+					 * Add 1 to the missed update counter for
+					 * all clients. We decrement it later in
+					 * clientAdded() if it is found.
+					 */
+					for (ClientData c : clients ) {
+						c.missedUpdateCounter = c.missedUpdateCounter+1;
+					}
+
 					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
 					for (Link l : dump.links) {
 						ClientData c = new ClientData(l.remoteIP, l.linkQuality,
@@ -221,6 +230,16 @@ public class LinksActivity extends android.app.ListActivity {
 									c.hasRouteToOther = true;
 						}
 						clientsToAdd.add(c);
+
+						/*
+						 * Reset the missed update counter since
+						 * we didn't miss them on this iteration.
+						 */
+						if (clients.contains(c)) {
+							ClientData cd = clients.get(clients.indexOf(c));
+							Log.i("LinksActivity", "Resetting missedUpdateCounter for " + cd.remoteIP);
+							cd.missedUpdateCounter = 0;
+						}
 					}
 					final ArrayList<ClientData> updateList = new ArrayList<ClientData>(clientsToAdd);
 					mHandler.post(new Runnable() {
@@ -235,6 +254,22 @@ public class LinksActivity extends android.app.ListActivity {
 					while (mPauseOlsrInfoThread)
 						Thread.sleep(500);
 					Thread.sleep(5000);
+
+					/*
+					 * Remove the clients whose missed update
+					 * counter exceeds the limit.
+					 */
+					for (ClientData c : clients ) {
+						if (c.shouldRemove()) {
+							Log.i("LinksActivity", "Removing " + c.remoteIP + " from the UI after too many missed updates.");
+							clients.remove(c);
+						}
+					}
+					mHandler.post(new Runnable() {
+						public void run() {
+							update();
+						}
+					});
 				}
 			} catch (InterruptedException e) {
 				// fall through

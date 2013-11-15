@@ -1,6 +1,7 @@
 package net.commotionwireless.olsrd;
 
 public class ClientData {
+	private static int MAXIMUM_MISSED_UPDATES = 3;
 
 	public final String remoteIP;
 	public final float linkQuality;
@@ -9,6 +10,7 @@ public class ClientData {
 	public final int validityTime;
 	public boolean hasRouteToOther;
 	public boolean hasDefaultRoute;
+	public int missedUpdateCounter;
 	public ClientData(String ip, float lq, float nlq, int lc, int vt) {
 		remoteIP = ip;
 		linkQuality = lq;
@@ -17,6 +19,7 @@ public class ClientData {
 		validityTime = vt;
 		hasRouteToOther = false;
 		hasDefaultRoute = false;
+		missedUpdateCounter = 0;
 	}
 	@Override
 	public String toString() { return remoteIP + " " + linkQuality + " " + neighborLinkQuality; }
@@ -31,5 +34,8 @@ public class ClientData {
 	}
 	public int hashCode() {
 		return remoteIP.hashCode();
+	}
+	public boolean shouldRemove() {
+		return (missedUpdateCounter>MAXIMUM_MISSED_UPDATES);
 	}
 }
