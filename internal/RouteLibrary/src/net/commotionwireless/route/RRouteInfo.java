@@ -108,7 +108,17 @@ public class RRouteInfo extends RClass {
 			e.printStackTrace();
 		}
 	}
-	
+	public boolean isDefaultGatewayRoute() {
+		RLinkAddress linkAddress = null;
+		InetAddress gateway = null;
+		try {
+			linkAddress = new RLinkAddress(InetAddress.getByName("0.0.0.0"), 0);
+			gateway = InetAddress.getByName("0.0.0.0");
+			return (linkAddress.equals(mLinkAddress) && gateway.equals(mGatewayAddress));
+		} catch (UnknownHostException ex) {
+		}
+		return false;
+	}
 	public InetAddress getGatewayAddress() {
 		return mGatewayAddress;
 	}

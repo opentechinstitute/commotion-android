@@ -79,6 +79,12 @@ public class OlsrdService extends Service {
 					Log.e("OlsrdService", "It appears that things are bad!");
 					return;
 				}
+
+				if (route.isDefaultGatewayRoute()) {
+					Log.i("OlsrdService", "Skipping default/default route.");
+					return;
+				}
+
 				linkProperties = new RLinkProperties(mEwifiConfig.getLinkProperties());
 				if ("ADD".equalsIgnoreCase(cmdParts[0])) {
 					Log.i("OlsrdService", "Would add a route (" + cmdParts[1] + "/" + cmdParts[2] + "->" + cmdParts[3] + ")");
@@ -157,6 +163,8 @@ public class OlsrdService extends Service {
 			FileOutputStream dotConfFileStream = null;
 			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
+			RLinkProperties linkProperties = null;
+
 			/*
 			 * Generate the conf file!
 			 */
@@ -208,6 +216,13 @@ public class OlsrdService extends Service {
 			mWifiConfig = NetworkStateChangeReceiver.getActiveWifiConfiguration(mMgr);
 			mEwifiConfig = new EWifiConfiguration(mWifiConfig);
 			
+			/*
+			 * clear out old routes.
+			 */
+			linkProperties = new RLinkProperties(mEwifiConfig.getLinkProperties());
+			linkProperties.clearRoutes();
+			mEwifiConfig.setLinkProperties(linkProperties);
+
 			mProcess = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStartPath, 
 					combinedEnvironment.toArray(new String[0]), 
 					NativeHelper.app_bin);
