@@ -33,8 +33,10 @@ import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.LinkQualityMultiplier;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import net.commotionwireless.olsrinfo.datatypes.Plugin;
+import net.commotionwireless.profiles.Profiles;
 import android.net.wifi.WifiInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -46,6 +48,8 @@ public class InfoActivity extends android.app.ListActivity {
 	private MeshTetherApp app;
 	private String[] info = new String[0];
 	private BaseAdapter adapter;
+	private Thread mUpdateThread = null;
+	private Handler mHandler = new Handler();
 
 	private static class ViewHolder {
 		TextView infoKey;
@@ -116,8 +120,20 @@ public class InfoActivity extends android.app.ListActivity {
 	}
 
 	void update() {
-		info = generateConfigList();
-		adapter.notifyDataSetChanged();
+		if (mUpdateThread == null) {
+			mUpdateThread = new Thread() {
+				public void run() {
+					info = generateConfigList();
+					mHandler.post(new Runnable() {
+						public void run() {
+							adapter.notifyDataSetChanged();		
+						}
+					});
+					mUpdateThread = null;
+				}
+			};
+			mUpdateThread.start();
+		}
 	}
 
 	private String[] makeStringArray(List<String> l) {
@@ -129,24 +145,11 @@ public class InfoActivity extends android.app.ListActivity {
 	private String[] generateConfigList() {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		List<String> stringList = new ArrayList<String>();
+		Profiles profiles = new Profiles(this);
 
-		// add active profile info first
-		/*
-		 * FIXME
-		 */
-		/*
-		if (app.service != null) {
-			String[] active = app.service.getActiveMeshProfile();
-			String profileString = "";
-			for (int i=0; i < active.length; i++) {
-				profileString += "\n";
-				profileString += "" + active[i];
-			}
-			stringList.add("active profile"); // key
-			stringList.add(profileString); // value
-		}
-		*/
-		
+		stringList.add("active profile");
+		stringList.add(profiles.getActiveProfileName());
+
 		// then add wifi info
 		WifiInfo wi = app.wifiManager.getConnectionInfo();
 		String wifiInfoString = "\n";
