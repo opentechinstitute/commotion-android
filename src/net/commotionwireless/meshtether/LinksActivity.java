@@ -124,7 +124,7 @@ public class LinksActivity extends android.app.ListActivity {
 
 		mOlsrdStatusReceiver = new BroadcastReceiver() {
 			public void onReceive(Context context, Intent intent) {
-				if (intent.getAction() == OlsrdService.OLSRD_CHANGE_ACTION) {
+				if (intent.getAction().equalsIgnoreCase(OlsrdService.OLSRD_CHANGE_ACTION)) {
 					OlsrdService olsrdService = app.getOlsrdService();
 					if (olsrdService.isOlsrdRunning()) {
 						mOlsrInfoThread = new OlsrInfoThread();
@@ -138,11 +138,7 @@ public class LinksActivity extends android.app.ListActivity {
 				}
 			}
 		};
-		OlsrdService olsrdService = app.getOlsrdService();
-		if (olsrdService != null && olsrdService.isOlsrdRunning()) {
-			mOlsrInfoThread = new OlsrInfoThread();
-			mOlsrInfoThread.start();
-		}
+
 	}
 
 	@Override
@@ -158,8 +154,31 @@ public class LinksActivity extends android.app.ListActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		OlsrdService olsrdService = app.getOlsrdService();
+
 		app.cancelClientNotify();
-		update();
+
+		if (olsrdService != null) {
+			if (olsrdService.isOlsrdRunning()) {
+				/*
+				 * service is running. Start a monitor
+				 * thread if one doesn't already exist.
+				 */
+				if (mOlsrInfoThread == null) {
+					mOlsrInfoThread = new OlsrInfoThread();
+					mOlsrInfoThread.start();
+				}
+			} else {
+				/*
+				 * service is not running. Stop the
+				 * monitor thread if it exists.
+				 */
+				if (mOlsrInfoThread != null) {
+					mOlsrInfoThread.interrupt();
+					mOlsrInfoThread = null;
+				}
+			}
+		}
 
 		if (hasWindowFocus() && clients.isEmpty())
 			app.updateToast(getString(R.string.noclients), false);

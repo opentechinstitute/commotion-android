@@ -99,21 +99,27 @@ public class OlsrdService extends Service {
 				/* STOPPED */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_RUNNING, /* DISCONNECTED */ TO_NOTHING, /* NEWPROFILE */ TO_NOTHING},
 				/* RUNNING */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_NOTHING, /* DISCONNECTED */ TO_STOPPED, /* NEWPROFILE */ TO_RESTART}
 		};
-		public OlsrdState transition(int message, OlsrdControl control) {
+		private OlsrdState actualTransition(int message, OlsrdControl control, boolean pre) {
 			int transitionToDo = mTransitions[this.ordinal()][message-1];
 			switch (transitionToDo) {
 			case TO_RUNNING:
-				control.start();
+				if (!pre) control.start();
 				return RUNNING;
 			case TO_STOPPED:
-				control.stop();
+				if (!pre) control.stop();
 				return STOPPED;
 			case TO_RESTART:
-				control.restart();
+				if (!pre) control.restart();
 				return RUNNING;
 			default:
 				return this;
 			}
+		}
+		public OlsrdState transition(int message, OlsrdControl control) {
+			return actualTransition(message, control, false);
+		}
+		public OlsrdState preTransition(int message, OlsrdControl control) {
+			return actualTransition(message, control, true);
 		}
 	}
 	
@@ -276,8 +282,14 @@ public class OlsrdService extends Service {
 				return;
 			}
 			
+			/*
+			 * Pre transition to the new state so that
+			 * functions inside the transition() function
+			 * can know the new state.
+			 */
 			OlsrdState oldState = mState;
-			mState = mState.transition(message, this);
+			mState = mState.preTransition(message, this);
+			oldState.transition(message, this);
 			Log.i("OlsrdControl", "Transitioned from " + oldState + " to " + mState + " on message " + message);
 		}
 	}
