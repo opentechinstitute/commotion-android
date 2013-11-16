@@ -20,6 +20,7 @@ package net.commotionwireless.meshtether;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.commotionwireless.olsrd.ClientData;
 import net.commotionwireless.olsrd.OlsrdService;
@@ -272,10 +273,14 @@ public class LinksActivity extends android.app.ListActivity {
 					 * Remove the clients whose missed update
 					 * counter exceeds the limit.
 					 */
-					for (ClientData c : clients ) {
-						if (c.shouldRemove()) {
-							Log.i("LinksActivity", "Removing " + c.remoteIP + " from the UI after too many missed updates.");
-							clients.remove(c);
+					synchronized (clients) {
+						Iterator<ClientData> i = clients.iterator();
+						while (i.hasNext()) {
+							ClientData c = i.next();
+							if (c.shouldRemove()) {
+								Log.i("LinksActivity", "Removing " + c.remoteIP + " from the UI after too many missed updates.");
+								i.remove();
+							}
 						}
 					}
 					mHandler.post(new Runnable() {
@@ -307,12 +312,16 @@ public class LinksActivity extends android.app.ListActivity {
 					&& c.neighborLinkQuality == cd.neighborLinkQuality) {
 				return; // no change
 			}
-			clients.remove(c);
-			clients.add(cd);
+			synchronized (clients) {
+				clients.remove(c);
+				clients.add(cd);
+			}
 			update();
 			return;
 		}
-		clients.add(cd);
+		synchronized (clients) {
+			clients.add(cd);
+		}
 		app.clientAdded(cd);
 	}
 
