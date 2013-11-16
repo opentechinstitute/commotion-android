@@ -18,6 +18,7 @@
 
 package net.commotionwireless.meshtether;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -168,50 +169,53 @@ public class InfoActivity extends android.app.ListActivity {
 		stringList.add("wifi info");   // key
 		stringList.add(wifiInfoString);// value
 
-		OlsrDataDump dump = app.mJsonInfo.parseCommand("/config");
-		if (dump == null || dump.config == null
-				|| dump.config.unicastSourceIpAddress == null) {
-			stringList.add(getString(R.string.waiting_for_olsrd));
-			stringList.add(getString(R.string.no_data_yet));
-			return makeStringArray(stringList);
-		}
-
-		Config config = dump.config;
-		data.put("systemTime", dump.systemTime);
-		data.put("timeSinceStartup", dump.timeSinceStartup);
-
 		try {
-			for (Field field : config.getClass().getDeclaredFields()) {
-				String name = field.getName();
-				String value = "";
-				if (name.equals("defaultLinkQualityMultipliers")) {
-					for (LinkQualityMultiplier lqm : config.defaultLinkQualityMultipliers) {
-						value += lqm.route + " - " + lqm.multiplier + "\n";
-					}
-				} else if (name.equals("ipcAllowedAddresses")) {
-					for (AddressNetmask addr : config.ipcAllowedAddresses) {
-						value += addr.ipAddress + "/" + addr.netmask + "\n";
-					}
-				} else if (name.equals("hna")) {
-					for (HNA hna : config.hna) {
-						value += hna.destination + "  " + hna.gateway + "\n";
-					}
-				} else {
-					Object o = field.get(config);
-					if (o != null)
-						value = o.toString() + "\n";
-				}
-				// remove the last, trailing \n
-				if (value.length() > 0)
-					data.put(name, value.substring(0, value.length() - 1));
-				else
-					data.put(name, "");
+			OlsrDataDump dump = app.mJsonInfo.parseCommand("/config");
+			if (dump == null || dump.config == null
+					|| dump.config.unicastSourceIpAddress == null) {
+				stringList.add(getString(R.string.waiting_for_olsrd));
+				stringList.add(getString(R.string.no_data_yet));
+				return makeStringArray(stringList);
 			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			Config config = dump.config;
+			data.put("systemTime", dump.systemTime);
+			data.put("timeSinceStartup", dump.timeSinceStartup);
+
+			try {
+				for (Field field : config.getClass().getDeclaredFields()) {
+					String name = field.getName();
+					String value = "";
+					if (name.equals("defaultLinkQualityMultipliers")) {
+						for (LinkQualityMultiplier lqm : config.defaultLinkQualityMultipliers) {
+							value += lqm.route + " - " + lqm.multiplier + "\n";
+						}
+					} else if (name.equals("ipcAllowedAddresses")) {
+						for (AddressNetmask addr : config.ipcAllowedAddresses) {
+							value += addr.ipAddress + "/" + addr.netmask + "\n";
+						}
+					} else if (name.equals("hna")) {
+						for (HNA hna : config.hna) {
+							value += hna.destination + "  " + hna.gateway + "\n";
+						}
+					} else {
+						Object o = field.get(config);
+						if (o != null)
+							value = o.toString() + "\n";
+					}
+					// remove the last, trailing \n
+					if (value.length() > 0)
+						data.put(name, value.substring(0, value.length() - 1));
+					else
+						data.put(name, "");
+				}
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+		} catch (IOException e) {
 		}
+
 
 		SortedSet<String> sortedKeys = new TreeSet<String>(data.keySet());
 		Iterator<String> iter = sortedKeys.iterator();
@@ -221,33 +225,36 @@ public class InfoActivity extends android.app.ListActivity {
 			stringList.add(data.get(key).toString());
 		}
 
-		Collection<Plugin> plugins = app.mJsonInfo.plugins();
-		for (Plugin p : plugins) {
-			String value = "\n";
-			if (p.port > 0 && p.port < 65536)
-				value += "port: " + p.port + "\n";
-			if (p.accept != null && !p.accept.equals(""))
-				value += "accept: " + p.accept + "\n";
-			if (p.host != null && !p.host.equals(""))
-				value += "host: " + p.host + "\n";
-			if (p.net != null && !p.net.equals(""))
-				value += "net: " + p.net + "\n";
-			if (p.ping != null && !p.ping.equals(""))
-				value += "ping: " + p.ping + "\n";
-			if (p.hna != null && !p.hna.equals(""))
-				value += "hna: " + p.hna + "\n";
-			if (p.uuidfile != null && !p.uuidfile.equals(""))
-				value += "uuidfile: " + p.uuidfile + "\n";
-			if (p.keyfile != null && !p.keyfile.equals(""))
-				value += "keyfile: " + p.keyfile + "\n";
+		try {
+			Collection<Plugin> plugins = app.mJsonInfo.plugins();
+			for (Plugin p : plugins) {
+				String value = "\n";
+				if (p.port > 0 && p.port < 65536)
+					value += "port: " + p.port + "\n";
+				if (p.accept != null && !p.accept.equals(""))
+					value += "accept: " + p.accept + "\n";
+				if (p.host != null && !p.host.equals(""))
+					value += "host: " + p.host + "\n";
+				if (p.net != null && !p.net.equals(""))
+					value += "net: " + p.net + "\n";
+				if (p.ping != null && !p.ping.equals(""))
+					value += "ping: " + p.ping + "\n";
+				if (p.hna != null && !p.hna.equals(""))
+					value += "hna: " + p.hna + "\n";
+				if (p.uuidfile != null && !p.uuidfile.equals(""))
+					value += "uuidfile: " + p.uuidfile + "\n";
+				if (p.keyfile != null && !p.keyfile.equals(""))
+					value += "keyfile: " + p.keyfile + "\n";
 
-			String key = p.plugin;
-			// remove the path to the plugin
-			key = key.substring(key.lastIndexOf("/olsrd_") + 7, key.length());
-			// remove the lib file name extension
-			stringList.add(key.replace(".so.", " "));
-			// remove the last, trailing \n
-			stringList.add(value.substring(0, value.length() - 1));
+				String key = p.plugin;
+				// remove the path to the plugin
+				key = key.substring(key.lastIndexOf("/olsrd_") + 7, key.length());
+				// remove the lib file name extension
+				stringList.add(key.replace(".so.", " "));
+				// remove the last, trailing \n
+				stringList.add(value.substring(0, value.length() - 1));
+			}
+		} catch (IOException e) {
 		}
 		return makeStringArray(stringList);
 	}

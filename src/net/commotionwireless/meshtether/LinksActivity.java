@@ -18,6 +18,7 @@
 
 package net.commotionwireless.meshtether;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import net.commotionwireless.olsrd.ClientData;
@@ -204,6 +205,8 @@ public class LinksActivity extends android.app.ListActivity {
 
 		@Override
 		public void run() {
+			int maxIoExceptions = 10;
+			int ioExceptionCount = 0;
 			try {
 				Log.i("LinksActivity", "Starting OlsrdInfoThread()");
 				while(!Thread.interrupted()) {
@@ -218,39 +221,49 @@ public class LinksActivity extends android.app.ListActivity {
 						c.missedUpdateCounter = c.missedUpdateCounter+1;
 					}
 
-					OlsrDataDump dump = app.mJsonInfo.parseCommand("/links/hna");
-					for (Link l : dump.links) {
-						ClientData c = new ClientData(l.remoteIP, l.linkQuality,
-								l.neighborLinkQuality, l.linkCost, l.validityTime);
-						for (HNA h : dump.hna) {
-							if (l.remoteIP.equals(h.gateway))
-								if (h.genmask == 0)
-									c.hasDefaultRoute = true;
-								else
-									c.hasRouteToOther = true;
-						}
-						clientsToAdd.add(c);
+					OlsrDataDump dump = null;
+					try {
+						dump = app.mJsonInfo.parseCommand("/links/hna");
+						for (Link l : dump.links) {
+							ClientData c = new ClientData(l.remoteIP, l.linkQuality,
+									l.neighborLinkQuality, l.linkCost, l.validityTime);
+							for (HNA h : dump.hna) {
+								if (l.remoteIP.equals(h.gateway))
+									if (h.genmask == 0)
+										c.hasDefaultRoute = true;
+									else
+										c.hasRouteToOther = true;
+							}
+							clientsToAdd.add(c);
 
-						/*
-						 * Reset the missed update counter since
-						 * we didn't miss them on this iteration.
-						 */
-						if (clients.contains(c)) {
-							ClientData cd = clients.get(clients.indexOf(c));
-							Log.i("LinksActivity", "Resetting missedUpdateCounter for " + cd.remoteIP);
-							cd.missedUpdateCounter = 0;
+							/*
+							 * Reset the missed update counter since
+							 * we didn't miss them on this iteration.
+							 */
+							if (clients.contains(c)) {
+								ClientData cd = clients.get(clients.indexOf(c));
+								Log.i("LinksActivity", "Resetting missedUpdateCounter for " + cd.remoteIP);
+								cd.missedUpdateCounter = 0;
+							}
+						}
+						final ArrayList<ClientData> updateList = new ArrayList<ClientData>(clientsToAdd);
+						mHandler.post(new Runnable() {
+							@Override
+							public void run() {
+								for (ClientData cd : updateList) {
+									clientAdded(cd);
+								}
+								updateList.clear();
+							}
+						});
+						ioExceptionCount = 0;
+					} catch (IOException e) {
+						if (ioExceptionCount++ > maxIoExceptions) {
+							Log.w("LinksActivity", "Too many missed connections for JsonInfo plugin.");
+							interrupt();
 						}
 					}
-					final ArrayList<ClientData> updateList = new ArrayList<ClientData>(clientsToAdd);
-					mHandler.post(new Runnable() {
-						@Override
-						public void run() {
-							for (ClientData cd : updateList) {
-								clientAdded(cd);
-							}
-							updateList.clear();
-						}
-					});
+
 					while (mPauseOlsrInfoThread)
 						Thread.sleep(500);
 					Thread.sleep(5000);

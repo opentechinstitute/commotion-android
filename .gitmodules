@@ -1,6 +1,3 @@
-[submodule "external/olsrinfo"]
-	path = external/olsrinfo
-	url = https://github.com/guardianproject/OlsrInfo.git
 [submodule "external/busybox"]
 	path = external/busybox
 	url = git://busybox.net/busybox.git
@@ -13,3 +10,6 @@
 [submodule "external/olsrd"]
 	path = external/olsrd
 	url = https://github.com/hawkinswnaf/olsrd.git
+[submodule "external/olsrinfo"]
+	path = external/olsrinfo
+	url = https://github.com/opentechinstitute/OlsrInfo.git
