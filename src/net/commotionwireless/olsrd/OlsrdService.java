@@ -136,6 +136,7 @@ public class OlsrdService extends Service {
 		MeshTetherProcess mProcess;
 		String mFallbackInterfaceName;
 		String mTetherIface;
+		Olsrd mOlsrd;
 		
 		final String mOlsrdPidFilePath = NativeHelper.app_log.getAbsolutePath() + "/olsrd.pid";
 		final String mOlsrdConfBaseFilePath = NativeHelper.app_bin.getAbsolutePath() + "/olsrd.conf";
@@ -195,40 +196,17 @@ public class OlsrdService extends Service {
 				Log.e("OlsrdControl", "Cannot open temp olsrd.conf: " + e.toString());
 				return;
 			}
-			profileEnvironment = p.toEnvironment(mOlsrdEnvironmentVariablePrefix);
 			if (p.getStringValue("if_lan").equalsIgnoreCase("") && mFallbackInterfaceName != null) {
-				profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "if_lan=" + mFallbackInterfaceName);
 				mTetherIface = mFallbackInterfaceName;
 			} else {
 				mTetherIface = p.getStringValue("if_lan");
 			}
 
-			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
-			profileEnvironment.add("olsrd_conf_path=" + dotConfFile);
-			profileEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
-			systemEnvironment = Util.getSystemEnvironment();
-			
-			(combinedEnvironment = (ArrayList<String>)systemEnvironment.clone()).addAll(profileEnvironment);
-
 			Log.i("OlsrdControl", "OlsrdControl.start()");
-			Log.i("OlsrdControl", "System environment: " + systemEnvironment.toString());
-			Log.i("OlsrdControl", "Profile environment: " + profileEnvironment.toString());
-			Log.i("OlsrdControl", "Combined environment: " + combinedEnvironment.toString());
 			
 			mWifiConfig = NetworkStateChangeReceiver.getActiveWifiConfiguration(mMgr);
 			mEwifiConfig = new EWifiConfiguration(mWifiConfig);
 			
-			olsrdAllStopper = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStopAllPath,
-					systemEnvironment.toArray(new String[0]), 
-					NativeHelper.app_bin);
-			try {
-				olsrdAllStopper.runUntilExit(mHandler, 1,1);
-			} catch (IOException e) {
-				Log.e("OlsrdService", "Tried (and failed) to stop other running olsrd instances: " + e.toString());
-			} catch (InterruptedException e) {
-				Log.e("OlsrdService", "Tried (and failed) to stop other running olsrd instances: " + e.toString());
-			}
-
 			/*
 			 * clear out old routes.
 			 */
@@ -236,19 +214,13 @@ public class OlsrdService extends Service {
 			linkProperties.clearRoutes();
 			mEwifiConfig.setLinkProperties(linkProperties);
 
-			mProcess = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStartPath, 
-					combinedEnvironment.toArray(new String[0]), 
-					NativeHelper.app_bin);
-			
-			try {
-				Intent startIntent = new Intent();
-				startIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
-				mProcess.run(mHandler, 1, 1);
-				mContext.sendBroadcast(startIntent);
-				ecMgr.tether(mTetherIface);
-			} catch (IOException e) {
-				Log.e("OlsrdService", "Could not start process: " + e.toString());
-			}
+			Intent startIntent = new Intent();
+			startIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
+			mOlsrd = new Olsrd(mHandler);
+			mOlsrd.startMain(new String[] {"-f", dotConfFile.toString(), "-i", mTetherIface, "-nofork", "-d", "2", "-pidfile", mOlsrdPidFilePath});
+			mContext.sendBroadcast(startIntent);
+			ecMgr.tether(mTetherIface);
+
 		}
 		/*
 		 * TODO: Should be able to make this much simpler now!
