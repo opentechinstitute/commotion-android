@@ -12,7 +12,7 @@ import android.util.Log;
 public class Olsrd {
 	static {
 		//System.loadLibrary("servald");
-		System.load("/data/data/net.commotionwireless.meshtether/app_bin/libolsrd.so");
+		System.load("/data/data/net.commotionwireless.meshtether/app_bin/libjniolsrd.so");
 	}
 
 	public InputStream mInputStream = null, mErrorStream = null;

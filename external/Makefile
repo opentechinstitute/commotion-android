@@ -60,7 +60,8 @@ OLSRD_SOURCE := $(wildcard olsrd/[*/*.[ch]) \
 olsrd: olsrd-build-stamp
 
 olsrd-build-stamp: $(OLSRD_SOURCE)
-	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 all
+	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 JNI_MAIN=1 NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) libolsrd.so DEBUG=0
+	make -C olsrd OS=android NO_DEBUG_MESSAGES=1 JNI_MAIN=1 NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) libjniolsrd.so DEBUG=0
 # build only the plugins we are likely to use to keep the build stable
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 arprefresh
 	make -C olsrd OS=android NDK_BASE=$(NDK_BASE) TOOLCHAIN_ARCHITECTURE=$(TOOLCHAIN_ARCHITECTURE) DEBUG=0 bmf
