@@ -157,16 +157,13 @@ public class OlsrdService extends Service {
 		}
 		
 		public void start() {
-			ArrayList<String> profileEnvironment, systemEnvironment, combinedEnvironment;
 			Profile p = new Profile(mProfileName, mContext);
-			String olsrdConfFilePath = null;
 			DotConf dotConf = null;
 			File dotConfFile = null;
 			FileOutputStream dotConfFileStream = null;
 			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
 			RLinkProperties linkProperties = null;
-			MeshTetherProcess olsrdAllStopper = null;
 
 			/*
 			 * Generate the conf file!
@@ -226,35 +223,19 @@ public class OlsrdService extends Service {
 		 * TODO: Should be able to make this much simpler now!
 		 */
 		public void stop() {
-			ArrayList<String> systemEnvironment = null;
-			systemEnvironment = Util.getSystemEnvironment();
-			MeshTetherProcess olsrdStopper = null;
 			ConnectivityManager cMgr = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 			EConnectivityManager ecMgr = new EConnectivityManager(cMgr);
-			
-			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "path=" + NativeHelper.app_bin.getAbsolutePath());
-			systemEnvironment.add(mOlsrdEnvironmentVariablePrefix + "olsrd_pid_file=" + mOlsrdPidFilePath);
-			
-			olsrdStopper = new MeshTetherProcess(NativeHelper.SU_C + " " + mOlsrdStopPath,
-					systemEnvironment.toArray(new String[0]), 
-					NativeHelper.app_bin);
-			
+
 			Log.i("OlsrdControl", "OlsrdControl.stop()");
 			Log.i("OlsrdControl", "Trying to stop with: " + mOlsrdStopPath);
-			
-			try {
-				Intent stopIntent = new Intent();
-				stopIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
-				olsrdStopper.run(mHandler, 1,1);
-				mProcess.stop();
-				mProcess = null;
-				mContext.sendBroadcast(stopIntent);
-				ecMgr.untether(mTetherIface);
-			} catch (InterruptedException e) {
-				Log.e("OlsrdService", "Could not stop process: " + e.toString());
-			} catch (IOException e) {
-				Log.e("OlsrdService", "Could not stop process: " + e.toString());
-			}
+
+			Intent stopIntent = new Intent();
+			stopIntent.setAction(OlsrdService.OLSRD_CHANGE_ACTION);
+			mOlsrd.stopMain();
+			mOlsrd = null;
+			mContext.sendBroadcast(stopIntent);
+			ecMgr.untether(mTetherIface);
+
 			mWifiConfig = null;
 			mEwifiConfig = null;
 		}
