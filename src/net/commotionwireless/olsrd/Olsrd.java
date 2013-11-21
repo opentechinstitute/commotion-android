@@ -19,7 +19,7 @@ public class Olsrd {
 	public boolean mStreamsAvailable = false;
 	public Object mLocker = null;
 
-	private Thread mOlsrdThread, mIoThread;
+	private Thread mOlsrdThread, mErrorIoThread, mOutputIoThread;
 	private Handler mHandler;
 
 	public native int main(String[] args);
@@ -30,7 +30,8 @@ public class Olsrd {
 	}
 	public void stopMain() {
 		mOlsrdThread.interrupt();
-		mIoThread.interrupt();
+		mErrorIoThread.interrupt();
+		mOutputIoThread.interrupt();
 	}
 	public void startMain(final String[] args) {
 		mOlsrdThread = new Thread() {
@@ -56,18 +57,43 @@ public class Olsrd {
 		if (mInputStream == null || mErrorStream == null) {
 			Log.e("Olsrd", "Streams not initialized!");
 		}
-		mIoThread = new Thread() {
+		mErrorIoThread = new Thread() {
 			public void run() {
-				BufferedReader mBr = new BufferedReader(new InputStreamReader(mInputStream), 1);
-				BufferedReader mBre = new BufferedReader(new InputStreamReader(mErrorStream), 1);
+				BufferedReader mBre = new BufferedReader(new InputStreamReader(mErrorStream), 4096);
 
-				Thread.currentThread().setName("olsrd/io");
+				Thread.currentThread().setName("olsrd/error_io");
+				try{
+					String line;
+					do {
+						line = mBre.readLine();
+						mHandler.dispatchMessage(mHandler.obtainMessage(0, line));
+					} while (line != null);
+				} catch (Exception e) {
+					/*
+					 * don't worry too much.
+					 */
+					Log.i("Olsrd", "Exception reading process output: " + e.toString());
+				}
+				try {
+					mBre.close();
+				} catch (IOException e) {
+					/*
+					 * don't really care.
+					 */
+				}
+			}
+		};
+		mErrorIoThread.start();
+		mOutputIoThread = new Thread() {
+			public void run() {
+				BufferedReader mBr = new BufferedReader(new InputStreamReader(mInputStream), 4096);
+
+				Thread.currentThread().setName("olsrd/output_io");
 				try{
 					String line;
 					do {
 						line = mBr.readLine();
 						mHandler.dispatchMessage(mHandler.obtainMessage(0, line));
-						line = mBre.readLine();
 					} while (line != null);
 				} catch (Exception e) {
 					/*
@@ -84,6 +110,6 @@ public class Olsrd {
 				}
 			}
 		};
-		mIoThread.start();
+		mOutputIoThread.start();
 	}
 }
