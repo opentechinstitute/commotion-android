@@ -30,10 +30,12 @@ public class Olsrd {
 	}
 	public void stopMain() {
 		mOlsrdThread.interrupt();
+		mIoThread.interrupt();
 	}
 	public void startMain(final String[] args) {
 		mOlsrdThread = new Thread() {
 			public void run() {
+				Thread.currentThread().setName("olsrd");
 				main(args);
 			}
 		};
@@ -59,6 +61,7 @@ public class Olsrd {
 				BufferedReader mBr = new BufferedReader(new InputStreamReader(mInputStream), 1);
 				BufferedReader mBre = new BufferedReader(new InputStreamReader(mErrorStream), 1);
 
+				Thread.currentThread().setName("olsrd/io");
 				try{
 					String line;
 					do {
