@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class Olsrd {
 	static {
-		//System.loadLibrary("servald");
+		System.load("/data/data/net.commotionwireless.meshtether/app_bin/libservald.so");
 		System.load("/data/data/net.commotionwireless.meshtether/app_bin/libjniolsrd.so");
 	}
 
