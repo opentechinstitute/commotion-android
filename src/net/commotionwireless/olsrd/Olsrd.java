@@ -15,14 +15,11 @@ public class Olsrd {
 		System.load("/data/data/net.commotionwireless.meshtether/app_bin/libjniolsrd.so");
 	}
 
-	public InputStream mInputStream = null, mErrorStream = null;
-	public boolean mStreamsAvailable = false;
-
+	public InputStream inputStream = null, errorStream = null;
+	public boolean streamsAvailable = false;
 	public enum OlsrdRunningState {NOT_STARTED, RUNNING, STOPPED};
 	public OlsrdRunningState mRunning;
-
-	public Object mLocker = null;
-	Object mRunningLocker = null;
+	public Object streamsLocker = null;
 
 	private Thread mOlsrdThread, mErrorIoThread, mOutputIoThread;
 	private Handler mHandler;
@@ -30,8 +27,7 @@ public class Olsrd {
 	public native int main(String[] args);
 
 	public Olsrd(Handler handler) {
-		mLocker = new Object();
-		mRunningLocker = new Object();
+		streamsLocker = new Object();
 		mHandler = handler;
 		mRunning = OlsrdRunningState.NOT_STARTED;
 	}
@@ -64,10 +60,10 @@ public class Olsrd {
 		mOlsrdThread.start();
 
 		Log.d("Olsrd", "Waiting for streams to become available.");
-		synchronized (mLocker) {
-			while (!mStreamsAvailable) {
+		synchronized (streamsLocker) {
+			while (!streamsAvailable) {
 				try {
-					mLocker.wait();
+					streamsLocker.wait();
 				} catch (InterruptedException e)
 				{
 				}
@@ -75,12 +71,12 @@ public class Olsrd {
 		}
 		Log.d("Olsrd", "Streams are available.");
 
-		if (mInputStream == null || mErrorStream == null) {
+		if (inputStream == null || errorStream == null) {
 			Log.e("Olsrd", "Streams not initialized!");
 		}
 		mErrorIoThread = new Thread() {
 			public void run() {
-				BufferedReader mBre = new BufferedReader(new InputStreamReader(mErrorStream), 4096);
+				BufferedReader mBre = new BufferedReader(new InputStreamReader(errorStream), 4096);
 
 				Thread.currentThread().setName("olsrd/error_io");
 				try{
@@ -107,7 +103,7 @@ public class Olsrd {
 		mErrorIoThread.start();
 		mOutputIoThread = new Thread() {
 			public void run() {
-				BufferedReader mBr = new BufferedReader(new InputStreamReader(mInputStream), 4096);
+				BufferedReader mBr = new BufferedReader(new InputStreamReader(inputStream), 4096);
 
 				Thread.currentThread().setName("olsrd/output_io");
 				try{
