@@ -17,7 +17,12 @@ public class Olsrd {
 
 	public InputStream mInputStream = null, mErrorStream = null;
 	public boolean mStreamsAvailable = false;
+
+	public enum OlsrdRunningState {NOT_STARTED, RUNNING, STOPPED};
+	public OlsrdRunningState mRunning;
+
 	public Object mLocker = null;
+	Object mRunningLocker = null;
 
 	private Thread mOlsrdThread, mErrorIoThread, mOutputIoThread;
 	private Handler mHandler;
@@ -26,18 +31,34 @@ public class Olsrd {
 
 	public Olsrd(Handler handler) {
 		mLocker = new Object();
+		mRunningLocker = new Object();
 		mHandler = handler;
+		mRunning = OlsrdRunningState.NOT_STARTED;
 	}
 	public void stopMain() {
 		mOlsrdThread.interrupt();
 		mErrorIoThread.interrupt();
 		mOutputIoThread.interrupt();
 	}
+
+	public boolean isRunning() {
+			return (mRunning == OlsrdRunningState.RUNNING);
+	}
+
 	public void startMain(final String[] args) {
+		final Olsrd mOlsrd = this;
 		mOlsrdThread = new Thread() {
 			public void run() {
 				Thread.currentThread().setName("olsrd");
+				synchronized (mOlsrd) {
+					mRunning = OlsrdRunningState.RUNNING;
+				}
 				main(args);
+				Log.v("Olsrd", "Main thread ending.");
+				synchronized (mOlsrd) {
+					mRunning = OlsrdRunningState.STOPPED;
+					mOlsrd.notifyAll();
+				}
 			}
 		};
 		mOlsrdThread.start();
