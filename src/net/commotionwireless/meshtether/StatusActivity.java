@@ -74,6 +74,8 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 
 	private final static String LINKS = "links";
 	private final static String INFO = "info";
+	private final static String ABOUT = "about";
+
 
 	static NumberFormat nf = NumberFormat.getInstance();
 	static {
@@ -143,6 +145,9 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		tabs.addTab(tabs.newTabSpec(INFO)
 				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_recent))
 				.setContent(new Intent(this, InfoActivity.class)));
+		tabs.addTab(tabs.newTabSpec(ABOUT)
+				.setIndicator(ABOUT, getResources().getDrawable(R.drawable.comlogo_sm_on))
+				.setContent(new Intent(this, AboutActivity.class)));
 		tabs.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
 			public void onTabChanged(String tabId) {

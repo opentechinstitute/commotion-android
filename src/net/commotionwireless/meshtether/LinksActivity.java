@@ -88,8 +88,8 @@ public class LinksActivity extends android.app.ListActivity {
 					/*
 					 * we want to simply display the About text.
 					 */
-					View view = getLayoutInflater().inflate(R.layout.about, null);
-					TextView tv = (TextView)view.findViewById(R.id.about_text_id);
+					View view = getLayoutInflater().inflate(R.layout.welcome, null);
+					TextView tv = (TextView)view.findViewById(R.id.welcome_text_id);
 					tv.setMovementMethod(LinkMovementMethod.getInstance());
 					convertView = view;
 

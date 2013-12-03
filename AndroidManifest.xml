@@ -68,6 +68,9 @@
         <activity
             android:name="InfoActivity"
             android:launchMode="singleTop" />
+        <activity
+            android:name="AboutActivity"
+            android:launchMode="singleTop" />
 		<activity
             android:name="net.commotionwireless.meshtether.ProfileEditorActivity"
             android:label="ProfileEditorActivity" >
