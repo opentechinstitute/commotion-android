@@ -89,6 +89,8 @@
     <string name="zippingfile">Zipping up file…</string>
     <string name="olsrdnotrunning">olsrd is not running, no status information available!</string>
 
+    <!-- About -->
+    <string name="about_text">Commotion is an open-source communication tool that uses mobile phones, computers and other wireless devices to create decentralized mesh networks.\n\n<a href="https://commotionwireless.net/about/license-privacy">Version: 1.0 Android License &amp; Privacy Policy</a>\n\n<a href="https://commotionwireless.net/docs">Get Help</a>\n\n<a href="https://commotionwireless.net/developer/resources">Get Involved</a></string>
     <!-- Share OLSR Status -->
     <string name="help_title">Help</string>
     <string name="help_message">Mesh on the phone is experimental! Please check our wiki, email our mailing list, or find us on IRC.</string>

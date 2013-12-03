@@ -33,6 +33,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,20 +71,32 @@ public class LinksActivity extends android.app.ListActivity {
 
 		adapter = new BaseAdapter(){
 			@Override
-			public int getCount() { return clients.size(); }
+			public int getCount() { return (clients.size() == 0) ? 1 : clients.size(); }
 			@Override
-			public Object getItem(int position) { return clients.get(position); }
+			public Object getItem(int position) { return clients.get(position); /*return (clients.get(position) == null) ? new Object() : clients.get(position); */ }
 			@Override
 			public long getItemId(int position) { return position; }
 
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				final ClientData client = clients.get(position);
+				final ClientData client;
 
 
 				ViewHolder holder;
 
-				if (convertView == null) {
+				if (clients.isEmpty()) {
+					/*
+					 * we want to simply display the About text.
+					 */
+					View view = getLayoutInflater().inflate(R.layout.about, null);
+					TextView tv = (TextView)view.findViewById(R.id.about_text_id);
+					tv.setMovementMethod(LinkMovementMethod.getInstance());
+					convertView = view;
+
+					return convertView;
+				}
+				client = clients.get(position);
+				if (convertView == null || convertView.getTag() == null) {
 					View view = getLayoutInflater().inflate(R.layout.linkrow, null);
 					holder = new ViewHolder();
 					holder.remoteIP = (TextView) view.findViewById(R.id.remoteip);

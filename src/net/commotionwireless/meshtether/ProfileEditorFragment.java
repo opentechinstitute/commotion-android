@@ -56,6 +56,7 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 		updateProfileName(mgr, mProfileName);
 		resultIntent.putExtra("profile_name", mProfileName);
 		thisActivity.setResult(0, resultIntent);
+		thisActivity.setTitle(mProfileName);
 
 		addPreferencesFromResource(R.xml.preferences);
 
@@ -125,6 +126,8 @@ public class ProfileEditorFragment extends PreferenceFragment implements OnShare
 			
 			mgr.setSharedPreferencesName(mProfileName);
 			updateProfileName(mgr, mProfileName);
+
+			getActivity().setTitle(mProfileName);
 		}
 	}
 	
