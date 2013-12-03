@@ -67,7 +67,7 @@
 
     <!-- messages for the Settings/Preferences -->
     <string name="profile_name_title">Profile Name</string>
-    <string name="mesh_profile">Default Mesh Profile</string>
+    <string name="general_settings">General Settings</string>
     <string name="ssid">SSID (Network Name)</string>
     <string name="bssid">BSSID (Network ID)</string>
     <string name="bssid_hint">unique MAC address</string>
