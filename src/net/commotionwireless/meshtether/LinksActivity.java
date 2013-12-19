@@ -196,8 +196,6 @@ public class LinksActivity extends android.app.ListActivity {
 			}
 		}
 
-		if (hasWindowFocus() && clients.isEmpty())
-			app.updateToast(getString(R.string.noclients), false);
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(OlsrdService.OLSRD_CHANGE_ACTION);
 		registerReceiver(mOlsrdStatusReceiver, filter);
