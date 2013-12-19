@@ -48,7 +48,7 @@
     <application
         android:name=".MeshTetherApp"
         android:description="@string/app_name"
-        android:icon="@drawable/comlogo_sm_on"
+        android:icon="@drawable/comlogo_sm"
         android:label="@string/app_name" >
         <activity
             android:name="StatusActivity"
