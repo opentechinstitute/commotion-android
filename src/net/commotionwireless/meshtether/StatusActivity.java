@@ -25,6 +25,7 @@ import java.text.NumberFormat;
 import net.commotionwireless.olsrd.OlsrdService;
 import net.commotionwireless.profiles.Profile;
 import net.commotionwireless.profiles.Profiles;
+import net.commotionwireless.route.EWifiConfiguration;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -65,8 +66,6 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	private TextView textDownloadRate;
 	private TextView textUploadRate;
 
-	private int NetworkId;
-
 	final static int DLG_ABOUT = 0;
 	final static int DLG_ROOT = 1;
 	final static int DLG_ERROR = 2;
@@ -99,15 +98,23 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 			/*
 			 * stop!
 			 */
-			Log.w("StatusActivity", "Attempting to stop network ID " + NetworkId);
+			WifiConfiguration config = NetworkStateChangeReceiver.getActiveWifiConfiguration(wifiManager);
+			int networkId = wifiManager.getConnectionInfo().getNetworkId();
 
-			wifiManager.disableNetwork(NetworkId);
-			wifiManager.removeNetwork(NetworkId);
+			if (config.priority == Profile.COMMOTION_PRIORITY)
+				Log.i("StatusActivity", "Would remove network!");
+
+			wifiManager.disableNetwork(networkId);
+
+			if (config.priority == Profile.COMMOTION_PRIORITY)
+				wifiManager.removeNetwork(networkId);
+
 			wifiManager.saveConfiguration();
 		} else {
 			/*
 			 * start!
 			 */
+			int networkId = 0;
 			WifiConfiguration newWc = new WifiConfiguration();
 			Profile mProfile = new Profile(mProfiles.getActiveProfileName(), this);
 
@@ -117,9 +124,9 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 			}
 
 			Log.w("StatusActivity", "Attempting to start with configuration: " + newWc.toString());
-			NetworkId = wifiManager.addNetwork(newWc);
+			networkId = wifiManager.addNetwork(newWc);
 			wifiManager.saveConfiguration();
-			wifiManager.enableNetwork(NetworkId, true);
+			wifiManager.enableNetwork(networkId, true);
 		}
 	}
 	/*

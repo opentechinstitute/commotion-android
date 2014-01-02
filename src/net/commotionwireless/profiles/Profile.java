@@ -19,6 +19,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class Profile {
+
+	public static final int COMMOTION_PRIORITY = 100001;
+
 	private String mName;
 	private SharedPreferences mSharedPreferences;
 	
@@ -190,7 +193,7 @@ public class Profile {
 		 */
 		eConfig.setIpAssignmentType(IpAssignmentType.STATIC);
 
-		config.priority = 100000;
+		config.priority = COMMOTION_PRIORITY;
 		config.status = WifiConfiguration.Status.ENABLED;
 		config.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 		config.BSSID = mSharedPreferences.getString("lan_bssid", "02:CA:FF:EE:BA:BE");
