@@ -100,7 +100,7 @@ public class OlsrdService extends Service {
 		}
 	};
 	
-	private enum OlsrdState { STOPPED, RUNNING;
+	public enum OlsrdState { STOPPED, RUNNING;
 		int mTransitions[][] = {
 				/* STOPPED */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_RUNNING, /* DISCONNECTED */ TO_NOTHING, /* NEWPROFILE */ TO_NOTHING},
 				/* RUNNING */ {/* CONNECTING */ TO_NOTHING, /* CONNECTED */ TO_NOTHING, /* DISCONNECTED */ TO_STOPPED, /* NEWPROFILE */ TO_RESTART}
@@ -257,7 +257,7 @@ public class OlsrdService extends Service {
 		}
 
 		public void transition(int message) {
-			
+			Intent transitionNotificationIntent = new Intent("net.commotionwireless.meshtether.OLSRD_TRANSITION");
 			if (!(message>=OLSRDSERVICE_MESSAGE_MIN && message<=OLSRDSERVICE_MESSAGE_MAX)) {
 				Log.e("OlsrdControl", "Transition message not appropriate");
 				return;
@@ -272,6 +272,9 @@ public class OlsrdService extends Service {
 			mState = mState.preTransition(message, this);
 			oldState.transition(message, this);
 			Log.i("OlsrdControl", "Transitioned from " + oldState + " to " + mState + " on message " + message);
+
+			transitionNotificationIntent.putExtra("state", mState.ordinal());
+			sendBroadcast(transitionNotificationIntent);
 		}
 	}
 	

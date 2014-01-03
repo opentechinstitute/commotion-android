@@ -90,7 +90,7 @@
 
         <service
             android:name=".MeshService"
-            android:icon="@drawable/comlogo_sm_on"
+            android:icon="@drawable/comlogo_sm"
             android:label="Barnacle Wifi Tether" />
 
         <receiver

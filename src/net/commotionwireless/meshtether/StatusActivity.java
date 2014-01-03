@@ -25,12 +25,14 @@ import java.text.NumberFormat;
 import net.commotionwireless.olsrd.OlsrdService;
 import net.commotionwireless.profiles.Profile;
 import net.commotionwireless.profiles.Profiles;
-import net.commotionwireless.route.EWifiConfiguration;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -55,7 +57,7 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	private MeshTetherApp app;
 
 	private TabHost tabs;
-	private ImageButton onoff;
+	private ImageButton mOnOffButton;
 	private Spinner chooseProfile;
 	private AlertDialog.Builder profileDialogBuilder;
 	
@@ -74,6 +76,8 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	private final static String LINKS = "links";
 	private final static String INFO = "info";
 	private final static String ABOUT = "about";
+
+	private BroadcastReceiver mOlsrdStateReceiver;
 
 
 	static NumberFormat nf = NumberFormat.getInstance();
@@ -141,6 +145,9 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setProgressBarIndeterminate(true);
 		setContentView(R.layout.main);
+		
+		
+		mOnOffButton = (ImageButton)findViewById(R.id.onoff);
 
 		profileDialogBuilder = new AlertDialog.Builder(this);
 		profileDialogBuilder.setTitle(R.string.choose_profile);
@@ -153,7 +160,7 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 				.setIndicator(INFO, getResources().getDrawable(R.drawable.ic_tab_recent))
 				.setContent(new Intent(this, InfoActivity.class)));
 		tabs.addTab(tabs.newTabSpec(ABOUT)
-				.setIndicator(ABOUT, getResources().getDrawable(R.drawable.comlogo_sm_on))
+				.setIndicator(ABOUT, getResources().getDrawable(R.drawable.comlogo_sm))
 				.setContent(new Intent(this, AboutActivity.class)));
 		tabs.setOnTabChangedListener(new OnTabChangeListener() {
 			@Override
@@ -195,6 +202,8 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	protected void onPause() {
 		super.onPause();
 		paused = true;
+		unregisterReceiver(mOlsrdStateReceiver);
+		mOlsrdStateReceiver = null;
 	}
 	@Override
 	protected void onResume() {
@@ -214,6 +223,31 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 		/*
 		app.cleanUpNotifications();
 		*/
+		IntentFilter olsrdIntentFilter = new IntentFilter("net.commotionwireless.meshtether.OLSRD_TRANSITION");
+		registerReceiver(mOlsrdStateReceiver = new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				// TODO Auto-generated method stub
+				OlsrdService.OlsrdState olsrdRunningState = OlsrdService.OlsrdState.RUNNING;
+				int currentState = intent.getIntExtra("state", OlsrdService.OlsrdState.STOPPED.ordinal());
+				if (currentState == olsrdRunningState.ordinal()) {
+					/*
+					 * running!
+					 */
+					mOnOffButton.setImageResource(R.drawable.commotion_power_on_icon);
+				} else {
+					/* 
+					 * not running
+					 */
+					mOnOffButton.setImageResource(R.drawable.commotion_power_off_icon);
+				}
+			}
+			
+		}, olsrdIntentFilter);
+		if (app.getOlsrdService() != null && app.getOlsrdService().isOlsrdRunning()) {
+			mOnOffButton.setImageResource(R.drawable.commotion_power_on_icon);
+		}
 	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

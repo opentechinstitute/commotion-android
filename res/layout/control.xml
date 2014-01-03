@@ -39,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:src="@drawable/comlogo_sm_off"
+        android:src="@drawable/commotion_power_off_icon"
  />
 
 </LinearLayout>

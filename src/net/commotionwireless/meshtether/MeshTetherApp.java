@@ -98,7 +98,7 @@ public class MeshTetherApp extends android.app.Application {
 
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
-		notification = new Notification(R.drawable.comlogo_sm_on, getString(R.string.notify_running), 0);
+		notification = new Notification(R.drawable.comlogo_sm, getString(R.string.notify_running), 0);
 		notification.flags |= Notification.FLAG_ONGOING_EVENT;
 		notificationClientAdded = new Notification(android.R.drawable.stat_sys_warning,
 				getString(R.string.notify_client), 0);
