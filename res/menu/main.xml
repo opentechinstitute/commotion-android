@@ -29,11 +29,6 @@
         android:title="New Profile">
     </item>
     <item
-        android:id="@+id/menu_about"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="Help">
-    </item>
-    <item
         android:id="@+id/menu_share_debug"
         android:title="Share Debug">
     </item>

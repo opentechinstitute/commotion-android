@@ -292,9 +292,6 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 			intent.putExtra("profile_name", (profileName != null) ? profileName : mProfiles.getActiveProfileName());
 			this.startActivityForResult(intent, 0);
 			return true;
-		case R.id.menu_about:
-			showDialog(DLG_ABOUT);
-			return true;
 		case R.id.menu_share_debug:
 			zipAndShareFile(new File(NativeHelper.app_log, "olsrd.log"));
 			return true;
@@ -337,28 +334,6 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		// TODO: these should not create and remove dialogs, but restore and dismiss
-		if (id == DLG_ABOUT) {
-			return (new AlertDialog.Builder(this))
-			.setIcon(android.R.drawable.ic_dialog_info)
-			.setTitle(R.string.help_title)
-			.setMessage(R.string.help_message)
-					.setPositiveButton("Live Chat", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							Uri uri = Uri.parse(getString(R.string.ircUrl));
-							startActivity(new Intent(Intent.ACTION_VIEW, uri));
-						}})
-						.setNeutralButton("Website", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								Uri uri = Uri.parse(getString(R.string.websiteUrl));
-								startActivity(new Intent(Intent.ACTION_VIEW, uri));
-							}})
-							.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-								@Override
-								public void onClick(DialogInterface dialog, int which) { removeDialog(DLG_ABOUT); }})
-								.create();
-		}
 		if (id == DLG_ROOT) {
 			return (new AlertDialog.Builder(this))
 			.setIcon(android.R.drawable.ic_dialog_alert)
