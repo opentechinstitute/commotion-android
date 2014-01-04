@@ -88,11 +88,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".MeshService"
-            android:icon="@drawable/comlogo_sm"
-            android:label="Barnacle Wifi Tether" />
-
         <receiver
             android:name="net.commotionwireless.meshtether.ToggleReceiver"
             android:permission="net.commotionwireless.meshtether.CHANGE_STATE" >
