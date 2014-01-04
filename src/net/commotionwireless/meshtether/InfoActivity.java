@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.AddressNetmask;
 import net.commotionwireless.olsrinfo.datatypes.Config;
 import net.commotionwireless.olsrinfo.datatypes.HNA;
@@ -35,7 +36,9 @@ import net.commotionwireless.olsrinfo.datatypes.LinkQualityMultiplier;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
 import net.commotionwireless.olsrinfo.datatypes.Plugin;
 import net.commotionwireless.profiles.Profiles;
+import android.content.Context;
 import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -147,12 +150,13 @@ public class InfoActivity extends android.app.ListActivity {
 		HashMap<String, Object> data = new HashMap<String, Object>();
 		List<String> stringList = new ArrayList<String>();
 		Profiles profiles = new Profiles(this);
-
+		WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
 		stringList.add("active profile");
 		stringList.add(profiles.getActiveProfileName());
+		JsonInfo jsonInfo = new JsonInfo();
 
 		// then add wifi info
-		WifiInfo wi = app.wifiManager.getConnectionInfo();
+		WifiInfo wi = wifiManager.getConnectionInfo();
 		String wifiInfoString = "\n";
 		wifiInfoString += "SSID: " + wi.getSSID() + "\n";
 		wifiInfoString += "BSSID: " + wi.getBSSID() + "\n";
@@ -170,7 +174,7 @@ public class InfoActivity extends android.app.ListActivity {
 		stringList.add(wifiInfoString);// value
 
 		try {
-			OlsrDataDump dump = app.mJsonInfo.parseCommand("/config");
+			OlsrDataDump dump = jsonInfo.parseCommand("/config");
 			if (dump == null || dump.config == null
 					|| dump.config.unicastSourceIpAddress == null) {
 				stringList.add(getString(R.string.waiting_for_olsrd));
@@ -226,7 +230,7 @@ public class InfoActivity extends android.app.ListActivity {
 		}
 
 		try {
-			Collection<Plugin> plugins = app.mJsonInfo.plugins();
+			Collection<Plugin> plugins = jsonInfo.plugins();
 			for (Plugin p : plugins) {
 				String value = "\n";
 				if (p.port > 0 && p.port < 65536)

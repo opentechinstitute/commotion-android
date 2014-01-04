@@ -18,14 +18,7 @@
 
 package net.commotionwireless.meshtether;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import net.commotionwireless.olsrd.OlsrdService;
-import net.commotionwireless.olsrinfo.JsonInfo;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -33,7 +26,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -46,24 +38,11 @@ import android.widget.Toast;
 public class MeshTetherApp extends android.app.Application {
 	final static String TAG = "MeshTetherApp";
 
-	final static String FILE_INI    = "brncl.ini";
-
-	final static String ACTION_CLIENTS = "net.commotionwireless.meshtether.SHOW_CLIENTS";
-	final static String ACTION_TOGGLE = "net.commotionwireless.meshtether.TOGGLE_STATE";
-	final static String ACTION_CHECK = "net.commotionwireless.meshtether.CHECK_STATE";
-	final static String ACTION_CHANGED = "net.commotionwireless.meshtether.STATE_CHANGED";
-
-	final static int ERROR_ROOT = 1;
-	final static int ERROR_OTHER = 2;
-	final static int ERROR_SUPPLICANT = 3;
-
-	SharedPreferences prefs;
+	SharedPreferences mPrefs;
 	StatusActivity  statusActivity = null;
 	LinksActivity linksActivity = null;
 	InfoActivity infoActivity = null;
 	private Toast toast;
-
-	WifiManager wifiManager;
 
 	// notifications
 	private NotificationManager notificationManager;
@@ -75,11 +54,6 @@ public class MeshTetherApp extends android.app.Application {
 	final static int NOTIFY_ERROR = 2;
 
 	private OlsrdService mOlsrdService;
-
-	JsonInfo mJsonInfo = null;
-	Set<String> profiles;
-	Map<String, String> profileProperties;
-	String activeProfile;
 
 	public Util.StyledStringBuilder log = null; // == service.log, unless service is dead
 
@@ -94,7 +68,7 @@ public class MeshTetherApp extends android.app.Application {
 
 		// initialize default values if not done this in the past
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
 		notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		toast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
@@ -110,15 +84,6 @@ public class MeshTetherApp extends android.app.Application {
 				getString(R.string.notify_error),
 				PendingIntent.getActivity(this, 0, new Intent(this, StatusActivity.class), 0));
 		notificationError.flags = Notification.FLAG_AUTO_CANCEL;
-
-		activeProfile = getString(R.string.defaultprofile);
-
-		mJsonInfo = new JsonInfo();
-		profiles = new CopyOnWriteArraySet<String>();
-		profiles.add(activeProfile);
-		profileProperties = new HashMap<String, String>();
-
-		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
 		/*
 		 * We need to poke the service to get it going. 
@@ -151,20 +116,9 @@ public class MeshTetherApp extends android.app.Application {
 		infoActivity = a;
 	}
 
-	static void broadcastState(Context ctx, int state) {
-		Intent intent = new Intent(ACTION_CHANGED);
-		intent.putExtra("state", state);
-		ctx.sendBroadcast(intent, "net.commotionwireless.meshtether.ACCESS_STATE");
-	}
-
 	void updateStatus() {
 		if (statusActivity != null)
 			statusActivity.update();
-		// TODO: only broadcast state if changed or stale, using a sticky intent broadcast
-		/*
-		 * TODO FIXME
-		 */
-		broadcastState(this, 0);
 	}
 
 	void updateToast(String msg, boolean islong) {
@@ -173,99 +127,13 @@ public class MeshTetherApp extends android.app.Application {
 		toast.show();
 	}
 
-	/* void clientAdded(MeshService.ClientData cd) { */
 	void clientAdded(Object cd) {
-		if (prefs.getBoolean("client_notify", false)) {
-			notificationClientAdded.defaults = 0;
-			if (prefs.getBoolean("client_light", false)) {
-				notificationClientAdded.flags |= Notification.FLAG_SHOW_LIGHTS;
-				notificationClientAdded.ledARGB = 0xffffff00; // yellow
-				notificationClientAdded.ledOnMS = 500;
-				notificationClientAdded.ledOffMS = 1000;
-			} else {
-				notificationClientAdded.flags &= ~Notification.FLAG_SHOW_LIGHTS;
-			}
-			String sound = prefs.getString("client_sound", null);
-			if (sound == null) {
-				notificationClientAdded.defaults |= Notification.DEFAULT_SOUND;
-				// | Notification.DEFAULT_VIBRATE // requires permission
-			} else {
-				if (sound.length() > 0)
-					notificationClientAdded.sound = Uri.parse(sound);
-			}
-			Intent notificationIntent = new Intent(this, StatusActivity.class);
-			notificationIntent.setAction(ACTION_CLIENTS);
-			PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-			notificationClientAdded.setLatestEventInfo(this, getString(R.string.app_name),
-					getString(R.string.notify_client) + " " + cd.toString(), contentIntent);
-			/*
-			 * Veracode thinks that we need permission to make this call.
-			 */
-			notificationManager.notify(NOTIFY_CLIENT, notificationClientAdded);
-		}
-
 		if (linksActivity != null)
 			linksActivity.update();
 	}
 
 	void cancelClientNotify() {
 		notificationManager.cancel(NOTIFY_CLIENT);
-	}
-
-	void failed(int err) {
-		if (statusActivity != null) {
-			if (err == ERROR_ROOT) {
-				statusActivity.showDialog(StatusActivity.DLG_ROOT);
-			} else if (err == ERROR_SUPPLICANT) {
-				statusActivity.showDialog(StatusActivity.DLG_SUPPLICANT);
-			} else if (err == ERROR_OTHER) {
-				statusActivity.getTabHost().setCurrentTab(0); // show links
-				statusActivity.showDialog(StatusActivity.DLG_ERROR);
-			}
-		}
-		if ((statusActivity == null) || !statusActivity.hasWindowFocus()) {
-			Log.d(TAG, "notifying error");
-			/*
-			 * Veracode thinks that we need permission to make this call.
-			 */
-			notificationManager.notify(NOTIFY_ERROR, notificationError);
-		}
-	}
-
-	/** find default route interface */
-	protected boolean findIfWan() {
-		// TODO move to Util.java and actually detect if there is a GSM/CDMA net connection
-		String if_wan = prefs.getString(getString(R.string.if_wan), "");
-		if (if_wan.length() != 0) return true;
-
-		// must find mobile data interface
-		ArrayList<String> routes = Util.readLinesFromFile("/proc/net/route");
-		for (int i = 1; i < routes.size(); ++i) {
-			String line = routes.get(i);
-			String[] tokens = line.split("\\s+");
-			if (tokens[1].equals("00000000")) {
-				// this is our default route
-				if_wan = tokens[0];
-				break;
-			}
-		}
-		if (if_wan.length() != 0) {
-			updateToast(getString(R.string.wanok) + if_wan, false);
-			prefs.edit().putString(getString(R.string.if_wan), if_wan).commit();
-			return true;
-		}
-		// it might be okay in local mode
-		return prefs.getBoolean("wan_nowait", false);
-	}
-
-	protected void foundIfLan(String found_if_lan) {
-		String if_lan = prefs.getString(getString(R.string.if_lan), "");
-		if (if_lan.length() == 0) {
-			updateToast(getString(R.string.lanok) + found_if_lan, false);
-		}
-		// NOTE: always use the name found by the process
-		if_lan = found_if_lan;
-		prefs.edit().putString(getString(R.string.if_lan), if_lan).commit();
 	}
 
 	void showProgressMessage(int resId) {

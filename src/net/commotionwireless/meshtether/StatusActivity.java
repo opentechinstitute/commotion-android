@@ -68,11 +68,6 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 	private TextView textDownloadRate;
 	private TextView textUploadRate;
 
-	final static int DLG_ABOUT = 0;
-	final static int DLG_ROOT = 1;
-	final static int DLG_ERROR = 2;
-	final static int DLG_SUPPLICANT = 3;
-
 	private final static String LINKS = "links";
 	private final static String INFO = "info";
 	private final static String ABOUT = "about";
@@ -333,70 +328,7 @@ public class StatusActivity extends android.app.TabActivity implements OnItemSel
 
 	@Override
 	protected Dialog onCreateDialog(int id) {
-		// TODO: these should not create and remove dialogs, but restore and dismiss
-		if (id == DLG_ROOT) {
-			return (new AlertDialog.Builder(this))
-			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setTitle("Root Access")
-			.setMessage("MeshTether requires 'su' to access the hardware! Please, make sure you have root access.")
-			.setPositiveButton("Help", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					Uri uri = Uri.parse(getString(R.string.rootUrl));
-					startActivity(new Intent(Intent.ACTION_VIEW, uri));
-				}})
-				.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) { removeDialog(DLG_ROOT); }})
-					.create();
-		}
-		if (id == DLG_ERROR) {
-			return (new AlertDialog.Builder(this))
-			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setTitle("Error")
-			.setMessage("Unexpected error occured! Check the troubleshooting guide for the error printed in the log tab.")
-			.setPositiveButton("Help", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					Uri uri = Uri.parse(getString(R.string.fixUrl));
-					startActivity(new Intent(Intent.ACTION_VIEW, uri));
-				}})
-				.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) { removeDialog(DLG_ERROR); }})
-					.create();
-		}
-		if (id == DLG_SUPPLICANT) {
-			return (new AlertDialog.Builder(this))
-			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setTitle("Supplicant not available")
-			.setMessage("MeshTether had trouble starting wpa_supplicant. Try again but set 'Skip wpa_supplicant' in settings.")
-			.setPositiveButton("Do it now!", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					app.prefs.edit().putBoolean(getString(R.string.lan_wext), true).commit();
-					app.updateToast("Settings updated, try again...", true);
-				}})
-				.setNeutralButton("More info", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						Uri uri = Uri.parse(getString(R.string.wikiUrl));
-						startActivity(new Intent(Intent.ACTION_VIEW, uri));
-					}})
-					.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) { removeDialog(DLG_ROOT); }})
-						.create();
-		}
 		return null;
-	}
-
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		if (MeshTetherApp.ACTION_CLIENTS.equals(intent.getAction())) {
-			getTabHost().setCurrentTab(0); // show links
-		}
 	}
 
 	static String formatRate(long v) {

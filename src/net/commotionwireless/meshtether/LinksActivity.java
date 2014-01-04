@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import net.commotionwireless.olsrd.ClientData;
 import net.commotionwireless.olsrd.OlsrdService;
+import net.commotionwireless.olsrinfo.JsonInfo;
 import net.commotionwireless.olsrinfo.datatypes.HNA;
 import net.commotionwireless.olsrinfo.datatypes.Link;
 import net.commotionwireless.olsrinfo.datatypes.OlsrDataDump;
@@ -235,7 +236,8 @@ public class LinksActivity extends android.app.ListActivity {
 
 					OlsrDataDump dump = null;
 					try {
-						dump = app.mJsonInfo.parseCommand("/links/hna");
+						JsonInfo jsonInfo = new JsonInfo();
+						dump = jsonInfo.parseCommand("/links/hna");
 						for (Link l : dump.links) {
 							ClientData c = new ClientData(l.remoteIP, l.linkQuality,
 									l.neighborLinkQuality, l.linkCost, l.validityTime);
